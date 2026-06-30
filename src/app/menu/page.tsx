@@ -1,9 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect, useMemo } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -21,83 +20,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Plus, UtensilsCrossed, Inbox, Loader2, Clock, Sparkles, Edit, Trash2, MoreVertical } from "lucide-react";
+import { Search, Plus, UtensilsCrossed, Loader2, Clock, Edit, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
-
-interface MenuCategory {
-  id: string;
-  name: string;
-  sortOrder: number;
-}
-
-interface MenuItem {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  categoryId: string;
-  category: { id: string; name: string };
-  isAvailable: boolean;
-  preparationTime: number;
-  image?: string;
-}
+import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
+import { fetchMenu, addItem, updateItem as updateItemAction, removeItem, optimisticToggleAvailability } from "@/lib/store/features/menuSlice";
+import type { MenuItem, MenuCategory } from "@/lib/store/features/menuSlice";
 
 export default function MenuPage() {
+  const dispatch = useAppDispatch();
+  const { items, categories, loading } = useAppSelector(s => s.menu);
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role || "CLIENT";
   const canAddItem = ["ADMIN", "WAITER", "KITCHEN"].includes(userRole);
   const canEditDelete = userRole === "ADMIN";
   const [searchQuery, setSearchQuery] = useState("");
-  const [items, setItems] = useState<MenuItem[]>([]);
-  const [categories, setCategories] = useState<MenuCategory[]>([]);
-  const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
 
-  const fetchMenu = useCallback(() => {
-    fetch("/api/menu")
-      .then(r => r.json())
-      .then(d => {
-        if (d.success) {
-          setItems(d.data.items);
-          setCategories(d.data.categories);
-        }
-      })
-      .catch(() => {});
-  }, []);
+  useEffect(() => { dispatch(fetchMenu()); }, [dispatch]);
 
   const handleDelete = async (itemId: string) => {
     if (!confirm("Are you sure you want to delete this item?")) return;
-    const prev = items;
-    setItems(p => p.filter(i => i.id !== itemId));
+    const prev = items.find(i => i.id === itemId);
+    if (!prev) return;
+    dispatch(removeItem(itemId));
     try {
       const res = await fetch(`/api/menu/items/${itemId}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         toast.success("Menu item deleted");
       } else {
-        setItems(prev);
+        dispatch(addItem(prev));
         toast.error(data.error || "Failed to delete item");
       }
     } catch {
-      setItems(prev);
+      dispatch(addItem(prev));
       toast.error("Failed to delete item");
     }
   };
 
-  useEffect(() => { fetchMenu(); }, []);
-
-  const filtered = useMemo(() => 
+  const filtered = useMemo(() =>
     items.filter(i =>
       i.name.toLowerCase().includes(searchQuery.toLowerCase())
     ),
     [items, searchQuery]
   );
 
-  const grouped = useMemo(() => 
+  const grouped = useMemo(() =>
     categories
       .filter(c => filtered.some(i => i.categoryId === c.id))
       .sort((a, b) => a.sortOrder - b.sortOrder),
@@ -285,6 +257,8 @@ export default function MenuPage() {
                               type="button"
                               onClick={async (e) => {
                                 e.stopPropagation();
+                                const prev = { ...item };
+                                dispatch(optimisticToggleAvailability(item.id));
                                 try {
                                   const res = await fetch(`/api/menu/items/${item.id}`, {
                                     method: "PATCH",
@@ -293,10 +267,11 @@ export default function MenuPage() {
                                   });
                                   const d = await res.json();
                                   if (d.success) {
-                                    setItems(p => p.map(i => i.id === item.id ? { ...i, isAvailable: !i.isAvailable } : i));
                                     toast.success(item.isAvailable ? "Marked unavailable" : "Marked available");
                                   }
-                                } catch {}
+                                } catch {
+                                  dispatch(updateItemAction(prev));
+                                }
                               }}
                               className={`text-xs font-medium px-2 py-0.5 rounded-full border transition-colors ${
                                 item.isAvailable
@@ -325,31 +300,23 @@ export default function MenuPage() {
         </div>
       )}
 
-      <AddItemDialog 
-        open={dialogOpen} 
-        onOpenChange={setDialogOpen} 
-        categories={categories} 
+      <AddItemDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        categories={categories}
         editingItem={editingItem}
-        onCreated={(item) => {
-          setItems(p => [...p, item]);
-        }}
-        onUpdated={(item) => {
-          setItems(p => p.map(i => i.id === item.id ? item : i));
-          setEditingItem(null);
-        }}
       />
     </div>
   );
 }
 
-function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem, onUpdated }: {
+function AddItemDialog({ open, onOpenChange, categories, editingItem }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   categories: MenuCategory[];
-  onCreated: (item: MenuItem) => void;
   editingItem: MenuItem | null;
-  onUpdated: (item: MenuItem) => void;
 }) {
+  const dispatch = useAppDispatch();
   const [submitting, setSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -358,7 +325,6 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
   const [prepTime, setPrepTime] = useState("15");
   const [image, setImage] = useState<string>("");
 
-  // Reset form when editingItem changes or dialog opens
   useEffect(() => {
     if (editingItem) {
       setName(editingItem.name);
@@ -368,12 +334,7 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
       setPrepTime(editingItem.preparationTime.toString());
       setImage(editingItem.image || "");
     } else {
-      setName("");
-      setDescription("");
-      setPrice("");
-      setCategoryId("");
-      setPrepTime("15");
-      setImage("");
+      setName(""); setDescription(""); setPrice(""); setCategoryId(""); setPrepTime("15"); setImage("");
     }
   }, [editingItem, open]);
 
@@ -381,9 +342,7 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => {
-      setImage(ev.target?.result as string);
-    };
+    reader.onload = (ev) => setImage(ev.target?.result as string);
     reader.readAsDataURL(file);
   };
 
@@ -394,7 +353,6 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
     try {
       const url = editingItem ? `/api/menu/items/${editingItem.id}` : "/api/menu";
       const method = editingItem ? "PATCH" : "POST";
-      
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
@@ -412,11 +370,10 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
         toast.success(editingItem ? "Menu item updated" : "Menu item added");
         onOpenChange(false);
         if (editingItem) {
-          onUpdated(data.data);
+          dispatch(updateItemAction(data.data));
         } else {
-          onCreated(data.data);
+          dispatch(addItem(data.data));
         }
-        setName(""); setDescription(""); setPrice(""); setCategoryId(""); setPrepTime("15");
       } else {
         toast.error(data.error || "Failed to save item");
       }
@@ -430,18 +387,8 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
       onOpenChange(isOpen);
-      if (!isOpen) {
-        // Clear editing item when dialog closes
-        setTimeout(() => {
-          if (!editingItem) {
-            setName("");
-            setDescription("");
-            setPrice("");
-            setCategoryId("");
-            setPrepTime("15");
-            setImage("");
-          }
-        }, 100);
+      if (!isOpen && !editingItem) {
+        setTimeout(() => { setName(""); setDescription(""); setPrice(""); setCategoryId(""); setPrepTime("15"); setImage(""); }, 100);
       }
     }}>
       <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
@@ -453,21 +400,12 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
           <div className="space-y-5 py-4">
             <div className="grid gap-2">
               <Label htmlFor="name" className="text-sm font-medium">Name *</Label>
-              <Input
-                id="name"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                placeholder="e.g. Grilled Salmon"
-                required
-                className="h-11"
-              />
+              <Input id="name" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Grilled Salmon" required className="h-11" />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="desc" className="text-sm font-medium">Description</Label>
               <textarea
-                id="desc"
-                value={description}
-                onChange={e => setDescription(e.target.value)}
+                id="desc" value={description} onChange={e => setDescription(e.target.value)}
                 className="flex min-h-[80px] w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
                 placeholder="Describe your dish..."
               />
@@ -475,28 +413,11 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="price" className="text-sm font-medium">Price *</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={price}
-                  onChange={e => setPrice(e.target.value)}
-                  placeholder="0.00"
-                  required
-                  className="h-11"
-                />
+                <Input id="price" type="number" step="0.01" min="0" value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" required className="h-11" />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="prep" className="text-sm font-medium">Prep Time (min)</Label>
-                <Input
-                  id="prep"
-                  type="number"
-                  min="1"
-                  value={prepTime}
-                  onChange={e => setPrepTime(e.target.value)}
-                  className="h-11"
-                />
+                <Input id="prep" type="number" min="1" value={prepTime} onChange={e => setPrepTime(e.target.value)} className="h-11" />
               </div>
             </div>
             <div className="grid gap-2">
@@ -515,13 +436,7 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
             <div className="grid gap-2">
               <Label className="text-sm font-medium">Photo</Label>
               <div className="flex items-center gap-3">
-                <Input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="h-11 file:h-full file:border-0 file:bg-muted file:px-3 file:mr-3 file:text-sm file:font-medium hover:file:bg-muted/80"
-                />
+                <Input id="image" type="file" accept="image/*" onChange={handleImageUpload} className="h-11 file:h-full file:border-0 file:bg-muted file:px-3 file:mr-3 file:text-sm file:font-medium hover:file:bg-muted/80" />
               </div>
               {image && (
                 <div className="relative w-full h-28 overflow-hidden rounded-xl border bg-muted mt-1">
@@ -534,28 +449,9 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
             </div>
           </div>
           <DialogFooter className="mt-6 gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              className="h-11"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              variant="premium"
-              disabled={submitting}
-              className="h-11"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Adding...
-                </>
-              ) : (
-                "Add Item"
-              )}
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11">Cancel</Button>
+            <Button type="submit" variant="premium" disabled={submitting} className="h-11">
+              {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Adding...</> : "Add Item"}
             </Button>
           </DialogFooter>
         </form>

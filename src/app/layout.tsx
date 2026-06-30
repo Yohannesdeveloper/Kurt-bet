@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/auth-provider";
 import { QueryProvider } from "@/components/query-provider";
+import { ReduxProvider } from "@/lib/store/provider";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
@@ -54,7 +55,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <QueryProvider>
-              {children}
+              <ReduxProvider>
+                {children}
+              </ReduxProvider>
               <Toaster
                 position="top-right"
                 toastOptions={{

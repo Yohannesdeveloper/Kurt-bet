@@ -58,7 +58,6 @@ export default function MenuPage() {
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
 
   const fetchMenu = useCallback(() => {
-    setLoading(true);
     fetch("/api/menu")
       .then(r => r.json())
       .then(d => {
@@ -67,25 +66,24 @@ export default function MenuPage() {
           setCategories(d.data.categories);
         }
       })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .catch(() => {});
   }, []);
 
   const handleDelete = async (itemId: string) => {
     if (!confirm("Are you sure you want to delete this item?")) return;
-    
+    const prev = items;
+    setItems(p => p.filter(i => i.id !== itemId));
     try {
-      const res = await fetch(`/api/menu/items/${itemId}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(`/api/menu/items/${itemId}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
         toast.success("Menu item deleted");
-        fetchMenu();
       } else {
+        setItems(prev);
         toast.error(data.error || "Failed to delete item");
       }
     } catch {
+      setItems(prev);
       toast.error("Failed to delete item");
     }
   };
@@ -283,23 +281,22 @@ export default function MenuPage() {
                       <CardContent className="px-4 lg:px-5 py-3">
                         {canAddItem && (
                           <div className="mb-2">
-                            <button
+                              <button
                               type="button"
-                              onClick={(e) => {
+                              onClick={async (e) => {
                                 e.stopPropagation();
-                                fetch(`/api/menu/items/${item.id}`, {
-                                  method: "PATCH",
-                                  headers: { "Content-Type": "application/json" },
-                                  body: JSON.stringify({ isAvailable: !item.isAvailable }),
-                                })
-                                  .then(r => r.json())
-                                  .then(d => {
-                                    if (d.success) {
-                                      toast.success(item.isAvailable ? "Marked unavailable" : "Marked available");
-                                      fetchMenu();
-                                    }
-                                  })
-                                  .catch(() => toast.error("Failed to toggle availability"));
+                                try {
+                                  const res = await fetch(`/api/menu/items/${item.id}`, {
+                                    method: "PATCH",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ isAvailable: !item.isAvailable }),
+                                  });
+                                  const d = await res.json();
+                                  if (d.success) {
+                                    setItems(p => p.map(i => i.id === item.id ? { ...i, isAvailable: !i.isAvailable } : i));
+                                    toast.success(item.isAvailable ? "Marked unavailable" : "Marked available");
+                                  }
+                                } catch {}
                               }}
                               className={`text-xs font-medium px-2 py-0.5 rounded-full border transition-colors ${
                                 item.isAvailable
@@ -332,24 +329,26 @@ export default function MenuPage() {
         open={dialogOpen} 
         onOpenChange={setDialogOpen} 
         categories={categories} 
-        onCreated={fetchMenu} 
         editingItem={editingItem}
-        onEditComplete={() => {
+        onCreated={(item) => {
+          setItems(p => [...p, item]);
+        }}
+        onUpdated={(item) => {
+          setItems(p => p.map(i => i.id === item.id ? item : i));
           setEditingItem(null);
-          fetchMenu();
         }}
       />
     </div>
   );
 }
 
-function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem, onEditComplete }: {
+function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem, onUpdated }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   categories: MenuCategory[];
-  onCreated: () => void;
+  onCreated: (item: MenuItem) => void;
   editingItem: MenuItem | null;
-  onEditComplete: () => void;
+  onUpdated: (item: MenuItem) => void;
 }) {
   const [submitting, setSubmitting] = useState(false);
   const [name, setName] = useState("");
@@ -413,9 +412,9 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
         toast.success(editingItem ? "Menu item updated" : "Menu item added");
         onOpenChange(false);
         if (editingItem) {
-          onEditComplete();
+          onUpdated(data.data);
         } else {
-          onCreated();
+          onCreated(data.data);
         }
         setName(""); setDescription(""); setPrice(""); setCategoryId(""); setPrepTime("15");
       } else {

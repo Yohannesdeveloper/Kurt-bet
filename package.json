@@ -15,7 +15,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "npx ts-node -T prisma/seed.ts",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "vercel-build": "npx prisma generate && next build"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -60,7 +60,7 @@
     "next": "^14.1.4",
     "next-auth": "^4.24.7",
     "next-themes": "^0.3.0",
-    "nodemailer": "^6.9.12",
+    "nodemailer": "^7.0.7",
     "nuqs": "^1.15.0",
     "pdfkit": "^0.14.0",
     "pino": "^8.19.0",

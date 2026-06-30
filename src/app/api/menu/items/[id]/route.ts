@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions, requireOwner } from "@/lib/auth";
 import { readDemoJSONSync, writeDemoJSONSync } from "@/lib/demo-storage";
-import { cacheDel } from "@/lib/redis";
 
 function readDemoItems(): any[] { return readDemoJSONSync(".demo-menu-items.json"); }
 function writeDemoItems(items: any[]) { writeDemoJSONSync(".demo-menu-items.json", items); }
@@ -34,7 +33,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       include: { category: true, variants: true, extras: true },
     });
 
-    await cacheDel("menu:data");
     return NextResponse.json({ success: true, data: item });
   } catch (error) {
     console.error("Menu item update error (trying demo):", error);
@@ -48,7 +46,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       items.push(override);
     }
     writeDemoItems(items);
-    await cacheDel("menu:data");
     return NextResponse.json({ success: true, data: override });
   }
 }
@@ -64,7 +61,6 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
       data: { isActive: false },
     });
 
-    await cacheDel("menu:data");
     return NextResponse.json({ success: true, data: { id: params.id } });
   } catch (error) {
     console.error("Menu item delete error, trying demo:", error);
@@ -80,7 +76,6 @@ export async function DELETE(req: NextRequest, { params }: { params: { id: strin
         writeDeletedIds(deleted);
       }
     }
-    await cacheDel("menu:data");
     return NextResponse.json({ success: true, data: { id: params.id } });
   }
 }

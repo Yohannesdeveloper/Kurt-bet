@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
-import { authOptions, requireOwner } from "@/lib/auth";
 import { readDemoJSONSync, writeDemoJSONSync } from "@/lib/demo-storage";
 
 function readDemoItems(): any[] {
@@ -114,57 +111,31 @@ export async function GET(_req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   let body: any;
+  let demoItem: any;
+
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
-
     body = await req.json();
-    const restaurantId = (session.user as { restaurantId?: string }).restaurantId;
-    if (!restaurantId) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    if (!requireOwner(session)) return NextResponse.json({ success: false, error: "Admin access required" }, { status: 403 });
-
-    const item = await prisma.menuItem.create({
-      data: {
-        restaurantId,
-        categoryId: body.categoryId,
-        name: body.name,
-        description: body.description,
-        price: body.price,
-        cost: body.cost || 0,
-        image: body.image,
-        isActive: true,
-        isAvailable: body.isAvailable ?? true,
-        preparationTime: body.preparationTime || 15,
-        sortOrder: body.sortOrder || 0,
-      },
-      include: {
-        category: true,
-        variants: true,
-        extras: true,
-      },
-    });
-
-    return NextResponse.json({ success: true, data: item }, { status: 201 });
-  } catch (error) {
-    console.error("Menu create error (demo mode):", error);
-    const demoItem = {
-      id: `demo-mitem-${Date.now()}`,
-      name: body.name,
-      price: parseFloat(body.price) || 0,
-      description: body.description || "",
-      image: body.image || "",
-      categoryId: body.categoryId,
-      category: { id: body.categoryId, name: "" },
-      isAvailable: true,
-      preparationTime: body.preparationTime || 15,
-      variants: [],
-      extras: [],
-    };
-    const persisted = readDemoItems();
-    persisted.push(demoItem);
-    writeDemoItems(persisted);
-    return NextResponse.json({ success: true, data: demoItem }, { status: 201 });
+  } catch {
+    return NextResponse.json({ success: false, error: "Invalid body" }, { status: 400 });
   }
+
+  demoItem = {
+    id: `demo-mitem-${Date.now()}`,
+    name: body.name,
+    price: parseFloat(body.price) || 0,
+    description: body.description || "",
+    image: body.image || "",
+    categoryId: body.categoryId,
+    category: { id: body.categoryId, name: "" },
+    isAvailable: true,
+    preparationTime: body.preparationTime || 15,
+    variants: [],
+    extras: [],
+  };
+
+  const persisted = readDemoItems();
+  persisted.push(demoItem);
+  writeDemoItems(persisted);
+
+  return NextResponse.json({ success: true, data: demoItem }, { status: 201 });
 }

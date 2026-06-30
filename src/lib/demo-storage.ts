@@ -36,6 +36,10 @@ export async function writeDemoJSON(filename: string, data: any) {
 export async function delDemoJSON(filename: string) {
   const rk = redisKey(filename);
   await cacheDel(rk);
+  try {
+    const p = path.join(BASE, filename);
+    await fs.unlink(p);
+  } catch {}
 }
 
 export function readDemoJSONSync<T = any>(filename: string): T[] {

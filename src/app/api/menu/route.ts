@@ -97,8 +97,19 @@ export async function GET(_req: NextRequest) {
     const persistedItems = await readDemoItems();
     if (persistedItems.length === 0) {
       await writeDemoItems(demoItems.map((di: any) => ({ ...di })));
+    } else {
+      const hcIndex = new Map(demoItems.map((di: any) => [di.id, di]));
+      const hasStaleHardcoded = persistedItems.some((pi: any) => {
+        const hc = hcIndex.get(pi.id);
+        return hc && (hc.price !== pi.price || hc.name !== pi.name);
+      });
+      if (hasStaleHardcoded) {
+        const userItems = persistedItems.filter((pi: any) => !hcIndex.has(pi.id));
+        await writeDemoItems([...demoItems.map((di: any) => ({ ...di })), ...userItems]);
+      }
     }
-    const persistedWithCategory = persistedItems.map((pi: any) => ({
+    const refreshed = await readDemoItems();
+    const persistedWithCategory = refreshed.map((pi: any) => ({
       ...pi,
       category: pi.category || { id: pi.categoryId, name: demoCategories.find((c: any) => c.id === pi.categoryId)?.name || "" },
     }));

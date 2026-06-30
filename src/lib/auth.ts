@@ -67,16 +67,26 @@ export const authOptions: NextAuthOptions = {
             image: user.avatar,
           };
         } catch {
-          if (credentials.email === "admin@restaurant.com" && credentials.password === "admin123") {
+          const DEMO_USERS: Record<string, { name: string; role: string; firstName: string; lastName: string }> = {
+            "admin@restaurant.com":  { name: "Admin User",    role: "ADMIN",  firstName: "Admin",  lastName: "User" },
+            "waiter@restaurant.com": { name: "Meron Tefera",  role: "WAITER", firstName: "Meron",  lastName: "Tefera" },
+            "kitchen@restaurant.com":{ name: "Bereket Hailu", role: "KITCHEN",firstName: "Bereket",lastName: "Hailu" },
+            "client@restaurant.com": { name: "Client User",   role: "CLIENT", firstName: "Client", lastName: "User" },
+          };
+          const demo = DEMO_USERS[credentials.email];
+          const passwordOk = credentials.email === "admin@restaurant.com"
+            ? (credentials.password === "admin123" || credentials.password === "demo123")
+            : credentials.password === "demo123";
+          if (demo && passwordOk) {
             return {
-              id: "demo-user",
-              email: "admin@restaurant.com",
-              name: "Admin User",
-              role: "ADMIN",
+              id: `demo-${demo.role.toLowerCase()}`,
+              email: credentials.email,
+              name: demo.name,
+              role: demo.role,
               restaurantId: "demo-restaurant",
               branchId: null,
-              firstName: "Admin",
-              lastName: "User",
+              firstName: demo.firstName,
+              lastName: demo.lastName,
               image: null,
             };
           }
@@ -124,7 +134,7 @@ export type AuthUser = {
 };
 
 export function requireOwner(session: any): boolean {
-  return session?.user?.role === "ADMIN" && session?.user?.email === "admin@restaurant.com";
+  return session?.user?.role === "ADMIN";
 }
 
 export function hasPermission(role: string, requiredRole: string): boolean {

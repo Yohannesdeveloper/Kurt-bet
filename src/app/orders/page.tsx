@@ -36,10 +36,16 @@ const statusStyles: Record<string, string> = {
   DELAYED: "bg-red-100 text-red-700",
 };
 
+const approvedBadge = (approved: boolean) =>
+  approved
+    ? "bg-emerald-100 text-emerald-700"
+    : "bg-yellow-100 text-yellow-700";
+
 interface Order {
   id: string;
   orderNumber: number;
   status: string;
+  approved: boolean;
   type: string;
   guestCount: number;
   total: number;
@@ -76,6 +82,7 @@ export default function OrdersPage() {
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role || "CLIENT";
   const isAdmin = userRole === "ADMIN";
+  const canApprove = userRole === "ADMIN" || userRole === "WAITER";
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -85,7 +92,10 @@ export default function OrdersPage() {
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/orders?status=${activeTab}`);
+      const statusParam = activeTab === "pending" ? "all" : activeTab;
+      const approvedParam = activeTab === "pending" ? "false" : "";
+      const url = `/api/orders?status=${statusParam}${approvedParam ? `&approved=${approvedParam}` : ""}`;
+      const res = await fetch(url);
       const data = await res.json();
       if (data.success) setOrders(data.data);
     } catch {
@@ -96,6 +106,24 @@ export default function OrdersPage() {
   }, [activeTab]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
+
+  const handleApprove = async (orderId: string, approve: boolean) => {
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, approved: approve } : o));
+    try {
+      const res = await fetch(`/api/orders/${orderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ approved: approve }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(approve ? "Order approved and sent to kitchen" : "Order unapproved");
+        fetchOrders();
+      }
+    } catch {
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, approved: !approve } : o));
+    }
+  };
 
   const filtered = orders.filter(o =>
     o.orderNumber.toString().includes(searchQuery) ||
@@ -143,6 +171,7 @@ export default function OrdersPage() {
           <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="bg-muted/50 p-1">
               <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">All Orders</TabsTrigger>
+              <TabsTrigger value="pending" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Pending Approval</TabsTrigger>
               <TabsTrigger value="NEW" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">New</TabsTrigger>
               <TabsTrigger value="PREPARING" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Preparing</TabsTrigger>
               <TabsTrigger value="READY" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Ready</TabsTrigger>
@@ -194,6 +223,9 @@ export default function OrdersPage() {
                             <Badge className={statusStyles[order.status] || ""}>
                               {order.status}
                             </Badge>
+                            <Badge className={approvedBadge(order.approved)}>
+                              {order.approved ? "Approved" : "Pending"}
+                            </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
                             {order.type} · {order.guestCount} {order.guestCount === 1 ? "guest" : "guests"}
@@ -205,12 +237,24 @@ export default function OrdersPage() {
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-bold text-lg">{formatCurrency(order.total)}</p>
-                        <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end">
-                          <Clock className="h-3 w-3" />
-                          {new Date(order.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </p>
+                      <div className="text-right flex items-center gap-3">
+                        <div>
+                          <p className="font-bold text-lg">{formatCurrency(order.total)}</p>
+                          <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end">
+                            <Clock className="h-3 w-3" />
+                            {new Date(order.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          </p>
+                        </div>
+                        {canApprove && (
+                          <Button
+                            variant={order.approved ? "outline" : "default"}
+                            size="sm"
+                            onClick={(e) => { e.stopPropagation(); handleApprove(order.id, !order.approved); }}
+                            className={`h-8 text-xs ${order.approved ? "" : "bg-emerald-600 hover:bg-emerald-700 text-white"}`}
+                          >
+                            {order.approved ? "Unapprove" : "Approve"}
+                          </Button>
+                        )}
                       </div>
                     </motion.div>
                   ))}

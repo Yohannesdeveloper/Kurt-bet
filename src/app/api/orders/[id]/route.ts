@@ -40,7 +40,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return NextResponse.json({ success: true, data: order });
   } catch (error) {
     console.error("Order fetch error:", error);
-    const demoOrders = await readDemoJSON<any>(DEMO_FILE);
+    const demoOrders = (await readDemoJSON<any>(DEMO_FILE)).map((o: any) => ({ ...o, approved: o.approved ?? false }));
     const demo = demoOrders.find((o: any) => o.id === params.id);
     if (!demo) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
     return NextResponse.json({ success: true, data: demo });
@@ -73,7 +73,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   } catch (error) {
     console.error("Order update error (demo mode):", error);
     if (!body) return NextResponse.json({ success: false, error: "Invalid request" }, { status: 400 });
-    const demoOrders = await readDemoJSON<any>(DEMO_FILE);
+    const demoOrders = (await readDemoJSON<any>(DEMO_FILE)).map((o: any) => ({ ...o, approved: o.approved ?? false }));
     const idx = demoOrders.findIndex((o: any) => o.id === params.id);
     if (idx === -1) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
     demoOrders[idx] = { ...demoOrders[idx], ...body, updatedAt: new Date().toISOString() };

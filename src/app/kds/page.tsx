@@ -139,7 +139,7 @@ export default function KDSPage() {
   const [loading, setLoading] = useState(true);
 
   const fetchOrders = useCallback(() => {
-    fetch("/api/orders?status=NEW,PREPARING,READY,SERVED")
+    fetch("/api/orders?status=NEW,PREPARING,READY,SERVED&approved=true")
       .then(r => r.json())
       .then(d => {
         if (d.success) setOrders(d.data);

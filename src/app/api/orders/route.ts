@@ -8,6 +8,7 @@ const DEMO_FILE = ".demo-orders.json";
 
 export async function GET(req: NextRequest) {
   let status: string | null = null;
+  let approvedFilter: string | null = null;
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
@@ -17,6 +18,7 @@ export async function GET(req: NextRequest) {
     const restaurantId = (session.user as { restaurantId?: string }).restaurantId;
     const searchParams = req.nextUrl.searchParams;
     status = searchParams.get("status");
+    approvedFilter = searchParams.get("approved");
     const limit = parseInt(searchParams.get("limit") || "50");
     const page = parseInt(searchParams.get("page") || "1");
 
@@ -28,6 +30,8 @@ export async function GET(req: NextRequest) {
         where.status = status;
       }
     }
+    if (approvedFilter === "true") where.approved = true;
+    if (approvedFilter === "false") where.approved = false;
 
     const [orders, total] = await Promise.all([
       prisma.order.findMany({
@@ -62,11 +66,13 @@ export async function GET(req: NextRequest) {
     });
   } catch (error) {
     console.error("Orders fetch error (demo mode):", error);
-    const demoOrders = await readDemoJSON<any>(DEMO_FILE);
+    const demoOrders = (await readDemoJSON<any>(DEMO_FILE)).map((o: any) => ({ ...o, approved: o.approved ?? false }));
     const statusFilter = status;
-    const filtered = statusFilter && statusFilter !== "all"
-      ? demoOrders.filter((o: any) => statusFilter.split(",").includes(o.status))
-      : demoOrders;
+    const filtered = demoOrders.filter((o: any) => {
+      const matchesStatus = !statusFilter || statusFilter === "all" || statusFilter.split(",").includes(o.status);
+      const matchesApproved = approvedFilter === null || o.approved === (approvedFilter === "true");
+      return matchesStatus && matchesApproved;
+    });
     return NextResponse.json({
       success: true,
       data: filtered,
@@ -138,6 +144,7 @@ export async function POST(req: NextRequest) {
       tableId: body?.tableId || null,
       waiterId: null,
       customerId: null,
+      approved: false,
       status: "NEW",
       type: body?.type || "DINE_IN",
       subtotal: body?.subtotal || 0,

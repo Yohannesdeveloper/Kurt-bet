@@ -62,6 +62,7 @@ interface MenuItem {
   price: number;
   categoryId: string;
   image?: string;
+  isAvailable?: boolean;
 }
 
 interface TableOption {
@@ -307,7 +308,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
   }, [open]);
 
   const filteredItems = menuItems.filter(i =>
-    i.name.toLowerCase().includes(menuSearch.toLowerCase())
+    i.name.toLowerCase().includes(menuSearch.toLowerCase()) && i.isAvailable !== false
   );
 
   const addToCart = (item: MenuItem) => {

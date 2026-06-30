@@ -103,7 +103,9 @@ export async function GET(_req: NextRequest) {
         const hc = hcIndex.get(pi.id);
         return hc && (hc.price !== pi.price || hc.name !== pi.name);
       });
-      if (hasStaleHardcoded) {
+      const persistedIds = new Set(persistedItems.map((pi: any) => pi.id));
+      const missingHardcoded = demoItems.some((di: any) => !persistedIds.has(di.id));
+      if (hasStaleHardcoded || missingHardcoded) {
         const userItems = persistedItems.filter((pi: any) => !hcIndex.has(pi.id));
         await writeDemoItems([...demoItems.map((di: any) => ({ ...di })), ...userItems]);
       }

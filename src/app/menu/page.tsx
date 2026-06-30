@@ -200,7 +200,7 @@ export default function MenuPage() {
                     <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/30 cursor-pointer relative overflow-hidden">
                       {item.image ? (
                         <div className="relative w-full h-52 overflow-hidden bg-muted">
-                          <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <img src={item.image} alt={item.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-12">
                             <div className="flex items-start justify-between">
                               <div className="flex-1 min-w-0">
@@ -525,7 +525,7 @@ function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem,
               </div>
               {image && (
                 <div className="relative w-full h-28 overflow-hidden rounded-xl border bg-muted mt-1">
-                  <img src={image} alt="Preview" className="w-full h-full object-cover" />
+                  <img src={image} alt="Preview" loading="lazy" className="w-full h-full object-cover" />
                   <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1 h-6 w-6 bg-background/80 hover:bg-background" onClick={() => setImage("")}>
                     <Trash2 className="h-3 w-3" />
                   </Button>

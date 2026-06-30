@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CookingPot, Clock, AlertCircle, XCircle, ChevronRight, UtensilsCrossed, ChefHat } from "lucide-react";
+import { CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
@@ -49,7 +49,7 @@ function formatTime(iso: string) {
   return `${hrs}h ${mins % 60}m`;
 }
 
-function OrderCard({ order, onStatusUpdate }: { order: Order; onStatusUpdate: (id: string, status: string) => void }) {
+const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Order; onStatusUpdate: (id: string, status: string) => void }) {
   const s = STATUS_FLOW[order.status] || STATUS_FLOW.NEW;
   const [updating, setUpdating] = useState(false);
 
@@ -132,7 +132,7 @@ function OrderCard({ order, onStatusUpdate }: { order: Order; onStatusUpdate: (i
       </Card>
     </motion.div>
   );
-}
+});
 
 export default function KDSPage() {
   const [orders, setOrders] = useState<Order[]>([]);

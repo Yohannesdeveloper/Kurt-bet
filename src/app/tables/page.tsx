@@ -53,7 +53,7 @@ export default function TablesPage() {
 
   useEffect(() => {
     fetchTables();
-    const interval = setInterval(fetchTables, 1000);
+    const interval = setInterval(fetchTables, 3000);
     return () => clearInterval(interval);
   }, []);
 

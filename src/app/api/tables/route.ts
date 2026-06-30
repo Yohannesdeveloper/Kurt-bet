@@ -2,29 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import fs from "fs";
-import path from "path";
-
-const DEMO_ORDERS_FILE = path.join(process.cwd(), ".demo-orders.json");
-const DEMO_RESERVATIONS_FILE = path.join(process.cwd(), ".demo-reservations.json");
-
-function readDemoOrders(): any[] {
-  try {
-    if (fs.existsSync(DEMO_ORDERS_FILE)) {
-      return JSON.parse(fs.readFileSync(DEMO_ORDERS_FILE, "utf-8"));
-    }
-  } catch {}
-  return [];
-}
-
-function readDemoReservations(): any[] {
-  try {
-    if (fs.existsSync(DEMO_RESERVATIONS_FILE)) {
-      return JSON.parse(fs.readFileSync(DEMO_RESERVATIONS_FILE, "utf-8"));
-    }
-  } catch {}
-  return [];
-}
+import { readDemoJSON } from "@/lib/demo-storage";
 
 const ACTIVE_STATUSES = ["NEW", "PREPARING", "READY"];
 
@@ -53,8 +31,10 @@ export async function GET() {
     return NextResponse.json({ success: true, data: tables });
   } catch (error) {
     console.error("Tables fetch error (demo mode):", error);
-    const orders = readDemoOrders();
-    const reservations = readDemoReservations();
+    const [orders, reservations] = await Promise.all([
+      readDemoJSON<any>(".demo-orders.json"),
+      readDemoJSON<any>(".demo-reservations.json"),
+    ]);
     const occupiedTableIds = new Set(
       orders
         .filter((o: any) => ACTIVE_STATUSES.includes(o.status) && o.tableId)

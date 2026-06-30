@@ -2,26 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions, requireOwner } from "@/lib/auth";
+import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
 
-import fs from "fs";
-import path from "path";
-
-const DEMO_FILE = path.join(process.cwd(), ".demo-orders.json");
-
-function readDemoOrders(): any[] {
-  try {
-    if (fs.existsSync(DEMO_FILE)) {
-      return JSON.parse(fs.readFileSync(DEMO_FILE, "utf-8"));
-    }
-  } catch {}
-  return [];
-}
-
-function writeDemoOrders(orders: any[]) {
-  try {
-    fs.writeFileSync(DEMO_FILE, JSON.stringify(orders));
-  } catch {}
-}
+const DEMO_FILE = ".demo-orders.json";
 
 export async function GET(req: NextRequest) {
   let status: string | null = null;
@@ -75,16 +58,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data: orders,
-      meta: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
+      meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch (error) {
     console.error("Orders fetch error (demo mode):", error);
-    const demoOrders = readDemoOrders();
+    const demoOrders = await readDemoJSON<any>(DEMO_FILE);
     const statusFilter = status;
     const filtered = statusFilter && statusFilter !== "all"
       ? demoOrders.filter((o: any) => statusFilter.split(",").includes(o.status))
@@ -110,7 +88,6 @@ export async function POST(req: NextRequest) {
     if (!restaurantId) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     if (!requireOwner(session)) return NextResponse.json({ success: false, error: "Admin access required" }, { status: 403 });
     const userId = (session.user as { id?: string }).id;
-    if (!restaurantId) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
 
     const order = await prisma.order.create({
       data: {
@@ -127,7 +104,7 @@ export async function POST(req: NextRequest) {
         serviceCharge: body.serviceCharge || 0,
         total: body.total || 0,
         items: {
-          create: body.items?.map((item: { menuItemId: string; name: string; quantity: number; unitPrice: number; totalPrice: number; variant?: string; extras?: string[]; modifiers?: string[]; cookingNotes?: string; instructions?: string }, index: number) => ({
+          create: (body.items || []).map((item: any, index: number) => ({
             menuItemId: item.menuItemId,
             name: item.name,
             quantity: item.quantity || 1,
@@ -149,52 +126,41 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    await prisma.activityLog.create({
-      data: {
-        restaurantId,
-        userId,
-        type: "ORDER_CREATED",
-        description: `Order #${order.orderNumber} created`,
-        entityType: "Order",
-        entityId: order.id,
-      },
-    });
-
     return NextResponse.json({ success: true, data: order }, { status: 201 });
   } catch (error) {
     console.error("Order create error (demo mode):", error);
-    const demoOrders = readDemoOrders();
+    const demoOrders = await readDemoJSON<any>(DEMO_FILE);
     const nextNumber = demoOrders.length > 0 ? Math.max(...demoOrders.map((o: any) => o.orderNumber)) + 1 : 1001;
     const demoOrder = {
       id: `demo-order-${Date.now()}`,
       orderNumber: nextNumber,
       restaurantId: "demo",
-      tableId: body.tableId || null,
+      tableId: body?.tableId || null,
       waiterId: null,
       customerId: null,
       status: "NEW",
-      type: body.type || "DINE_IN",
-      subtotal: body.subtotal || 0,
+      type: body?.type || "DINE_IN",
+      subtotal: body?.subtotal || 0,
       taxAmount: 0,
       serviceCharge: 0,
       discountAmount: 0,
-      total: body.total || 0,
+      total: body?.total || 0,
       paidAmount: 0,
       changeAmount: 0,
-      notes: body.notes || null,
+      notes: body?.notes || null,
       customerNotes: null,
       isPaid: false,
       isTakeaway: false,
       isDelivery: false,
       deliveryAddress: null,
-      guestCount: body.guestCount || 1,
+      guestCount: body?.guestCount || 1,
       preparationTime: 0,
       completedAt: null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       table: null,
       waiter: null,
-      items: (body.items || []).map((item: any, i: number) => ({
+      items: (body?.items || []).map((item: any, i: number) => ({
         id: `demo-oi-${i}`,
         menuItemId: item.menuItemId,
         name: item.name,
@@ -211,7 +177,7 @@ export async function POST(req: NextRequest) {
       })),
     };
     demoOrders.unshift(demoOrder);
-    writeDemoOrders(demoOrders);
+    await writeDemoJSON(DEMO_FILE, demoOrders);
     return NextResponse.json({ success: true, data: demoOrder }, { status: 201 });
   }
 }

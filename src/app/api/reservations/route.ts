@@ -2,25 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions, requireOwner } from "@/lib/auth";
-import fs from "fs";
-import path from "path";
+import { readDemoJSONSync, writeDemoJSONSync } from "@/lib/demo-storage";
 
-const DEMO_RESERVATIONS_FILE = path.join(process.cwd(), ".demo-reservations.json");
-
-function readDemoReservations(): any[] {
-  try {
-    if (fs.existsSync(DEMO_RESERVATIONS_FILE)) {
-      return JSON.parse(fs.readFileSync(DEMO_RESERVATIONS_FILE, "utf-8"));
-    }
-  } catch { /* ignore */ }
-  return [];
-}
-
-function writeDemoReservations(items: any[]) {
-  try {
-    fs.writeFileSync(DEMO_RESERVATIONS_FILE, JSON.stringify(items, null, 2));
-  } catch { /* ignore */ }
-}
+function readDemoReservations(): any[] { return readDemoJSONSync(".demo-reservations.json"); }
+function writeDemoReservations(items: any[]) { writeDemoJSONSync(".demo-reservations.json", items); }
 
 export async function GET() {
   try {

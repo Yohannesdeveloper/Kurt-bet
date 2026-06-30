@@ -2,41 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions, requireOwner } from "@/lib/auth";
-import fs from "fs";
-import path from "path";
+import { readDemoJSONSync, writeDemoJSONSync } from "@/lib/demo-storage";
 
-const DEMO_MENU_FILE = path.join(process.cwd(), ".demo-menu-items.json");
-const DEMO_DELETED_FILE = path.join(process.cwd(), ".demo-deleted-items.json");
-
-function readDemoItems(): any[] {
-  try {
-    if (fs.existsSync(DEMO_MENU_FILE)) {
-      return JSON.parse(fs.readFileSync(DEMO_MENU_FILE, "utf-8"));
-    }
-  } catch { /* ignore */ }
-  return [];
-}
-
-function writeDemoItems(items: any[]) {
-  try {
-    fs.writeFileSync(DEMO_MENU_FILE, JSON.stringify(items, null, 2));
-  } catch { /* ignore */ }
-}
-
-function readDeletedIds(): string[] {
-  try {
-    if (fs.existsSync(DEMO_DELETED_FILE)) {
-      return JSON.parse(fs.readFileSync(DEMO_DELETED_FILE, "utf-8"));
-    }
-  } catch { /* ignore */ }
-  return [];
-}
-
-function writeDeletedIds(ids: string[]) {
-  try {
-    fs.writeFileSync(DEMO_DELETED_FILE, JSON.stringify(ids, null, 2));
-  } catch { /* ignore */ }
-}
+function readDemoItems(): any[] { return readDemoJSONSync(".demo-menu-items.json"); }
+function writeDemoItems(items: any[]) { writeDemoJSONSync(".demo-menu-items.json", items); }
+function readDeletedIds(): string[] { return readDemoJSONSync(".demo-deleted-items.json"); }
+function writeDeletedIds(ids: string[]) { writeDemoJSONSync(".demo-deleted-items.json", ids); }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   let body: any;

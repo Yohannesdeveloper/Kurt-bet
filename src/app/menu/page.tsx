@@ -1,0 +1,566 @@
+"use client";
+
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, Plus, UtensilsCrossed, Inbox, Loader2, Clock, Sparkles, Edit, Trash2, MoreVertical } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
+import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
+import { motion } from "framer-motion";
+
+interface MenuCategory {
+  id: string;
+  name: string;
+  sortOrder: number;
+}
+
+interface MenuItem {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  categoryId: string;
+  category: { id: string; name: string };
+  isAvailable: boolean;
+  preparationTime: number;
+  image?: string;
+}
+
+export default function MenuPage() {
+  const { data: session } = useSession();
+  const userRole = (session?.user as { role?: string })?.role || "CLIENT";
+  const canAddItem = ["ADMIN", "WAITER", "KITCHEN"].includes(userRole);
+  const canEditDelete = userRole === "ADMIN";
+  const [searchQuery, setSearchQuery] = useState("");
+  const [items, setItems] = useState<MenuItem[]>([]);
+  const [categories, setCategories] = useState<MenuCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+
+  const fetchMenu = useCallback(() => {
+    setLoading(true);
+    fetch("/api/menu")
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) {
+          setItems(d.data.items);
+          setCategories(d.data.categories);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleDelete = async (itemId: string) => {
+    if (!confirm("Are you sure you want to delete this item?")) return;
+    
+    try {
+      const res = await fetch(`/api/menu/items/${itemId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Menu item deleted");
+        fetchMenu();
+      } else {
+        toast.error(data.error || "Failed to delete item");
+      }
+    } catch {
+      toast.error("Failed to delete item");
+    }
+  };
+
+  useEffect(() => { fetchMenu(); }, []);
+
+  const filtered = useMemo(() => 
+    items.filter(i =>
+      i.name.toLowerCase().includes(searchQuery.toLowerCase())
+    ),
+    [items, searchQuery]
+  );
+
+  const grouped = useMemo(() => 
+    categories
+      .filter(c => filtered.some(i => i.categoryId === c.id))
+      .sort((a, b) => a.sortOrder - b.sortOrder),
+    [categories, filtered]
+  );
+
+  return (
+    <div className="space-y-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+      >
+        <div className="flex items-center gap-3 lg:gap-4">
+          <div className="flex h-10 w-10 lg:h-12 lg:w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-emerald-500/20 shadow-lg">
+            <UtensilsCrossed className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">Menu</h1>
+            <p className="text-sm text-muted-foreground">{items.length} items · {categories.length} categories</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 lg:gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search menu..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 h-10 lg:h-11 w-full sm:w-64 transition-all duration-200 focus:w-72"
+            />
+          </div>
+          {canAddItem && (
+            <Button
+              variant="premium"
+              onClick={() => { setEditingItem(null); setDialogOpen(true); }}
+              className="h-10 lg:h-11 flex-shrink-0"
+            >
+              <Plus className="h-4 w-4 mr-2" /> Add Item
+            </Button>
+          )}
+        </div>
+      </motion.div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-sm text-muted-foreground">Loading menu...</p>
+          </div>
+        </div>
+      ) : filtered.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border-2 border-dashed">
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
+                  <UtensilsCrossed className="h-10 w-10" />
+                </div>
+                <p className="text-lg font-semibold mb-2">No menu items</p>
+                <p className="text-sm mb-6">Add your first menu item to get started</p>
+                {canAddItem && (
+                  <Button
+                    variant="premium"
+                    onClick={() => { setEditingItem(null); setDialogOpen(true); }}
+                    className="h-11"
+                  >
+                    <Plus className="h-4 w-4 mr-2" /> Add Item
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      ) : (
+        <div className="space-y-10">
+          {grouped.map((cat, catIndex) => (
+            <motion.div
+              key={cat.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: catIndex * 0.1 }}
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{cat.name}</h2>
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
+                {filtered.filter(i => i.categoryId === cat.id).map((item, itemIndex) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: catIndex * 0.1 + itemIndex * 0.05 }}
+                  >
+                    <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/30 cursor-pointer relative overflow-hidden">
+                      {item.image ? (
+                        <div className="relative w-full h-52 overflow-hidden bg-muted">
+                          <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-12">
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm lg:text-base text-white drop-shadow-sm">{item.name}</p>
+                                {item.description && (
+                                  <p className="text-xs text-white/80 line-clamp-1 mt-0.5">{item.description}</p>
+                                )}
+                              </div>
+                              {canEditDelete && (
+                                <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 text-white/90 hover:text-white hover:bg-white/20"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEditingItem(item);
+                                      setDialogOpen(true);
+                                    }}
+                                  >
+                                    <Edit className="h-3.5 w-3.5" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 text-white/90 hover:text-destructive hover:bg-destructive/20"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDelete(item.id);
+                                    }}
+                                  >
+                                    <Trash2 className="h-3.5 w-3.5" />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <CardContent className="p-4 lg:p-5 pb-2">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-sm lg:text-base">{item.name}</p>
+                              {item.description && (
+                                <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{item.description}</p>
+                              )}
+                            </div>
+                            {canEditDelete && (
+                              <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditingItem(item);
+                                    setDialogOpen(true);
+                                  }}
+                                >
+                                  <Edit className="h-3.5 w-3.5" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(item.id);
+                                  }}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      )}
+                      <CardContent className="px-4 lg:px-5 py-3">
+                        {canAddItem && (
+                          <div className="mb-2">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                fetch(`/api/menu/items/${item.id}`, {
+                                  method: "PATCH",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ isAvailable: !item.isAvailable }),
+                                })
+                                  .then(r => r.json())
+                                  .then(d => {
+                                    if (d.success) {
+                                      toast.success(item.isAvailable ? "Marked unavailable" : "Marked available");
+                                      fetchMenu();
+                                    }
+                                  })
+                                  .catch(() => toast.error("Failed to toggle availability"));
+                              }}
+                              className={`text-xs font-medium px-2 py-0.5 rounded-full border transition-colors ${
+                                item.isAvailable
+                                  ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                                  : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+                              }`}
+                            >
+                              {item.isAvailable ? "Available" : "Unavailable"}
+                            </button>
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <Clock className="h-3 w-3 lg:h-3.5 lg:w-3.5" />
+                            <span>{item.preparationTime} min</span>
+                          </div>
+                          <p className="font-bold text-base lg:text-lg text-primary">{formatCurrency(item.price)}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      <AddItemDialog 
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen} 
+        categories={categories} 
+        onCreated={fetchMenu} 
+        editingItem={editingItem}
+        onEditComplete={() => {
+          setEditingItem(null);
+          fetchMenu();
+        }}
+      />
+    </div>
+  );
+}
+
+function AddItemDialog({ open, onOpenChange, categories, onCreated, editingItem, onEditComplete }: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  categories: MenuCategory[];
+  onCreated: () => void;
+  editingItem: MenuItem | null;
+  onEditComplete: () => void;
+}) {
+  const [submitting, setSubmitting] = useState(false);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [prepTime, setPrepTime] = useState("15");
+  const [image, setImage] = useState<string>("");
+
+  // Reset form when editingItem changes or dialog opens
+  useEffect(() => {
+    if (editingItem) {
+      setName(editingItem.name);
+      setDescription(editingItem.description || "");
+      setPrice(editingItem.price.toString());
+      setCategoryId(editingItem.categoryId);
+      setPrepTime(editingItem.preparationTime.toString());
+      setImage(editingItem.image || "");
+    } else {
+      setName("");
+      setDescription("");
+      setPrice("");
+      setCategoryId("");
+      setPrepTime("15");
+      setImage("");
+    }
+  }, [editingItem, open]);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setImage(ev.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name || !price || !categoryId) { toast.error("Name, price and category required"); return; }
+    setSubmitting(true);
+    try {
+      const url = editingItem ? `/api/menu/items/${editingItem.id}` : "/api/menu";
+      const method = editingItem ? "PATCH" : "POST";
+      
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          description: description || undefined,
+          price: parseFloat(price),
+          categoryId,
+          preparationTime: parseInt(prepTime) || 15,
+          image: image || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(editingItem ? "Menu item updated" : "Menu item added");
+        onOpenChange(false);
+        if (editingItem) {
+          onEditComplete();
+        } else {
+          onCreated();
+        }
+        setName(""); setDescription(""); setPrice(""); setCategoryId(""); setPrepTime("15");
+      } else {
+        toast.error(data.error || "Failed to save item");
+      }
+    } catch {
+      toast.error("Failed to save item");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      onOpenChange(isOpen);
+      if (!isOpen) {
+        // Clear editing item when dialog closes
+        setTimeout(() => {
+          if (!editingItem) {
+            setName("");
+            setDescription("");
+            setPrice("");
+            setCategoryId("");
+            setPrepTime("15");
+            setImage("");
+          }
+        }, 100);
+      }
+    }}>
+      <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-xl">{editingItem ? "Edit Menu Item" : "Add Menu Item"}</DialogTitle>
+          <DialogDescription>{editingItem ? "Update the menu item details" : "Add a new item to your menu"}</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-5 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name" className="text-sm font-medium">Name *</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder="e.g. Grilled Salmon"
+                required
+                className="h-11"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="desc" className="text-sm font-medium">Description</Label>
+              <textarea
+                id="desc"
+                value={description}
+                onChange={e => setDescription(e.target.value)}
+                className="flex min-h-[80px] w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-all duration-200"
+                placeholder="Describe your dish..."
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label htmlFor="price" className="text-sm font-medium">Price *</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={price}
+                  onChange={e => setPrice(e.target.value)}
+                  placeholder="0.00"
+                  required
+                  className="h-11"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="prep" className="text-sm font-medium">Prep Time (min)</Label>
+                <Input
+                  id="prep"
+                  type="number"
+                  min="1"
+                  value={prepTime}
+                  onChange={e => setPrepTime(e.target.value)}
+                  className="h-11"
+                />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label className="text-sm font-medium">Category *</Label>
+              <Select value={categoryId} onValueChange={setCategoryId}>
+                <SelectTrigger className="h-11">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map(c => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
+              <Label className="text-sm font-medium">Photo</Label>
+              <div className="flex items-center gap-3">
+                <Input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="h-11 file:h-full file:border-0 file:bg-muted file:px-3 file:mr-3 file:text-sm file:font-medium hover:file:bg-muted/80"
+                />
+              </div>
+              {image && (
+                <div className="relative w-full h-28 overflow-hidden rounded-xl border bg-muted mt-1">
+                  <img src={image} alt="Preview" className="w-full h-full object-cover" />
+                  <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1 h-6 w-6 bg-background/80 hover:bg-background" onClick={() => setImage("")}>
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="mt-6 gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              className="h-11"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="premium"
+              disabled={submitting}
+              className="h-11"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                "Add Item"
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

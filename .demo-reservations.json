@@ -1,0 +1,13 @@
+[
+  {
+    "id": "demo-res-1782825067684",
+    "tableId": "table-2",
+    "guestName": "yohannes",
+    "guestCount": 2,
+    "dateTime": "2026-06-30T13:10:47.960Z",
+    "duration": 120,
+    "notes": "",
+    "status": "PENDING",
+    "createdAt": "2026-06-30T13:11:07.684Z"
+  }
+]

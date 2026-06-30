@@ -1,0 +1,271 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Store, Users, Loader2, CalendarCheck } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
+
+interface TableData {
+  id: string;
+  number: number;
+  name: string;
+  capacity: number;
+  status: string;
+  section: string;
+  guestCount: number;
+  orders: { id: string; total: number; status: string; guestCount: number }[];
+  _count: { orders: number };
+}
+
+const statusColors: Record<string, string> = {
+  AVAILABLE: "bg-green-100 text-green-700 border-green-200",
+  OCCUPIED: "bg-amber-100 text-amber-700 border-amber-200",
+  RESERVED: "bg-blue-100 text-blue-700 border-blue-200",
+  CLEANING: "bg-gray-100 text-gray-500 border-gray-200",
+};
+
+export default function TablesPage() {
+  const { data: session } = useSession();
+  const isAdmin = (session?.user as { role?: string })?.role === "ADMIN";
+  const [tables, setTables] = useState<TableData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [reserveDialogOpen, setReserveDialogOpen] = useState(false);
+  const [selectedTable, setSelectedTable] = useState<TableData | null>(null);
+  const [guestName, setGuestName] = useState("");
+  const [guestCount, setGuestCount] = useState("2");
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchTables = () => {
+    fetch("/api/tables")
+      .then(r => r.json())
+      .then(d => { if (d.success) setTables(d.data); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchTables();
+    const interval = setInterval(fetchTables, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const openReserveDialog = (table: TableData) => {
+    setSelectedTable(table);
+    setGuestName("");
+    setGuestCount(String(Math.min(2, table.capacity)));
+    setReserveDialogOpen(true);
+  };
+
+  const handleReserve = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTable || !guestName.trim()) { toast.error("Guest name required"); return; }
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/reservations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tableId: selectedTable.id,
+          guestName: guestName.trim(),
+          guestCount: parseInt(guestCount) || 2,
+          dateTime: new Date().toISOString(),
+          duration: 120,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Table ${selectedTable.name} reserved for ${guestName}`);
+        setReserveDialogOpen(false);
+        fetchTables();
+      } else {
+        toast.error(data.error || "Failed to reserve");
+      }
+    } catch {
+      toast.error("Failed to reserve");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const sections = Array.from(new Set(tables.map(t => t.section)));
+
+  const occupied = tables.filter(t => t.status === "OCCUPIED").length;
+  const reserved = tables.filter(t => t.status === "RESERVED").length;
+
+  return (
+    <div className="space-y-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+      >
+        <div className="flex items-center gap-3 lg:gap-4">
+          <div className="flex h-10 w-10 lg:h-12 lg:w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-emerald-500/20 shadow-lg">
+            <Store className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">Tables</h1>
+            <p className="text-sm text-muted-foreground">{occupied}/{tables.length} tables occupied</p>
+          </div>
+        </div>
+        {tables.length > 0 && (
+          <div className="flex items-center gap-2 lg:gap-4">
+            <div className="flex items-center gap-2 px-3 py-1.5 lg:px-4 lg:py-2 rounded-xl bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800">
+              <span className="inline-block h-2 w-2 lg:h-2.5 lg:w-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs lg:text-sm font-medium text-emerald-700 dark:text-emerald-300">{tables.length - occupied - reserved} free</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 lg:px-4 lg:py-2 rounded-xl bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800">
+              <span className="inline-block h-2 w-2 lg:h-2.5 lg:w-2.5 rounded-full bg-amber-500 animate-pulse" />
+              <span className="text-xs lg:text-sm font-medium text-amber-700 dark:text-amber-300">{occupied} occupied</span>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 lg:px-4 lg:py-2 rounded-xl bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800">
+              <span className="inline-block h-2 w-2 lg:h-2.5 lg:w-2.5 rounded-full bg-blue-500 animate-pulse" />
+              <span className="text-xs lg:text-sm font-medium text-blue-700 dark:text-blue-300">{reserved} reserved</span>
+            </div>
+          </div>
+        )}
+      </motion.div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
+            <p className="text-sm text-muted-foreground">Loading tables...</p>
+          </div>
+        </div>
+      ) : tables.length === 0 ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Card className="border-2 border-dashed">
+            <CardContent className="p-8">
+              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
+                  <Store className="h-10 w-10" />
+                </div>
+                <p className="text-lg font-semibold mb-2">No tables configured</p>
+                <p className="text-sm">Add tables to get started with your floor plan</p>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      ) : (
+        sections.map((section, sectionIndex) => (
+          <motion.div
+            key={section}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: sectionIndex * 0.1 }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{section}</h2>
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 lg:gap-4">
+              {tables.filter(t => t.section === section).map((table, tableIndex) => (
+                <motion.div
+                  key={table.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, delay: sectionIndex * 0.1 + tableIndex * 0.05 }}
+                >
+                  <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/30">
+                    <CardContent className="p-4 lg:p-5">
+                      <div className="flex items-center justify-between mb-2 lg:mb-3">
+                        <p className="font-bold text-lg lg:text-xl">{table.name}</p>
+                        <Badge
+                          className={statusColors[table.status] || "bg-gray-100"}
+                          variant="outline"
+                        >
+                          {table.status}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs lg:text-sm text-muted-foreground mb-2 lg:mb-3">
+                        <Users className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
+                        <span>
+                          {table.status === "OCCUPIED"
+                            ? `${table.guestCount}/${table.capacity}`
+                            : `${table.capacity} seats`}
+                        </span>
+                      </div>
+                      {table.orders.length > 0 && (
+                        <div className="mt-2 lg:mt-3 pt-2 lg:pt-3 border-t">
+                          <p className="text-xs font-medium text-primary">
+                            Active order: {formatCurrency(table.orders[0].total)}
+                          </p>
+                        </div>
+                      )}
+                      {table.status === "AVAILABLE" && isAdmin && (
+                        <div className="mt-3 pt-3 border-t">
+                          <Button size="sm" variant="outline" className="w-full" onClick={() => openReserveDialog(table)}>
+                            <CalendarCheck className="h-3.5 w-3.5 mr-1" /> Reserve
+                          </Button>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        ))
+      )}
+
+      <Dialog open={reserveDialogOpen} onOpenChange={setReserveDialogOpen}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Reserve {selectedTable?.name}</DialogTitle>
+            <DialogDescription>
+              Enter guest details to reserve this table
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleReserve}>
+            <div className="space-y-4 py-4">
+              <div className="grid gap-2">
+                <Label htmlFor="guestName" className="text-sm font-medium">Guest Name *</Label>
+                <Input
+                  id="guestName"
+                  value={guestName}
+                  onChange={e => setGuestName(e.target.value)}
+                  placeholder="e.g. Abebe Kebede"
+                  required
+                  className="h-11"
+                />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="guestCount" className="text-sm font-medium">Number of Guests</Label>
+                <Input
+                  id="guestCount"
+                  type="number"
+                  min="1"
+                  max={selectedTable?.capacity || 4}
+                  value={guestCount}
+                  onChange={e => setGuestCount(e.target.value)}
+                  className="h-11"
+                />
+              </div>
+            </div>
+            <DialogFooter className="gap-2">
+              <Button type="button" variant="outline" onClick={() => setReserveDialogOpen(false)} className="h-11">
+                Cancel
+              </Button>
+              <Button type="submit" disabled={submitting} className="h-11">
+                {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Reserving...</> : "Confirm Reservation"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

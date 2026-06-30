@@ -59,9 +59,17 @@ export async function cacheSet(key: string, value: unknown, ttl = DEFAULT_TTL): 
   if (!c) return;
   try {
     if (c instanceof UpstashRedis) {
-      await c.set(key, value, { ex: ttl });
+      if (ttl > 0) {
+        await c.set(key, value, { ex: ttl });
+      } else {
+        await c.set(key, value);
+      }
     } else {
-      await (c as IORedis).setex(key, ttl, JSON.stringify(value));
+      if (ttl > 0) {
+        await (c as IORedis).setex(key, ttl, JSON.stringify(value));
+      } else {
+        await (c as IORedis).set(key, JSON.stringify(value));
+      }
     }
   } catch { /* silent */ }
 }

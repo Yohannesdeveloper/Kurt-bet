@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions, requireOwner } from "@/lib/auth";
 import { readDemoJSONSync, writeDemoJSONSync } from "@/lib/demo-storage";
+import { cacheGet, cacheSet, cacheDelPattern } from "@/lib/redis";
 
 function readDemoItems(): any[] {
   return readDemoJSONSync(".demo-menu-items.json");
@@ -27,6 +28,10 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     const categoryId = searchParams.get("categoryId");
 
+    const cacheKey = `menu:${restaurantId || "demo"}:${categoryId || "all"}`;
+    const cached = await cacheGet<{ items: any[]; categories: any[] }>(cacheKey);
+    if (cached) return NextResponse.json({ success: true, data: cached });
+
     const where: Record<string, unknown> = { restaurantId, isActive: true };
     if (categoryId) where.categoryId = categoryId;
 
@@ -45,10 +50,9 @@ export async function GET(req: NextRequest) {
       orderBy: { sortOrder: "asc" },
     });
 
-    return NextResponse.json({
-      success: true,
-      data: { items, categories },
-    });
+    const data = { items, categories };
+    await cacheSet(cacheKey, data, 60);
+    return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error("Menu fetch error:", error);
     const demoCategories = [
@@ -181,6 +185,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await cacheDelPattern("menu:*");
     return NextResponse.json({ success: true, data: item }, { status: 201 });
   } catch (error) {
     console.error("Menu create error (demo mode):", error);
@@ -200,6 +205,7 @@ export async function POST(req: NextRequest) {
     const persisted = readDemoItems();
     persisted.push(demoItem);
     writeDemoItems(persisted);
+    await cacheDelPattern("menu:*");
     return NextResponse.json({ success: true, data: demoItem }, { status: 201 });
   }
 }

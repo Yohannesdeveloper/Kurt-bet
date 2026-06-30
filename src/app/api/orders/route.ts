@@ -9,18 +9,21 @@ const DEMO_FILE = ".demo-orders.json";
 export async function GET(req: NextRequest) {
   let status: string | null = null;
   let approvedFilter: string | null = null;
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
+  let restaurantId: string | null = null;
 
-    const restaurantId = (session.user as { restaurantId?: string }).restaurantId;
-    const searchParams = req.nextUrl.searchParams;
-    status = searchParams.get("status");
-    approvedFilter = searchParams.get("approved");
-    const limit = parseInt(searchParams.get("limit") || "50");
-    const page = parseInt(searchParams.get("page") || "1");
+  const session = await getServerSession(authOptions).catch(() => null);
+  if (session?.user) {
+    restaurantId = (session.user as { restaurantId?: string }).restaurantId || null;
+  }
+
+  const searchParams = req.nextUrl.searchParams;
+  status = searchParams.get("status");
+  approvedFilter = searchParams.get("approved");
+  const limit = parseInt(searchParams.get("limit") || "50");
+  const page = parseInt(searchParams.get("page") || "1");
+
+  try {
+    if (!restaurantId) throw new Error("No restaurant");
 
     const where: Record<string, unknown> = { restaurantId };
     if (status && status !== "all") {
@@ -64,8 +67,7 @@ export async function GET(req: NextRequest) {
       data: orders,
       meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
-  } catch (error) {
-    console.error("Orders fetch error (demo mode):", error);
+  } catch {
     const demoOrders = (await readDemoJSON<any>(DEMO_FILE)).map((o: any) => ({ ...o, approved: o.approved ?? false }));
     const statusFilter = status;
     const filtered = demoOrders.filter((o: any) => {

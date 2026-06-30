@@ -16,39 +16,8 @@ function writeDemoItems(items: any[]) {
   writeDemoJSONSync(".demo-menu-items.json", items);
 }
 
-export async function GET(req: NextRequest) {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    }
-
-    const restaurantId = (session.user as { restaurantId?: string }).restaurantId;
-    const searchParams = req.nextUrl.searchParams;
-    const categoryId = searchParams.get("categoryId");
-
-    const where: Record<string, unknown> = { restaurantId, isActive: true };
-    if (categoryId) where.categoryId = categoryId;
-
-    const items = await prisma.menuItem.findMany({
-      where,
-      include: {
-        category: { select: { id: true, name: true } },
-        variants: true,
-        extras: true,
-      },
-      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-    });
-
-    const categories = await prisma.menuCategory.findMany({
-      where: { restaurantId, isActive: true },
-      orderBy: { sortOrder: "asc" },
-    });
-
-    return NextResponse.json({ success: true, data: { items, categories } });
-  } catch (error) {
-    console.error("Menu fetch error:", error);
-    const demoCategories = [
+export async function GET(_req: NextRequest) {
+  const demoCategories: any[] = [
       { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)", sortOrder: 0, isActive: true },
       { id: "cat-2", name: "የበሰለ ሥጋ (Cooked Meat)", sortOrder: 1, isActive: true },
       { id: "cat-3", name: "ሾርባ እና ወጥ (Stews & Wot)", sortOrder: 2, isActive: true },
@@ -141,7 +110,6 @@ export async function GET(req: NextRequest) {
     const allItems = merged.filter((i: any) => !deletedIds.includes(i.id));
 
     return NextResponse.json({ success: true, data: { items: allItems, categories: demoCategories } });
-  }
 }
 
 export async function POST(req: NextRequest) {

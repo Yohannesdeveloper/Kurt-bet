@@ -217,8 +217,14 @@ export default function OrdersPage() {
                       className="flex items-center justify-between py-4 px-4 hover:bg-muted/50 rounded-xl transition-all duration-200 group cursor-pointer"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-emerald-500/20 group-hover:scale-110 transition-transform duration-200">
-                          <UtensilsCrossed className="h-5 w-5 text-primary" />
+                        <div className="h-12 w-12 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
+                          {order.items[0]?.menuItem?.image ? (
+                            <img src={order.items[0].menuItem.image} alt="" className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-emerald-500/20">
+                              <UtensilsCrossed className="h-5 w-5 text-primary" />
+                            </div>
+                          )}
                         </div>
                         <div>
                           <div className="flex items-center gap-2 mb-1">

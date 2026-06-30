@@ -95,6 +95,9 @@ export async function GET(_req: NextRequest) {
       { id: "item-44", name: "Atmet (አጥሜት)", price: 50, categoryId: "cat-7", category: { id: "cat-7", name: "መጠጥ (Beverages)" }, description: "Toasted barley flour drink with spices", isAvailable: true, preparationTime: 5, variants: [], extras: [] },
     ];
     const persistedItems = await readDemoItems();
+    if (persistedItems.length === 0) {
+      await writeDemoItems(demoItems.map((di: any) => ({ ...di })));
+    }
     const persistedWithCategory = persistedItems.map((pi: any) => ({
       ...pi,
       category: pi.category || { id: pi.categoryId, name: demoCategories.find((c: any) => c.id === pi.categoryId)?.name || "" },

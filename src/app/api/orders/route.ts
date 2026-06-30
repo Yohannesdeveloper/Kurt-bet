@@ -39,7 +39,11 @@ export async function GET(req: NextRequest) {
 
     const where: Record<string, unknown> = { restaurantId };
     if (status && status !== "all") {
-      where.status = status;
+      if (status.includes(",")) {
+        where.status = { in: status.split(",") };
+      } else {
+        where.status = status;
+      }
     }
 
     const [orders, total] = await Promise.all([
@@ -81,7 +85,10 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Orders fetch error (demo mode):", error);
     const demoOrders = readDemoOrders();
-    const filtered = status && status !== "all" ? demoOrders.filter((o: any) => o.status === status) : demoOrders;
+    const statusFilter = status;
+    const filtered = statusFilter && statusFilter !== "all"
+      ? demoOrders.filter((o: any) => statusFilter.split(",").includes(o.status))
+      : demoOrders;
     return NextResponse.json({
       success: true,
       data: filtered,

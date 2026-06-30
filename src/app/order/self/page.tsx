@@ -19,6 +19,7 @@ interface CartItem {
   name: string;
   price: number;
   quantity: number;
+  image?: string;
 }
 
 export default function SelfOrderPage() {
@@ -41,11 +42,11 @@ function SelfOrderContent() {
   const [ordered, setOrdered] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const addToCart = (item: { id: string; name: string; price: number }) => {
+  const addToCart = (item: { id: string; name: string; price: number; image?: string }) => {
     setCart((prev) => {
       const existing = prev.find((ci) => ci.id === item.id);
       if (existing) return prev.map((ci) => ci.id === item.id ? { ...ci, quantity: ci.quantity + 1 } : ci);
-      return [...prev, { id: item.id, name: item.name, price: item.price, quantity: 1 }];
+      return [...prev, { id: item.id, name: item.name, price: item.price, quantity: 1, image: item.image }];
     });
     toast.success(`${item.name} added`);
   };
@@ -119,9 +120,12 @@ function SelfOrderContent() {
               <div className="space-y-3">
                 {cart.map((item) => (
                   <div key={item.id} className="flex items-center justify-between bg-muted/50 rounded-xl p-3">
-                    <div>
-                      <p className="font-medium text-sm">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">{formatCurrency(item.price * item.quantity)}</p>
+                    <div className="flex items-center gap-3">
+                      {item.image && <img src={item.image} alt="" className="h-10 w-10 rounded-lg object-cover" />}
+                      <div>
+                        <p className="font-medium text-sm">{item.name}</p>
+                        <p className="text-xs text-muted-foreground">{formatCurrency(item.price * item.quantity)}</p>
+                      </div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => removeFromCart(item.id)}>

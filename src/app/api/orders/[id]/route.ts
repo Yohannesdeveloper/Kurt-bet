@@ -40,8 +40,20 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
     return NextResponse.json({ success: true, data: order });
   } catch (error) {
     console.error("Order fetch error:", error);
-    const demoOrders = (await readDemoJSON<any>(DEMO_FILE)).map((o: any) => ({ ...o, approved: o.approved ?? false }));
-    const demo = demoOrders.find((o: any) => o.id === params.id);
+    const [demoOrders, menuItems] = await Promise.all([
+      readDemoJSON<any>(DEMO_FILE),
+      readDemoJSON<any>(".demo-menu-items.json"),
+    ]);
+    const menuMap = new Map(menuItems.map((mi: any) => [mi.id, mi]));
+    const demoWithImages = demoOrders.map((o: any) => ({
+      ...o,
+      approved: o.approved ?? false,
+      items: (o.items || []).map((item: any) => ({
+        ...item,
+        menuItem: menuMap.has(item.menuItemId) ? { image: menuMap.get(item.menuItemId).image } : null,
+      })),
+    }));
+    const demo = demoWithImages.find((o: any) => o.id === params.id);
     if (!demo) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
     return NextResponse.json({ success: true, data: demo });
   }
@@ -73,14 +85,30 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   } catch (error) {
     console.error("Order update error (demo mode):", error);
     if (!body) return NextResponse.json({ success: false, error: "Invalid request" }, { status: 400 });
-    const demoOrders = (await readDemoJSON<any>(DEMO_FILE)).map((o: any) => ({ ...o, approved: o.approved ?? false }));
+    const [demoOrders, menuItems] = await Promise.all([
+      readDemoJSON<any>(DEMO_FILE),
+      readDemoJSON<any>(".demo-menu-items.json"),
+    ]);
+    const menuMap = new Map(menuItems.map((mi: any) => [mi.id, mi]));
+    const demoOrdersMap = demoOrders.map((o: any) => ({
+      ...o,
+      approved: o.approved ?? false,
+      items: (o.items || []).map((item: any) => ({
+        ...item,
+        menuItem: menuMap.has(item.menuItemId) ? { image: menuMap.get(item.menuItemId).image } : null,
+      })),
+    }));
     const idx = demoOrders.findIndex((o: any) => o.id === params.id);
     if (idx === -1) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
     demoOrders[idx] = { ...demoOrders[idx], ...body, updatedAt: new Date().toISOString() };
     if (body.status === "COMPLETED" || body.status === "CANCELLED") {
       demoOrders[idx].completedAt = new Date().toISOString();
     }
+    demoOrdersMap[idx] = { ...demoOrdersMap[idx], ...body, updatedAt: new Date().toISOString() };
+    if (body.status === "COMPLETED" || body.status === "CANCELLED") {
+      demoOrdersMap[idx].completedAt = new Date().toISOString();
+    }
     await writeDemoJSON(DEMO_FILE, demoOrders);
-    return NextResponse.json({ success: true, data: demoOrders[idx] });
+    return NextResponse.json({ success: true, data: demoOrdersMap[idx] });
   }
 }

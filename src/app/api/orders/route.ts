@@ -68,9 +68,21 @@ export async function GET(req: NextRequest) {
       meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch {
-    const demoOrders = (await readDemoJSON<any>(DEMO_FILE)).map((o: any) => ({ ...o, approved: o.approved ?? false }));
+    const [demoOrders, menuItems] = await Promise.all([
+      readDemoJSON<any>(DEMO_FILE),
+      readDemoJSON<any>(".demo-menu-items.json"),
+    ]);
+    const menuMap = new Map(menuItems.map((mi: any) => [mi.id, mi]));
+    const demoWithImages = demoOrders.map((o: any) => ({
+      ...o,
+      approved: o.approved ?? false,
+      items: (o.items || []).map((item: any) => ({
+        ...item,
+        menuItem: menuMap.has(item.menuItemId) ? { image: menuMap.get(item.menuItemId).image } : null,
+      })),
+    }));
     const statusFilter = status;
-    const filtered = demoOrders.filter((o: any) => {
+    const filtered = demoWithImages.filter((o: any) => {
       const matchesStatus = !statusFilter || statusFilter === "all" || statusFilter.split(",").includes(o.status);
       const matchesApproved = approvedFilter === null || o.approved === (approvedFilter === "true");
       return matchesStatus && matchesApproved;
@@ -137,7 +149,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, data: order }, { status: 201 });
   } catch (error) {
     console.error("Order create error (demo mode):", error);
-    const demoOrders = await readDemoJSON<any>(DEMO_FILE);
+    const [demoOrders, menuItems] = await Promise.all([
+      readDemoJSON<any>(DEMO_FILE),
+      readDemoJSON<any>(".demo-menu-items.json"),
+    ]);
+    const menuMap = new Map(menuItems.map((mi: any) => [mi.id, mi]));
     const nextNumber = demoOrders.length > 0 ? Math.max(...demoOrders.map((o: any) => o.orderNumber)) + 1 : 1001;
     const demoOrder = {
       id: `demo-order-${Date.now()}`,
@@ -183,6 +199,7 @@ export async function POST(req: NextRequest) {
         instructions: null,
         status: "NEW",
         sortOrder: i,
+        menuItem: menuMap.has(item.menuItemId) ? { image: menuMap.get(item.menuItemId).image } : null,
       })),
     };
     demoOrders.unshift(demoOrder);

@@ -53,7 +53,7 @@ interface Order {
   createdAt: string;
   table: { number: number; name: string | null } | null;
   waiter: { firstName: string; lastName: string } | null;
-  items: { id: string; name: string; quantity: number; totalPrice: number }[];
+  items: { id: string; name: string; quantity: number; totalPrice: number; menuItem?: { image?: string } | null }[];
 }
 
 interface MenuItem {
@@ -61,6 +61,7 @@ interface MenuItem {
   name: string;
   price: number;
   categoryId: string;
+  image?: string;
 }
 
 interface TableOption {
@@ -76,6 +77,7 @@ interface CartItem {
   unitPrice: number;
   totalPrice: number;
   quantity: number;
+  image?: string;
 }
 
 export default function OrdersPage() {
@@ -324,6 +326,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
         unitPrice: item.price,
         totalPrice: item.price,
         quantity: 1,
+        image: item.image,
       }]);
     }
   };
@@ -516,7 +519,10 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
               <div className="space-y-2">
                 {cart.map(item => (
                   <div key={item.menuItemId} className="flex items-center justify-between text-sm">
-                    <span>{item.name} x{item.quantity}</span>
+                    <span className="flex items-center gap-2">
+                      {item.image && <img src={item.image} alt="" className="h-7 w-7 rounded object-cover" />}
+                      {item.name} x{item.quantity}
+                    </span>
                     <span>{formatCurrency(item.totalPrice)}</span>
                   </div>
                 ))}

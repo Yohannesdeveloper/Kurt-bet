@@ -15,6 +15,7 @@ interface OrderItem {
   unitPrice: number;
   totalPrice: number;
   cookingNotes?: string;
+  menuItem?: { image?: string } | null;
 }
 
 interface Order {
@@ -97,7 +98,10 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
 
           <div className="space-y-1 mb-3">
             {order.items.map((item) => (
-              <div key={item.id} className="flex items-center justify-between text-sm">
+              <div key={item.id} className="flex items-center gap-2 text-sm">
+                {item.menuItem?.image && (
+                  <img src={item.menuItem.image} alt="" className="h-8 w-8 rounded-md object-cover flex-shrink-0" />
+                )}
                 <span className="font-medium"><span className="text-muted-foreground mr-1">×{item.quantity}</span>{item.name}</span>
                 {item.cookingNotes && <span className="text-xs text-muted-foreground ml-2">({item.cookingNotes})</span>}
               </div>

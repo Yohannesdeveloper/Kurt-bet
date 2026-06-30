@@ -78,17 +78,7 @@ export async function cacheDel(key: string): Promise<void> {
   } catch { /* silent */ }
 }
 
-export async function cacheDelPattern(pattern: string): Promise<void> {
-  const c = getClient();
-  if (!c) return;
-  try {
-    if (c instanceof UpstashRedis) {
-      const keys = await c.keys(pattern);
-      if (keys.length > 0) await c.del(...keys);
-    } else {
-      const io = c as IORedis;
-      const keys = await io.keys(pattern);
-      if (keys.length > 0) await io.del(...keys);
-    }
-  } catch { /* silent */ }
+export async function cacheDelPattern(_pattern: string): Promise<void> {
+  // KEYS command not supported by Upstash Redis REST API.
+  // Use direct key deletion instead — pattern-based not needed.
 }

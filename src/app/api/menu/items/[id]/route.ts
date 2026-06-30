@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
+import { ensureDemoItemsSeeded } from "@/lib/demo-menu-data";
 
 async function readDemoItems(): Promise<any[]> { return readDemoJSON(".demo-menu-items.json"); }
 async function writeDemoItems(items: any[]) { await writeDemoJSON(".demo-menu-items.json", items); }
@@ -13,6 +14,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   } catch {
     return NextResponse.json({ success: false, error: "Invalid request body" }, { status: 400 });
   }
+
+  await ensureDemoItemsSeeded();
 
   const items = await readDemoItems();
   const idx = items.findIndex((i: any) => i.id === params.id);

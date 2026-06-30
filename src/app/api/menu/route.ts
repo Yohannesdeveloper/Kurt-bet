@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readDemoJSONSync, writeDemoJSONSync } from "@/lib/demo-storage";
+import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
 
-function readDemoItems(): any[] {
-  return readDemoJSONSync(".demo-menu-items.json");
+async function readDemoItems(): Promise<any[]> {
+  return readDemoJSON(".demo-menu-items.json");
 }
 
-function readDeletedIds(): string[] {
-  return readDemoJSONSync(".demo-deleted-items.json");
+async function readDeletedIds(): Promise<string[]> {
+  return readDemoJSON(".demo-deleted-items.json");
 }
 
-function writeDemoItems(items: any[]) {
-  writeDemoJSONSync(".demo-menu-items.json", items);
+async function writeDemoItems(items: any[]) {
+  await writeDemoJSON(".demo-menu-items.json", items);
 }
 
 export async function GET(_req: NextRequest) {
@@ -94,12 +94,12 @@ export async function GET(_req: NextRequest) {
       { id: "item-43", name: "Besso (በሶ)", price: 50, categoryId: "cat-7", category: { id: "cat-7", name: "መጠጥ (Beverages)" }, description: "Roasted barley drink — traditional and refreshing", isAvailable: true, preparationTime: 5, variants: [], extras: [] },
       { id: "item-44", name: "Atmet (አጥሜት)", price: 50, categoryId: "cat-7", category: { id: "cat-7", name: "መጠጥ (Beverages)" }, description: "Toasted barley flour drink with spices", isAvailable: true, preparationTime: 5, variants: [], extras: [] },
     ];
-    const persistedItems = readDemoItems();
+    const persistedItems = await readDemoItems();
     const persistedWithCategory = persistedItems.map((pi: any) => ({
       ...pi,
       category: pi.category || { id: pi.categoryId, name: demoCategories.find((c: any) => c.id === pi.categoryId)?.name || "" },
     }));
-    const deletedIds = readDeletedIds();
+    const deletedIds = await readDeletedIds();
     const overrideIds = new Set(persistedWithCategory.map((pi: any) => pi.id));
     const merged = demoItems
       .filter((di: any) => !overrideIds.has(di.id))
@@ -133,9 +133,9 @@ export async function POST(req: NextRequest) {
     extras: [],
   };
 
-  const persisted = readDemoItems();
+  const persisted = await readDemoItems();
   persisted.push(demoItem);
-  writeDemoItems(persisted);
+  await writeDemoItems(persisted);
 
   return NextResponse.json({ success: true, data: demoItem }, { status: 201 });
 }

@@ -3,31 +3,39 @@ import path from "path";
 import { cacheGet, cacheSet, cacheDel } from "./redis";
 
 const BASE = process.cwd();
-const DEMO_TTL = 15;
 
-function fileCacheKey(filename: string): string {
-  return `demo:file:${filename.replace(/^\./, "")}`;
+function redisKey(filename: string): string {
+  return `demo:data:${filename.replace(/^\./, "")}`;
 }
 
 export async function readDemoJSON<T = any>(filename: string): Promise<T[]> {
-  const ck = fileCacheKey(filename);
-  const cached = await cacheGet<T[]>(ck);
-  if (cached) return cached;
+  const rk = redisKey(filename);
+  const fromRedis = await cacheGet<T[]>(rk);
+  if (fromRedis) return fromRedis;
   try {
     const p = path.join(BASE, filename);
     const data = await fs.readFile(p, "utf-8");
     const parsed = JSON.parse(data);
-    await cacheSet(ck, parsed, DEMO_TTL);
+    await cacheSet(rk, parsed, 0);
     return parsed;
   } catch { return []; }
 }
 
 export async function writeDemoJSON(filename: string, data: any) {
+  const rk = redisKey(filename);
+  const json = JSON.stringify(data);
+  try {
+    await cacheSet(rk, data, 0);
+  } catch {}
   try {
     const p = path.join(BASE, filename);
-    await fs.writeFile(p, JSON.stringify(data, null, 2), "utf-8");
-    await cacheDel(fileCacheKey(filename));
+    await fs.writeFile(p, json, "utf-8");
   } catch {}
+}
+
+export async function delDemoJSON(filename: string) {
+  const rk = redisKey(filename);
+  await cacheDel(rk);
 }
 
 export function readDemoJSONSync<T = any>(filename: string): T[] {

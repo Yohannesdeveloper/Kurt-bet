@@ -1,11 +1,31 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import bcrypt from "bcryptjs";
-import { prisma } from "./prisma";
+
+function hasDatabase(): boolean {
+  try {
+    require("./prisma");
+    return !!process.env.DATABASE_URL;
+  } catch {
+    return false;
+  }
+}
+
+const useDb = hasDatabase();
+
+function getAdapter(): NextAuthOptions["adapter"] {
+  if (!useDb) return undefined;
+  try {
+    const { PrismaAdapter } = require("@next-auth/prisma-adapter");
+    const { prisma } = require("./prisma");
+    return PrismaAdapter(prisma);
+  } catch {
+    return undefined;
+  }
+}
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: getAdapter(),
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60,
@@ -25,73 +45,69 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials");
         }
 
-        try {
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-            include: { role: true, restaurant: true },
-          });
+        if (useDb) {
+          try {
+            const { prisma } = require("./prisma");
+            const user = await prisma.user.findUnique({
+              where: { email: credentials.email },
+              include: { role: true, restaurant: true },
+            });
 
-          if (!user || !user.isActive) {
-            throw new Error("Invalid credentials");
-          }
+            if (!user || !user.isActive) {
+              throw new Error("Invalid credentials");
+            }
 
-          const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
+            const isValid = await bcrypt.compare(credentials.password, user.passwordHash);
 
-          if (!isValid) {
-            throw new Error("Invalid credentials");
-          }
+            if (!isValid) {
+              throw new Error("Invalid credentials");
+            }
 
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { lastLogin: new Date() },
-          });
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { lastLogin: new Date() },
+            });
 
-          await prisma.activityLog.create({
-            data: {
-              restaurantId: user.restaurantId,
-              userId: user.id,
-              type: "LOGIN",
-              description: `${user.firstName} ${user.lastName} logged in`,
-            },
-          });
-
-          return {
-            id: user.id,
-            email: user.email,
-            name: `${user.firstName} ${user.lastName}`,
-            role: user.role.name,
-            restaurantId: user.restaurantId,
-            branchId: user.branchId,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            image: user.avatar,
-          };
-        } catch {
-          const DEMO_USERS: Record<string, { name: string; role: string; firstName: string; lastName: string }> = {
-            "admin@restaurant.com":  { name: "Admin User",    role: "ADMIN",  firstName: "Admin",  lastName: "User" },
-            "waiter@restaurant.com": { name: "Meron Tefera",  role: "WAITER", firstName: "Meron",  lastName: "Tefera" },
-            "kitchen@restaurant.com":{ name: "Bereket Hailu", role: "KITCHEN",firstName: "Bereket",lastName: "Hailu" },
-            "client@restaurant.com": { name: "Client User",   role: "CLIENT", firstName: "Client", lastName: "User" },
-          };
-          const demo = DEMO_USERS[credentials.email];
-          const passwordOk = credentials.email === "admin@restaurant.com"
-            ? (credentials.password === "admin123" || credentials.password === "demo123")
-            : credentials.password === "demo123";
-          if (demo && passwordOk) {
             return {
-              id: `demo-${demo.role.toLowerCase()}`,
-              email: credentials.email,
-              name: demo.name,
-              role: demo.role,
-              restaurantId: "demo-restaurant",
-              branchId: null,
-              firstName: demo.firstName,
-              lastName: demo.lastName,
-              image: null,
+              id: user.id,
+              email: user.email,
+              name: `${user.firstName} ${user.lastName}`,
+              role: user.role.name,
+              restaurantId: user.restaurantId,
+              branchId: user.branchId,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              image: user.avatar,
             };
+          } catch {
+            // fall through to demo users
           }
-          throw new Error("Invalid credentials");
         }
+
+        const DEMO_USERS: Record<string, { name: string; role: string; firstName: string; lastName: string }> = {
+          "admin@restaurant.com":  { name: "Admin User",    role: "ADMIN",  firstName: "Admin",  lastName: "User" },
+          "waiter@restaurant.com": { name: "Meron Tefera",  role: "WAITER", firstName: "Meron",  lastName: "Tefera" },
+          "kitchen@restaurant.com":{ name: "Bereket Hailu", role: "KITCHEN",firstName: "Bereket",lastName: "Hailu" },
+          "client@restaurant.com": { name: "Client User",   role: "CLIENT", firstName: "Client", lastName: "User" },
+        };
+        const demo = DEMO_USERS[credentials.email];
+        const passwordOk = credentials.email === "admin@restaurant.com"
+          ? (credentials.password === "admin123" || credentials.password === "demo123")
+          : credentials.password === "demo123";
+        if (demo && passwordOk) {
+          return {
+            id: `demo-${demo.role.toLowerCase()}`,
+            email: credentials.email,
+            name: demo.name,
+            role: demo.role,
+            restaurantId: "demo-restaurant",
+            branchId: null,
+            firstName: demo.firstName,
+            lastName: demo.lastName,
+            image: null,
+          };
+        }
+        throw new Error("Invalid credentials");
       },
     }),
   ],

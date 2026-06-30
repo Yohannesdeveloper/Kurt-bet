@@ -10,10 +10,13 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Remove any cached Prisma engines so they get downloaded for the current platform
+RUN rm -rf node_modules/@prisma/client node_modules/.prisma
 RUN npx prisma generate
 RUN npm run build
 
 FROM base AS runner
+RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV NODE_ENV=production
 

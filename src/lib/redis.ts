@@ -1,56 +1,94 @@
-import { Redis } from "@upstash/redis";
+import { Redis as UpstashRedis } from "@upstash/redis";
+import IORedis from "ioredis";
 
-const REDIS_URL = process.env.REDIS_URL || process.env.UPSTASH_REDIS_REST_URL || "";
-const REDIS_TOKEN = process.env.REDIS_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || "";
+const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL || "";
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || "";
+const REDIS_URL = process.env.REDIS_URL || "";
 
-let redis: Redis | null = null;
+type Client = UpstashRedis | IORedis;
+let client: Client | null = null;
 
-if (REDIS_URL && REDIS_TOKEN) {
-  try {
-    redis = new Redis({ url: REDIS_URL, token: REDIS_TOKEN });
-  } catch {
-    redis = null;
-  }
+function isUpstash(url: string): boolean {
+  return url.startsWith("https://") || url.startsWith("http://");
 }
 
-export const kv = redis;
+function initClient(): Client | null {
+  if (UPSTASH_URL && UPSTASH_TOKEN && isUpstash(UPSTASH_URL)) {
+    try {
+      return new UpstashRedis({ url: UPSTASH_URL, token: UPSTASH_TOKEN });
+    } catch { /* fall through */ }
+  }
+
+  if (REDIS_URL) {
+    try {
+      const io = new IORedis(REDIS_URL, {
+        maxRetriesPerRequest: 1,
+        retryStrategy() { return null; },
+        lazyConnect: true,
+      });
+      io.connect().catch(() => {});
+      return io;
+    } catch { /* fall through */ }
+  }
+
+  return null;
+}
+
+function getClient(): Client | null {
+  if (!client) client = initClient();
+  return client;
+}
 
 const DEFAULT_TTL = 60;
 
 export async function cacheGet<T>(key: string): Promise<T | null> {
-  if (!kv) return null;
+  const c = getClient();
+  if (!c) return null;
   try {
-    const data = await kv.get<T>(key);
-    return data ?? null;
-  } catch {
-    return null;
-  }
+    if (c instanceof UpstashRedis) {
+      return (await c.get<T>(key)) ?? null;
+    }
+    const raw = await (c as IORedis).get(key);
+    if (raw === null) return null;
+    return JSON.parse(raw) as T;
+  } catch { return null; }
 }
 
 export async function cacheSet(key: string, value: unknown, ttl = DEFAULT_TTL): Promise<void> {
-  if (!kv) return;
+  const c = getClient();
+  if (!c) return;
   try {
-    await kv.set(key, value, { ex: ttl });
-  } catch {
-    // silent
-  }
+    if (c instanceof UpstashRedis) {
+      await c.set(key, value, { ex: ttl });
+    } else {
+      await (c as IORedis).setex(key, ttl, JSON.stringify(value));
+    }
+  } catch { /* silent */ }
 }
 
 export async function cacheDel(key: string): Promise<void> {
-  if (!kv) return;
+  const c = getClient();
+  if (!c) return;
   try {
-    await kv.del(key);
-  } catch {
-    // silent
-  }
+    if (c instanceof UpstashRedis) {
+      await c.del(key);
+    } else {
+      await (c as IORedis).del(key);
+    }
+  } catch { /* silent */ }
 }
 
 export async function cacheDelPattern(pattern: string): Promise<void> {
-  if (!kv) return;
+  const c = getClient();
+  if (!c) return;
   try {
-    const keys = await kv.keys(pattern);
-    if (keys.length > 0) await kv.del(...keys);
-  } catch {
-    // silent
-  }
+    if (c instanceof UpstashRedis) {
+      const keys = await c.keys(pattern);
+      if (keys.length > 0) await c.del(...keys);
+    } else {
+      const io = c as IORedis;
+      const keys = await io.keys(pattern);
+      if (keys.length > 0) await io.del(...keys);
+    }
+  } catch { /* silent */ }
 }

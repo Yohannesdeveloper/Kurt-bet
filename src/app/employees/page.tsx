@@ -105,22 +105,22 @@ export default function EmployeesPage() {
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
       >
         <div className="flex items-center gap-3 lg:gap-4">
-          <div className="flex h-10 w-10 lg:h-12 lg:w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-[#C89B3C]/20 to-[#A12222]/20 shadow-lg">
-            <Users className="h-5 w-5 lg:h-6 lg:w-6 text-[#C89B3C]" />
+          <div className="flex h-10 w-10 lg:h-12 lg:w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 shadow-lg">
+            <Users className="h-5 w-5 lg:h-6 lg:w-6 text-ethiopian-gold" />
           </div>
           <div>
-            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">{t("employees.title")}</h1>
-            <p className="text-sm text-muted-foreground">{t("employees.subtitle")}</p>
+            <h1 className="text-xl lg:text-2xl font-bold tracking-tight font-serif text-ethiopian-coffee">{t("employees.title")}</h1>
+            <p className="text-sm text-ethiopian-coffee/60">{t("employees.subtitle")}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 lg:gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ethiopian-coffee/40" />
             <Input
               placeholder={t("employees.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-10 lg:h-11 w-full sm:w-64"
+              className="pl-10 h-10 lg:h-11 w-full sm:w-64 border-ethiopian-gold/20 focus:border-ethiopian-gold/40"
             />
           </div>
           <Button
@@ -148,15 +148,15 @@ export default function EmployeesPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
           >
-            <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#C89B3C]/20">
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-ethiopian-gold/10 hover:border-ethiopian-gold/20">
               <CardContent className="p-4 lg:p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className={`h-10 w-10 lg:h-12 lg:w-12 rounded-xl ${stat.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                     <stat.icon className={`h-5 w-5 lg:h-6 lg:w-6 ${stat.iconColor}`} />
                   </div>
                 </div>
-                <p className="text-xs lg:text-sm text-muted-foreground font-medium mb-1">{stat.label}</p>
-                <p className="text-2xl lg:text-3xl font-bold tracking-tight">{stat.value}</p>
+                <p className="text-xs lg:text-sm text-ethiopian-coffee/60 font-medium mb-1">{stat.label}</p>
+                <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee">{stat.value}</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -169,13 +169,13 @@ export default function EmployeesPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.3 }}
         >
-          <Card className="border-2 border-dashed">
+          <Card className="border-2 border-dashed border-ethiopian-gold/20">
             <CardContent className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
-                <Inbox className="h-10 w-10 text-muted-foreground" />
+              <div className="h-20 w-20 rounded-2xl bg-ethiopian-gold/5 flex items-center justify-center mb-4 border border-ethiopian-gold/10">
+                <Inbox className="h-10 w-10 text-ethiopian-coffee/30" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">{t("employees.noEmployees")}</h3>
-              <p className="text-sm text-muted-foreground mb-6">
+              <h3 className="text-lg font-semibold text-ethiopian-coffee mb-2 font-serif">{t("employees.noEmployees")}</h3>
+              <p className="text-sm text-ethiopian-coffee/50 mb-6">
                 {t("employees.addFirstEmployee")}
               </p>
               <Button
@@ -202,22 +202,22 @@ export default function EmployeesPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("employees.name")}</th>
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("employees.fatherName")}</th>
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("employees.age")}</th>
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("employees.position")}</th>
-                      <th className="text-right p-4 text-sm font-semibold text-muted-foreground">{t("employees.action")}</th>
+                    <tr className="border-b bg-ethiopian-gold/5">
+                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70">{t("employees.name")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70">{t("employees.fatherName")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70">{t("employees.age")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70">{t("employees.position")}</th>
+                      <th className="text-right p-4 text-sm font-semibold text-ethiopian-coffee/70">{t("employees.action")}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.map((emp) => (
-                      <tr key={emp.id} className="border-b last:border-0 hover:bg-muted/30 transition-colors">
-                        <td className="p-4 text-sm font-medium">{emp.name}</td>
-                        <td className="p-4 text-sm text-muted-foreground">{emp.fatherName}</td>
-                        <td className="p-4 text-sm">{emp.age}</td>
+                      <tr key={emp.id} className="border-b border-ethiopian-gold/5 last:border-0 hover:bg-ethiopian-gold/5 transition-colors">
+                        <td className="p-4 text-sm font-medium text-ethiopian-coffee">{emp.name}</td>
+                        <td className="p-4 text-sm text-ethiopian-coffee/60">{emp.fatherName}</td>
+                        <td className="p-4 text-sm text-ethiopian-coffee">{emp.age}</td>
                         <td className="p-4">
-                          <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#C89B3C]/10 text-[#C89B3C]">
+                          <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-ethiopian-gold/10 text-ethiopian-gold border border-ethiopian-gold/20">
                             {emp.position}
                           </span>
                         </td>

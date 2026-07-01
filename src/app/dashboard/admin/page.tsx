@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { TrendingUp, Users, ChefHat, ClipboardList, DollarSign, Settings, BarChart3, Shield, Plus } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
+import { EthiopianCornerSet } from "@/components/shared/ethiopian-patterns";
 
 const adminActions = [
   { label: "Manage Employees", icon: Users, href: "/employees", description: "Add, edit, or remove staff members" },
@@ -16,7 +17,7 @@ const adminActions = [
 export default function AdminDashboard() {
   const { t } = useTranslation();
   const stats = [
-    { label: t("dashboard.totalRevenue"), value: "$0.00", icon: DollarSign, color: "from-[#C89B3C] to-[#3E2723]", bgColor: "bg-[#C89B3C]/10", iconColor: "text-[#C89B3C]" },
+    { label: t("dashboard.totalRevenue"), value: "$0.00", icon: DollarSign, color: "from-ethiopian-gold to-ethiopian-coffee", bgColor: "bg-ethiopian-gold/10", iconColor: "text-ethiopian-gold" },
     { label: t("dashboard.totalOrders"), value: "0", icon: ClipboardList, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
     { label: "Active Users", value: "0", icon: Users, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
     { label: "Kitchen Queue", value: "0", icon: ChefHat, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-500/10", iconColor: "text-purple-600" },
@@ -25,14 +26,14 @@ export default function AdminDashboard() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold tracking-tight font-serif text-ethiopian-coffee">
             Admin Dashboard
           </h1>
-          <p className="text-muted-foreground mt-1">Full control over restaurant operations</p>
+          <p className="text-ethiopian-coffee/60 mt-1">Full control over restaurant operations</p>
         </div>
         <div className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-primary" />
-          <span className="text-sm font-medium">Admin Access</span>
+          <Shield className="h-5 w-5 text-ethiopian-gold" />
+          <span className="text-sm font-medium text-ethiopian-coffee">Admin Access</span>
         </div>
       </div>
 
@@ -44,16 +45,16 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.1 }}
           >
-            <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/20">
+            <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-ethiopian-gold/10 hover:border-ethiopian-gold/20">
               <CardContent className="p-4 lg:p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className={`h-10 w-10 lg:h-12 lg:w-12 rounded-xl ${s.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                     <s.icon className={`h-5 w-5 lg:h-6 lg:w-6 ${s.iconColor}`} />
                   </div>
-                  <TrendingUp className="h-4 w-4 text-[#C89B3C]" />
+                  <TrendingUp className="h-4 w-4 text-ethiopian-gold" />
                 </div>
-                <p className="text-xs lg:text-sm text-muted-foreground font-medium mb-1">{s.label}</p>
-                <p className="text-2xl lg:text-3xl font-bold tracking-tight">{s.value}</p>
+                <p className="text-xs lg:text-sm text-ethiopian-coffee/60 font-medium mb-1">{s.label}</p>
+                <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee">{s.value}</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -68,8 +69,8 @@ export default function AdminDashboard() {
         >
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 font-serif text-ethiopian-coffee">
+                <Shield className="h-5 w-5 text-ethiopian-gold" />
                 Admin Actions
               </CardTitle>
             </CardHeader>
@@ -79,54 +80,20 @@ export default function AdminDashboard() {
                   <Button
                     key={action.label}
                     variant="outline"
-                    className="h-auto flex-col items-start p-4 hover:border-primary/30 transition-all duration-300"
+                    className="h-auto flex-col items-start p-4 border-ethiopian-gold/20 hover:border-ethiopian-gold/40 transition-all duration-300"
                     asChild
                   >
                     <a href={action.href}>
                       <div className="flex items-center gap-3 mb-2">
-                        <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                          <action.icon className="h-4 w-4 text-primary" />
+                        <div className="h-8 w-8 rounded-lg bg-ethiopian-gold/10 flex items-center justify-center">
+                          <action.icon className="h-4 w-4 text-ethiopian-gold" />
                         </div>
-                        <span className="font-semibold">{action.label}</span>
+                        <span className="font-semibold text-ethiopian-coffee">{action.label}</span>
                       </div>
-                      <p className="text-xs text-muted-foreground text-left">{action.description}</p>
+                      <p className="text-xs text-ethiopian-coffee/60 text-left">{action.description}</p>
                     </a>
                   </Button>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.5 }}
-        >
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <Button className="w-full justify-start gap-2" variant="default" asChild>
-                  <a href="/orders">
-                    <Plus className="h-4 w-4" />
-                    {t("orders.newOrder")}
-                  </a>
-                </Button>
-                <Button className="w-full justify-start gap-2" variant="outline" asChild>
-                  <a href="/tables">
-                    <Users className="h-4 w-4" />
-                    Manage Tables
-                  </a>
-                </Button>
-                <Button className="w-full justify-start gap-2" variant="outline" asChild>
-                  <a href="/menu">
-                    <ClipboardList className="h-4 w-4" />
-                    Edit Menu
-                  </a>
-                </Button>
               </div>
             </CardContent>
           </Card>

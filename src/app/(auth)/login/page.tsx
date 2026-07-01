@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { UtensilsCrossed, Eye, EyeOff, Loader2, Sparkles, Shield, Zap } from "lucide-react";
+import { UtensilsCrossed, Eye, EyeOff, Loader2, Sparkles, Shield, Zap, Coffee } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
+import { EthiopianCornerSet, JebenaIcon } from "@/components/shared/ethiopian-patterns";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -44,10 +45,8 @@ export default function LoginPage() {
       if (result?.error) {
         setError("Invalid email or password");
       } else {
-        // Fetch session to get user role
         const response = await fetch("/api/auth/session");
         const session = await response.json();
-        
         router.push("/");
         router.refresh();
       }
@@ -65,10 +64,14 @@ export default function LoginPage() {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F8F4EE] via-white to-[#F8F4EE] dark:from-gray-900 dark:via-gray-900 dark:to-[#3E2723]/20 p-4 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-b from-[#C89B3C]/10 to-transparent rounded-full blur-3xl" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-ethiopian-cream via-white to-ethiopian-cream p-4 relative overflow-hidden">
+      <div className="absolute inset-0 opacity-[0.03] bg-ethiopian-cross pointer-events-none" />
+      <div className="absolute inset-0 bg-grid-pattern opacity-[0.02]" />
+      <motion.div
+        animate={{ scale: [1, 1.1, 1] }}
+        transition={{ duration: 15, repeat: Infinity }}
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-b from-ethiopian-gold/10 to-transparent rounded-full blur-3xl"
+      />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -82,13 +85,18 @@ export default function LoginPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-[#C89B3C] to-[#3E2723] shadow-2xl shadow-[#C89B3C]/30 mb-6 animate-float">
-            <UtensilsCrossed className="h-10 w-10 text-white" />
+          <div className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-ethiopian-gold to-ethiopian-coffee shadow-2xl shadow-ethiopian-gold/30 mb-6 relative">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay opacity-25 blur-sm"
+            />
+            <UtensilsCrossed className="h-10 w-10 text-white relative z-10" />
           </div>
-          <h1 className="text-4xl font-bold tracking-tight mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-serif font-bold tracking-tight mb-2 text-ethiopian-coffee">
             {t("app.name")}
           </h1>
-          <p className="text-muted-foreground text-lg">{t("app.tagline")}</p>
+          <p className="text-ethiopian-coffee/60 text-lg">{t("app.tagline")}</p>
         </motion.div>
 
         <motion.div
@@ -96,25 +104,27 @@ export default function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="border-0 shadow-2xl shadow-[#3E2723]/10 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80">
-            <CardHeader className="space-y-1">
+          <Card className="border border-ethiopian-gold/20 shadow-2xl shadow-ethiopian-coffee/10 backdrop-blur-xl bg-white/90 relative overflow-hidden">
+            <EthiopianCornerSet />
+            <div className="absolute inset-0 pattern-overlay pointer-events-none" />
+            <CardHeader className="space-y-1 relative z-10">
               <CardTitle className="text-2xl">{t("auth.welcomeBack")}</CardTitle>
               <CardDescription className="text-base">Enter your credentials to access your dashboard</CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <form onSubmit={handleSubmit} className="space-y-5">
                 {error && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="rounded-xl bg-destructive/10 border border-destructive/20 p-4 text-sm text-destructive"
+                    className="rounded-xl bg-red-50 border border-red-200 p-4 text-sm text-red-600"
                   >
                     {error}
                   </motion.div>
                 )}
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t("auth.email")}</label>
+                  <label className="text-sm font-medium text-ethiopian-coffee">{t("auth.email")}</label>
                   <Input
                     type="email"
                     placeholder="name@restaurant.com"
@@ -122,26 +132,26 @@ export default function LoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     autoComplete="email"
-                    className="h-12 text-base"
+                    className="h-12 text-base border-ethiopian-gold/20 focus:border-ethiopian-gold focus:ring-ethiopian-gold/20"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{t("auth.password")}</label>
+                  <label className="text-sm font-medium text-ethiopian-coffee">{t("auth.password")}</label>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
-                      placeholder="••••••••"
+                      placeholder="......"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       autoComplete="current-password"
-                      className="h-12 pr-12 text-base"
+                      className="h-12 pr-12 text-base border-ethiopian-gold/20 focus:border-ethiopian-gold focus:ring-ethiopian-gold/20"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-ethiopian-coffee/50 hover:text-ethiopian-gold transition-colors"
                     >
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
@@ -180,9 +190,9 @@ export default function LoginPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: 0.5 + index * 0.1 }}
-              className="flex items-center gap-2 text-sm text-muted-foreground"
+              className="flex items-center gap-2 text-sm text-ethiopian-coffee/60"
             >
-              <feature.icon className="h-4 w-4 text-primary" />
+              <feature.icon className="h-4 w-4 text-ethiopian-gold" />
               <span>{feature.label}</span>
             </motion.div>
           ))}
@@ -192,9 +202,9 @@ export default function LoginPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.6 }}
-          className="text-center text-xs text-muted-foreground mt-6"
+          className="text-center text-xs text-ethiopian-coffee/40 mt-6"
         >
-          Restaurant OS v1.0 &mdash; Built with excellence
+          Kurt Bet v1.0 &mdash; {t("landing.excellence")}
         </motion.p>
       </motion.div>
     </div>

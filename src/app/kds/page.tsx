@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback, memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat, Beef, CheckCircle } from "lucide-react";
+import { CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat, Beef, CheckCircle, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
+import { EthiopianCornerSet } from "@/components/shared/ethiopian-patterns";
 
 interface OrderItem {
   id: string;
@@ -90,18 +91,18 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className={`h-2.5 w-2.5 rounded-full ${s.dot}`} />
-                <span className="font-bold text-base">#{order.orderNumber}</span>
-                <Badge variant="outline" className={`text-xs ${s.color}`}>{statusTLabel[order.status]}</Badge>
+                <span className="font-bold text-base text-ethiopian-coffee">#{order.orderNumber}</span>
+                <Badge variant={order.status === "NEW" ? "premium" : "outline"} className={`text-xs ${s.color}`}>{statusTLabel[order.status]}</Badge>
               </div>
-              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60">
                 <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(order.createdAt)}</span>
                 {order.table && <span className="flex items-center gap-1"><UtensilsCrossed className="h-3 w-3" />Table {order.table.number}</span>}
                 {order.guestCount && <span>{order.guestCount} guests</span>}
               </div>
             </div>
             {order.notes && (
-              <div className="text-xs text-muted-foreground max-w-[120px] text-right truncate" title={order.notes}>
-                📝 {order.notes}
+              <div className="text-xs text-ethiopian-coffee/50 max-w-[120px] text-right truncate" title={order.notes}>
+                {order.notes}
               </div>
             )}
           </div>
@@ -112,17 +113,17 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
                 {item.menuItem?.image && (
                   <img src={item.menuItem.image} alt="" className="h-8 w-8 rounded-md object-cover flex-shrink-0" />
                 )}
-                <span className="font-medium"><span className="text-muted-foreground mr-1">×{item.quantity}</span>{item.name}</span>
-                {item.cookingNotes && <span className="text-xs text-muted-foreground ml-2">({item.cookingNotes})</span>}
+                <span className="font-medium text-ethiopian-coffee"><span className="text-ethiopian-coffee/50 mr-1">×{item.quantity}</span>{item.name}</span>
+                {item.cookingNotes && <span className="text-xs text-ethiopian-coffee/50 ml-2">({item.cookingNotes})</span>}
               </div>
             ))}
           </div>
 
-          <div className="flex items-center gap-2 pt-2 border-t border-border/50">
+          <div className="flex items-center gap-2 pt-2 border-t border-ethiopian-gold/10">
             {s.next && (
               <Button
                 size="sm"
-                variant="default"
+                variant="premium"
                 disabled={updating}
                 onClick={() => handleStatus(s.next!)}
                 className="h-8 text-xs gap-1"
@@ -231,36 +232,46 @@ export default function KDSPage() {
   const hasOrders = orders.length > 0 || butcherOrders.length > 0;
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
+    <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-ethiopian-cream texture-linen">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between px-6 py-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        className="flex items-center justify-between px-6 py-4 border-b border-ethiopian-gold/10 bg-ethiopian-cream/95 backdrop-blur-sm"
       >
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-emerald-500/20">
-            <CookingPot className="h-5 w-5 text-primary" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20">
+            <CookingPot className="h-5 w-5 text-ethiopian-gold" />
           </div>
           <div>
-            <h1 className="text-lg font-bold tracking-tight">{t("kds.title")}</h1>
-            <p className="text-xs text-muted-foreground">{orders.length + butcherOrders.length} orders active</p>
+            <h1 className="text-lg font-bold tracking-tight text-ethiopian-coffee font-serif">{t("kds.title")}</h1>
+            <p className="text-xs text-ethiopian-coffee/50">{orders.length + butcherOrders.length} orders active</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs text-muted-foreground">Live</span>
+          <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }} className="h-2 w-2 rounded-full bg-emerald-500" />
+          <span className="text-xs text-ethiopian-coffee/50">Live</span>
         </div>
       </motion.div>
 
       <div className="flex-1 overflow-auto p-4 lg:p-6">
         {loading ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
+            <div className="flex items-center gap-2 text-ethiopian-coffee/50">
+              <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity }} className="w-4 h-4 border-2 border-ethiopian-gold/20 border-t-ethiopian-gold rounded-full" />
+              <span>{t("common.loading")}</span>
+            </div>
           </div>
         ) : !hasOrders ? (
-          <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
-            <ChefHat className="h-16 w-16 mb-4 opacity-30" />
-            <p className="text-lg font-semibold">{t("orders.pending")}</p>
+          <div className="flex flex-col items-center justify-center h-full text-ethiopian-coffee/50">
+            <div className="relative mb-6">
+              <ChefHat className="h-20 w-20 opacity-20" />
+              <motion.div
+                animate={{ scale: [0, 1.5, 0], opacity: [0, 0.3, 0] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="absolute inset-0 bg-ethiopian-gold/10 rounded-full blur-xl"
+              />
+            </div>
+            <p className="text-lg font-semibold text-ethiopian-coffee">{t("orders.pending")}</p>
             <p className="text-sm">{t("orders.noOrders")}</p>
           </div>
         ) : (
@@ -269,7 +280,7 @@ export default function KDSPage() {
               <div key={grp.status} className="flex flex-col min-h-0">
                 <div className="flex items-center gap-2 mb-3 px-1">
                   <span className={`h-2.5 w-2.5 rounded-full ${grp.dot}`} />
-                  <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{grp.label}</h2>
+                  <h2 className="text-sm font-semibold text-ethiopian-coffee/70 uppercase tracking-wider">{grp.label}</h2>
                   <Badge variant="secondary" className="text-xs ml-auto">{grp.orders.length}</Badge>
                 </div>
                 <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pr-1">
@@ -279,40 +290,33 @@ export default function KDSPage() {
                     ))}
                   </AnimatePresence>
                   {grp.orders.length === 0 && (
-                    <div className="flex items-center justify-center h-20 text-xs text-muted-foreground border border-dashed rounded-xl">
+                    <div className="flex items-center justify-center h-20 text-xs text-ethiopian-coffee/50 border border-dashed border-ethiopian-gold/20 rounded-xl">
                       {t("orders.noOrders")}
                     </div>
                   )}
                 </div>
               </div>
             ))}
-            {/* Butcher column */}
             <div className="flex flex-col min-h-0">
               <div className="flex items-center gap-2 mb-3 px-1">
-                <span className="h-2.5 w-2.5 rounded-full bg-[#A12222]" />
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t("kds.butcher")}</h2>
+                <span className="h-2.5 w-2.5 rounded-full bg-ethiopian-clay" />
+                <h2 className="text-sm font-semibold text-ethiopian-coffee/70 uppercase tracking-wider">{t("kds.butcher")}</h2>
                 <Badge variant="secondary" className="text-xs ml-auto">{butcherOrders.length}</Badge>
               </div>
               <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pr-1">
                 <AnimatePresence mode="popLayout">
                   {butcherOrders.map((bo) => (
-                    <motion.div
-                      key={bo.id}
-                      layout
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                    >
-                      <Card className="border-l-4 border-red-300 bg-red-50 shadow-sm hover:shadow-md transition-shadow">
+                    <motion.div key={bo.id} layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
+                      <Card className="border-l-4 border-ethiopian-clay/30 bg-clay-50 shadow-sm hover:shadow-md transition-shadow">
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between mb-3">
                             <div>
                               <div className="flex items-center gap-2 mb-1">
-                                <Beef className="h-4 w-4 text-[#A12222]" />
-                                <span className="font-bold text-base">#{bo.orderNumber}</span>
-                                <Badge variant="outline" className="text-xs text-red-600 border-red-300">{t("kds.butcher")}</Badge>
+                                <Beef className="h-4 w-4 text-ethiopian-clay" />
+                                <span className="font-bold text-base text-ethiopian-coffee">#{bo.orderNumber}</span>
+                                <Badge variant="outline" className="text-xs text-ethiopian-clay border-ethiopian-clay/30">{t("kds.butcher")}</Badge>
                               </div>
-                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                              <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60">
                                 <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{t("butcher.sentToKitchen")}</span>
                                 <span>{bo.customerName}</span>
                               </div>
@@ -320,21 +324,14 @@ export default function KDSPage() {
                           </div>
                           <div className="space-y-1 mb-3">
                             <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium text-[#A12222]">{bo.meatType}</span>
-                              <span className="text-muted-foreground">· {bo.portionSize}</span>
-                              <span className="font-semibold">×{bo.quantity}</span>
+                              <span className="font-medium text-ethiopian-clay">{bo.meatType}</span>
+                              <span className="text-ethiopian-coffee/50">· {bo.portionSize}</span>
+                              <span className="font-semibold text-ethiopian-coffee">×{bo.quantity}</span>
                             </div>
-                            {bo.notes && (
-                              <p className="text-xs text-muted-foreground italic">"{bo.notes}"</p>
-                            )}
+                            {bo.notes && <p className="text-xs text-ethiopian-coffee/50 italic">"{bo.notes}"</p>}
                           </div>
-                          <div className="flex items-center gap-2 pt-2 border-t border-border/50">
-                            <Button
-                              size="sm"
-                              variant="default"
-                              onClick={() => handleButcherStatus(bo.id, "SENT_TO_KITCHEN")}
-                              className="h-8 text-xs gap-1 bg-green-600 hover:bg-green-700"
-                            >
+                          <div className="flex items-center gap-2 pt-2 border-t border-ethiopian-gold/10">
+                            <Button size="sm" variant="premium" onClick={() => handleButcherStatus(bo.id, "SENT_TO_KITCHEN")} className="h-8 text-xs gap-1">
                               <CheckCircle className="h-3 w-3" /> {t("kds.received")}
                             </Button>
                           </div>
@@ -344,7 +341,7 @@ export default function KDSPage() {
                   ))}
                 </AnimatePresence>
                 {butcherOrders.length === 0 && (
-                  <div className="flex items-center justify-center h-20 text-xs text-muted-foreground border border-dashed rounded-xl">
+                  <div className="flex items-center justify-center h-20 text-xs text-ethiopian-coffee/50 border border-dashed border-ethiopian-gold/20 rounded-xl">
                     {t("orders.noOrders")}
                   </div>
                 )}

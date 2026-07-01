@@ -13,9 +13,9 @@ const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
   const statsConfig = {
     NEW:       { label: "Pending Orders",   value: "0", icon: Clock,       color: "from-amber-500 to-orange-600",    bgColor: "bg-amber-500/10",  iconColor: "text-amber-600" },
     PREPARING: { label: "In Progress",      value: "0", icon: Flame,       color: "from-orange-500 to-red-600",     bgColor: "bg-orange-500/10",  iconColor: "text-orange-600" },
-    READY:     { label: "Ready to Serve",   value: "0", icon: CheckCircle, color: "from-[#C89B3C] to-[#3E2723]",  bgColor: "bg-[#C89B3C]/10", iconColor: "text-[#C89B3C]" },
+    READY:     { label: "Ready to Serve",   value: "0", icon: CheckCircle, color: "from-ethiopian-gold to-ethiopian-coffee",  bgColor: "bg-ethiopian-gold/10", iconColor: "text-ethiopian-gold" },
     SERVED:    { label: "Served Today",     value: "0", icon: Timer,       color: "from-blue-500 to-cyan-600",     bgColor: "bg-blue-500/10",   iconColor: "text-blue-600" },
-    BUTCHER:   { label: "Butcher Orders",  value: "0", icon: Beef,        color: "from-[#A12222] to-[#C89B3C]",  bgColor: "bg-red-500/10",   iconColor: "text-[#A12222]" },
+    BUTCHER:   { label: "Butcher Orders",  value: "0", icon: Beef,        color: "from-ethiopian-burgundy to-ethiopian-gold",  bgColor: "bg-red-500/10",   iconColor: "text-ethiopian-burgundy" },
   };
 
 export default function KitchenDashboard() {
@@ -59,15 +59,15 @@ export default function KitchenDashboard() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold tracking-tight font-serif text-ethiopian-coffee">
             {t("nav.kitchen")} Dashboard
           </h1>
-          <p className="text-muted-foreground mt-1">Manage incoming orders and kitchen queue</p>
+          <p className="text-ethiopian-coffee/60 mt-1">Manage incoming orders and kitchen queue</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-[#C89B3C] animate-pulse" />
-          <ChefHat className="h-5 w-5 text-primary" />
-          <span className="text-sm font-medium">{total} active</span>
+          <div className="h-2 w-2 rounded-full bg-ethiopian-gold animate-pulse" />
+          <ChefHat className="h-5 w-5 text-ethiopian-gold" />
+          <span className="text-sm font-medium text-ethiopian-coffee">{total} active</span>
         </div>
       </div>
 
@@ -81,15 +81,15 @@ export default function KitchenDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
             >
-              <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/20">
+              <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-ethiopian-gold/10 hover:border-ethiopian-gold/20">
                 <CardContent className="p-4 lg:p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className={`h-10 w-10 lg:h-12 lg:w-12 rounded-xl ${s.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                       <s.icon className={`h-5 w-5 lg:h-6 lg:w-6 ${s.iconColor}`} />
                     </div>
                   </div>
-                  <p className="text-xs lg:text-sm text-muted-foreground font-medium mb-1">{statusLabels[status]}</p>
-                  <p className="text-2xl lg:text-3xl font-bold tracking-tight">{counts[status]}</p>
+                  <p className="text-xs lg:text-sm text-ethiopian-coffee/60 font-medium mb-1">{statusLabels[status]}</p>
+                  <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee">{counts[status]}</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -101,15 +101,15 @@ export default function KitchenDashboard() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.5 }}
         >
-          <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-red-300">
+          <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-ethiopian-gold/10 hover:border-ethiopian-burgundy/30">
             <CardContent className="p-4 lg:p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-xl bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                  <Beef className="h-5 w-5 lg:h-6 lg:w-6 text-[#A12222]" />
+                  <Beef className="h-5 w-5 lg:h-6 lg:w-6 text-ethiopian-burgundy" />
                 </div>
               </div>
-              <p className="text-xs lg:text-sm text-muted-foreground font-medium mb-1">{t("dashboard.butcherOrders")}</p>
-              <p className="text-2xl lg:text-3xl font-bold tracking-tight">{butcherCount}</p>
+              <p className="text-xs lg:text-sm text-ethiopian-coffee/60 font-medium mb-1">{t("dashboard.butcherOrders")}</p>
+              <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee">{butcherCount}</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -122,8 +122,8 @@ export default function KitchenDashboard() {
       >
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" />
+            <CardTitle className="flex items-center gap-2 font-serif text-ethiopian-coffee">
+              <AlertCircle className="h-5 w-5 text-ethiopian-gold" />
               Order Queue
             </CardTitle>
           </CardHeader>
@@ -134,19 +134,19 @@ export default function KitchenDashboard() {
                 const labels: Record<string, string> = { NEW: t("orders.pending"), PREPARING: t("orders.preparing"), READY: t("orders.ready"), SERVED: t("orders.delivered") };
                 return (
                   <div key={status} className="text-center">
-                    <div className={`h-12 w-12 rounded-full ${colors[status]} flex items-center justify-center mx-auto mb-2`}>
+                    <div className={`h-12 w-12 rounded-full ${colors[status]} flex items-center justify-center mx-auto mb-2 shadow-lg`}>
                       <span className="text-white font-bold text-lg">{counts[status]}</span>
                     </div>
-                    <p className="text-sm font-medium">{labels[status]}</p>
+                    <p className="text-sm font-medium text-ethiopian-coffee">{labels[status]}</p>
                   </div>
                 );
               })}
             </div>
             {total === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                <ChefHat className="h-16 w-16 mb-4 opacity-50" />
-                <p className="font-medium mb-1">No orders in queue</p>
-                <p className="text-sm">New orders will appear here</p>
+              <div className="flex flex-col items-center justify-center py-12 text-ethiopian-coffee/60">
+                <ChefHat className="h-16 w-16 mb-4 opacity-30 text-ethiopian-coffee" />
+                <p className="font-medium mb-1 text-ethiopian-coffee">No orders in queue</p>
+                <p className="text-sm text-ethiopian-coffee/60">New orders will appear here</p>
               </div>
             ) : (
               <div className="space-y-2">
@@ -154,14 +154,14 @@ export default function KitchenDashboard() {
                   Array.from({ length: Math.min(counts[status], 3) }).map((_, i) => (
                     <div key={`${status}-${i}`} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <div className={`h-2 w-2 rounded-full ${statsConfig[status as keyof typeof statsConfig].bgColor}`} />
-                      <span className="text-sm font-medium">{statusLabels[status]}</span>
-                      <span className="text-xs text-muted-foreground ml-auto">In queue</span>
+                      <span className="text-sm font-medium text-ethiopian-coffee">{statusLabels[status]}</span>
+                      <span className="text-xs text-ethiopian-coffee/60 ml-auto">In queue</span>
                     </div>
                   ))
                 )}
               </div>
             )}
-            <Button className="w-full mt-4" asChild>
+            <Button className="w-full mt-4" variant="premium" asChild>
               <Link href="/kds">
                 <CookingPot className="h-4 w-4 mr-2" />
                 Open Kitchen Display System

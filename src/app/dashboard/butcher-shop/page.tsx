@@ -66,24 +66,24 @@ export default function ButcherShopPage() {
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="p-2.5 rounded-xl bg-gradient-to-br from-[#A12222] to-[#C89B3C] text-white shadow-lg"
+          className="p-2.5 rounded-xl bg-gradient-to-br from-ethiopian-burgundy to-ethiopian-gold text-white shadow-lg"
         >
           <Beef className="w-6 h-6" />
         </motion.div>
         <div>
-          <h1 className="text-2xl font-bold text-[#3E2723]">{t("nav.butcherShop")}</h1>
-          <p className="text-sm text-[#3E2723]/60">{t("butcher.placeOrder")}</p>
+          <h1 className="text-2xl font-bold font-serif text-ethiopian-coffee">{t("nav.butcherShop")}</h1>
+          <p className="text-sm text-ethiopian-coffee/60">{t("butcher.placeOrder")}</p>
         </div>
       </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-[#C89B3C]/10"
+        className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-ethiopian-gold/10"
       >
         {/* Meat Type */}
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.meatType")}</label>
+          <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("butcher.meatType")}</label>
           <div className="flex flex-wrap gap-2">
             {meatTypes.map((type) => (
               <button
@@ -91,8 +91,8 @@ export default function ButcherShopPage() {
                 onClick={() => { setMeatType(type); setPortionSize("1/2 kg"); }}
                 className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   meatType === type
-                    ? "bg-[#A12222] text-white shadow-md scale-105"
-                    : "bg-[#F8F4EE] text-[#3E2723] hover:bg-[#C89B3C]/20"
+                    ? "bg-ethiopian-burgundy text-white shadow-md scale-105"
+                    : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
                 }`}
               >
                 {meatTypeLabels[type]}
@@ -103,7 +103,7 @@ export default function ButcherShopPage() {
 
         {/* Portion Size */}
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.portionSize")}</label>
+          <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("butcher.portionSize")}</label>
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {portionOptions.map((size) => {
               const price = meatPrices[meatType]?.[size] || 0;
@@ -113,12 +113,12 @@ export default function ButcherShopPage() {
                   onClick={() => setPortionSize(size)}
                   className={`flex flex-col items-center px-3 py-3 rounded-xl text-sm font-medium transition-all ${
                     portionSize === size
-                      ? "bg-[#C89B3C] text-white shadow-md scale-105 border-2 border-[#C89B3C]"
-                      : "bg-[#F8F4EE] text-[#3E2723] hover:bg-[#C89B3C]/20 border-2 border-transparent"
+                      ? "bg-ethiopian-gold text-white shadow-md scale-105 border-2 border-ethiopian-gold"
+                      : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border-2 border-transparent"
                   }`}
                 >
                   <span>{size}</span>
-                  <span className={`text-xs mt-1 ${portionSize === size ? "text-white/80" : "text-[#C89B3C]"}`}>
+                  <span className={`text-xs mt-1 ${portionSize === size ? "text-white/80" : "text-ethiopian-gold"}`}>
                     ETB {price}
                   </span>
                 </button>
@@ -130,26 +130,26 @@ export default function ButcherShopPage() {
         {/* Quantity + Total */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.quantity")}</label>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("butcher.quantity")}</label>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-12 h-12 rounded-xl bg-[#F8F4EE] text-[#3E2723] hover:bg-[#C89B3C]/20 transition-all flex items-center justify-center"
+                className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center"
               >
                 <Minus className="w-5 h-5" />
               </button>
-              <span className="text-3xl font-bold text-[#C89B3C] min-w-[3rem] text-center">{quantity}</span>
+              <span className="text-3xl font-bold text-ethiopian-gold min-w-[3rem] text-center">{quantity}</span>
               <button
                 onClick={() => setQuantity(Math.min(20, quantity + 1))}
-                className="w-12 h-12 rounded-xl bg-[#F8F4EE] text-[#3E2723] hover:bg-[#C89B3C]/20 transition-all flex items-center justify-center"
+                className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center"
               >
                 <Plus className="w-5 h-5" />
               </button>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("orders.total")}</label>
-            <div className="p-4 rounded-xl bg-gradient-to-r from-[#3E2723] to-[#1B1B1B] text-white">
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("orders.total")}</label>
+            <div className="p-4 rounded-xl bg-gradient-to-r from-ethiopian-coffee to-ethiopian-charcoal text-white">
               <p className="text-xs opacity-80">{quantity} x {portionSize} {meatTypeLabels[meatType]}</p>
               <p className="text-2xl font-bold">ETB {total.toLocaleString()}</p>
             </div>
@@ -158,12 +158,12 @@ export default function ButcherShopPage() {
 
         {/* Notes */}
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.notes")}</label>
+          <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("butcher.notes")}</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="E.g., cut into small cubes, mince finely, remove bones..."
-            className="w-full px-4 py-3 rounded-xl bg-[#F8F4EE] text-[#3E2723] placeholder:text-[#3E2723]/40 text-sm border border-transparent focus:border-[#C89B3C] focus:outline-none transition-all resize-none"
+            className="w-full px-4 py-3 rounded-xl bg-ethiopian-cream text-ethiopian-coffee placeholder:text-ethiopian-coffee/40 text-sm border border-transparent focus:border-ethiopian-gold focus:outline-none transition-all resize-none"
             rows={3}
           />
         </div>
@@ -174,7 +174,7 @@ export default function ButcherShopPage() {
           disabled={submitting}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="w-full sm:w-auto px-10 py-3.5 rounded-xl bg-gradient-to-r from-[#A12222] to-[#C89B3C] text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+          className="w-full sm:w-auto px-10 py-3.5 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
         >
           {submitting ? t("common.loading") : `${t("butcher.placeOrder")} - ETB ${total.toLocaleString()}`}
         </motion.button>

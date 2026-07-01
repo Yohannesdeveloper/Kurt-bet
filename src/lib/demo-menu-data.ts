@@ -11,7 +11,7 @@ export const demoCategories = [
 ];
 
 export const demoItems = [
-  { id: "item-1", name: "Kurt (ኩርት)", price: 350, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Fresh raw beef cubes seasoned with mitmita and niter kibbeh — our signature dish", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/kurt.jpg" },
+  { id: "item-1", name: "Kurt (ቁርጥ)", price: 350, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Fresh raw beef cubes seasoned with mitmita and niter kibbeh — our signature dish", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/kurt.jpg" },
   { id: "item-2", name: "Kitfo (ክትፎ)", price: 300, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Minced raw beef marinated in mitmita, niter kibbeh and cardamom", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/kifo.jpg" },
   { id: "item-3", name: "Gored Gored (ጎረድ ጎረድ)", price: 320, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Large cubes of raw beef served with awaze dipping sauce", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/gored gored.jpg" },
   { id: "item-4", name: "Zelzl Sega (ዝልዝል ሥጋ)", price: 400, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Thinly sliced raw beef strips seasoned with traditional spices", isAvailable: true, preparationTime: 5, variants: [], extras: [], image: "/images/zilzil tibs.jpg" },

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from "react";
 
 export type Locale = "en" | "am";
 export const defaultLocale: Locale = "en";
@@ -15,6 +15,7 @@ import en from "./translations/en.json";
 import am from "./translations/am.json";
 
 const allTranslations: Record<Locale, any> = { en, am };
+const STORAGE_KEY = "kurtbet-locale";
 
 type TranslationContextType = {
   locale: Locale;
@@ -24,8 +25,25 @@ type TranslationContextType = {
 
 const TranslationContext = createContext<TranslationContextType | null>(null);
 
-export function TranslationProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(defaultLocale);
+export function TranslationProvider({ children, initialLocale }: { children: ReactNode; initialLocale?: Locale }) {
+  const [locale, setLocaleState] = useState<Locale>(initialLocale || defaultLocale);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY) as Locale | null;
+      if (stored && locales.includes(stored) && stored !== locale) {
+        setLocaleState(stored);
+      }
+    } catch {}
+  }, []);
+
+  const setLocale = useCallback((newLocale: Locale) => {
+    setLocaleState(newLocale);
+    try {
+      localStorage.setItem(STORAGE_KEY, newLocale);
+      document.cookie = `${STORAGE_KEY}=${newLocale};path=/;max-age=31536000`;
+    } catch {}
+  }, []);
 
   const translate = useCallback((path: string, vars?: Record<string, string | number>): string => {
     const keys = path.split(".");

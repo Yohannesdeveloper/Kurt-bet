@@ -410,8 +410,8 @@
     "name": "ቁርጥ ቤት"
   },
   "categories": {
-    "tereSega": "ጠላ ሥጋ",
-    "kitfo": "ቅትፎ",
+    "tereSega": "ጥሬ ሥጋ",
+    "kitfo": "ክትፎ",
     "tibs": "ጥብስ",
     "goredGored": "ጎረድ ጎረድ",
     "awazeTibs": "አዋዜ ጥብስ",
@@ -421,7 +421,7 @@
   },
   "restaurant": {
     "kurtBetSpecial": "ቁርጥ ቤት ልዩ",
-    "addisKitfoHouse": "አዲስ ቅትፎ ቤት",
+    "addisKitfoHouse": "አዲስ ክትፎ ቤት",
     "tibsPalace": "ጥብስ ቤተ መንግሥት",
     "goredGoredHouse": "ጎረድ ጎረድ ቤት",
     "traditional": "ባህላዊ",
@@ -431,8 +431,8 @@
     "featured": "ታዋቂ",
     "orderNow": "አሁን ያዝዙ",
     "deliveryTime": "{time} ደቂቃ",
-    "tereSega": "ጠላ ሥጋ",
-    "kitfo": "ቅትፎ",
+    "tereSega": "ጥሬ ሥጋ",
+    "kitfo": "ክትፎ",
     "tibs": "ጥብስ",
     "goredGored": "ጎረድ ጎረድ"
   },

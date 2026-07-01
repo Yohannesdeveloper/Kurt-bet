@@ -143,20 +143,20 @@ export default function OrdersPage() {
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-xl lg:text-2xl font-bold tracking-tight">{t("orders.title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("orders.subtitle")}</p>
+          <h1 className="text-xl lg:text-2xl font-bold tracking-tight font-serif text-ethiopian-coffee">{t("orders.title")}</h1>
+          <p className="text-sm text-ethiopian-coffee/60">{t("orders.subtitle")}</p>
         </div>
         <div className="flex items-center gap-2 lg:gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ethiopian-coffee/40" />
             <Input
               placeholder={t("orders.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-10 lg:h-11 w-full sm:w-64 transition-all duration-200 focus:w-72"
+              className="pl-10 h-10 lg:h-11 w-full sm:w-64 transition-all duration-200 focus:w-72 border-ethiopian-gold/20 focus:border-ethiopian-gold/40"
             />
           </div>
-          <Button variant="outline" size="icon" className="h-10 lg:h-11 w-10 lg:w-11 flex-shrink-0">
+          <Button variant="outline" size="icon" className="h-10 lg:h-11 w-10 lg:w-11 flex-shrink-0 border-ethiopian-gold/20 text-ethiopian-coffee">
             <Filter className="h-4 w-4" />
           </Button>
           {canCreateOrder && (
@@ -171,10 +171,10 @@ export default function OrdersPage() {
         </div>
       </motion.div>
 
-      <Card className="border-2">
+      <Card className="border border-ethiopian-gold/10">
         <CardContent className="p-6">
           <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-muted/50 p-1">
+            <TabsList className="bg-ethiopian-gold/5 border border-ethiopian-gold/10 p-1">
               <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("orders.allOrders")}</TabsTrigger>
               <TabsTrigger value="pending" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("orders.pendingApproval")}</TabsTrigger>
               <TabsTrigger value="NEW" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("orders.statusNew")}</TabsTrigger>

@@ -25,7 +25,14 @@ export async function GET(req: NextRequest) {
   try {
     if (!restaurantId) throw new Error("No restaurant");
 
+    const currentUserId = (session?.user as { id?: string })?.id;
+    const currentRole = (session?.user as { role?: string })?.role;
+    const isStaff = currentRole === "ADMIN" || currentRole === "WAITER" || currentRole === "KITCHEN";
+
     const where: Record<string, unknown> = { restaurantId };
+    if (!isStaff && currentUserId) {
+      where.OR = [{ waiterId: currentUserId }, { customerId: currentUserId }];
+    }
     if (status && status !== "all") {
       if (status.includes(",")) {
         where.status = { in: status.split(",") };
@@ -81,11 +88,15 @@ export async function GET(req: NextRequest) {
         menuItem: menuMap.has(item.menuItemId) ? { image: menuMap.get(item.menuItemId).image } : null,
       })),
     }));
+    const currentUserId = (session?.user as { id?: string })?.id;
+    const currentRole = (session?.user as { role?: string })?.role;
+    const isStaff = currentRole === "ADMIN" || currentRole === "WAITER" || currentRole === "KITCHEN";
     const statusFilter = status;
     const filtered = demoWithImages.filter((o: any) => {
       const matchesStatus = !statusFilter || statusFilter === "all" || statusFilter.split(",").includes(o.status);
       const matchesApproved = approvedFilter === null || o.approved === (approvedFilter === "true");
-      return matchesStatus && matchesApproved;
+      const matchesUser = isStaff || !currentUserId || o.userId === currentUserId;
+      return matchesStatus && matchesApproved && matchesUser;
     });
     return NextResponse.json({
       success: true,
@@ -97,8 +108,9 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   let body: any;
+  let session: any = null;
   try {
-    const session = await getServerSession(authOptions);
+    session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
     }
@@ -155,6 +167,7 @@ export async function POST(req: NextRequest) {
     ]);
     const menuMap = new Map(menuItems.map((mi: any) => [mi.id, mi]));
     const nextNumber = demoOrders.length > 0 ? Math.max(...demoOrders.map((o: any) => o.orderNumber)) + 1 : 1001;
+    const sessionUserId = (session?.user as { id?: string })?.id;
     const demoOrder = {
       id: `demo-order-${Date.now()}`,
       orderNumber: nextNumber,
@@ -162,6 +175,7 @@ export async function POST(req: NextRequest) {
       tableId: body?.tableId || null,
       waiterId: null,
       customerId: null,
+      userId: sessionUserId || null,
       approved: false,
       status: "NEW",
       type: body?.type || "DINE_IN",

@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Plus, UtensilsCrossed, Loader2, Clock, Edit, Trash2 } from "lucide-react";
+import { Search, Plus, UtensilsCrossed, Loader2, Clock, Edit, Trash2, ShoppingCart, Minus, X, Check, Send, ArrowRight } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
@@ -28,6 +28,15 @@ import { motion } from "framer-motion";
 import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
 import { fetchMenu, addItem, updateItem as updateItemAction, removeItem, optimisticToggleAvailability } from "@/lib/store/features/menuSlice";
 import type { MenuItem, MenuCategory } from "@/lib/store/features/menuSlice";
+
+interface CartItem {
+  id: string;
+  name: string;
+  unitPrice: number;
+  quantity: number;
+  totalPrice: number;
+  image?: string;
+}
 
 export default function MenuPage() {
   const dispatch = useAppDispatch();
@@ -39,6 +48,9 @@ export default function MenuPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [showCart, setShowCart] = useState(false);
+  const [orderDialogOpen, setOrderDialogOpen] = useState(false);
 
   useEffect(() => { dispatch(fetchMenu()); }, [dispatch]);
 
@@ -61,6 +73,21 @@ export default function MenuPage() {
       toast.error("Failed to delete item");
     }
   };
+
+  const addToCart = (item: MenuItem) => {
+    setCart(prev => {
+      const existing = prev.find(c => c.id === item.id);
+      if (existing) return prev.map(c => c.id === item.id ? { ...c, quantity: c.quantity + 1, totalPrice: (c.quantity + 1) * c.unitPrice } : c);
+      return [...prev, { id: item.id, name: item.name, unitPrice: item.price, quantity: 1, totalPrice: item.price, image: item.image }];
+    });
+  };
+
+  const updateQty = (itemId: string, delta: number) => {
+    setCart(prev => prev.map(c => c.id === itemId ? { ...c, quantity: Math.max(0, c.quantity + delta), totalPrice: Math.max(0, c.quantity + delta) * c.unitPrice } : c).filter(c => c.quantity > 0));
+  };
+
+  const cartTotal = cart.reduce((s, c) => s + c.totalPrice, 0);
+  const cartCount = cart.reduce((s, c) => s + c.quantity, 0);
 
   const filtered = useMemo(() =>
     items.filter(i =>
@@ -250,7 +277,7 @@ export default function MenuPage() {
                           </div>
                         </CardContent>
                       )}
-                      <CardContent className="px-4 lg:px-5 py-3">
+                        <CardContent className="px-4 lg:px-5 py-3">
                         {canAddItem && (
                           <div className="mb-2">
                               <button
@@ -290,6 +317,25 @@ export default function MenuPage() {
                           </div>
                           <p className="font-bold text-base lg:text-lg text-primary">{formatCurrency(item.price)}</p>
                         </div>
+                        {item.isAvailable && (
+                          <div className="mt-3 pt-3 border-t flex items-center justify-between">
+                            {cart.find(c => c.id === item.id) ? (
+                              <div className="flex items-center gap-2">
+                                <Button variant="outline" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); updateQty(item.id, -1); }}>
+                                  <Minus className="h-3 w-3" />
+                                </Button>
+                                <span className="w-5 text-center text-sm font-medium">{cart.find(c => c.id === item.id)?.quantity || 0}</span>
+                                <Button variant="outline" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); updateQty(item.id, 1); }}>
+                                  <Plus className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={(e) => { e.stopPropagation(); addToCart(item); }}>
+                                <Plus className="h-3 w-3 mr-1" /> Add to Order
+                              </Button>
+                            )}
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -305,6 +351,80 @@ export default function MenuPage() {
         onOpenChange={setDialogOpen}
         categories={categories}
         editingItem={editingItem}
+      />
+
+      {cartCount > 0 && (
+        <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
+          <Button
+            className="h-14 w-14 rounded-full shadow-xl"
+            onClick={() => setShowCart(!showCart)}
+          >
+            <ShoppingCart className="h-6 w-6" />
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] text-white font-bold">
+              {cartCount}
+            </span>
+          </Button>
+        </div>
+      )}
+
+      {showCart && (
+        <div className="fixed inset-0 z-50 bg-black/50" onClick={() => setShowCart(false)}>
+          <div className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-background shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="font-bold text-lg">Your Order</h2>
+              <Button variant="ghost" size="icon" onClick={() => setShowCart(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            <div className="overflow-y-auto p-4" style={{ maxHeight: "calc(100vh - 190px)" }}>
+              {cart.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">Cart is empty</p>
+              ) : (
+                <div className="space-y-3">
+                  {cart.map(item => (
+                    <div key={item.id} className="flex items-center justify-between bg-muted/50 rounded-xl p-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        {item.image && <img src={item.image} alt="" className="h-10 w-10 rounded-lg object-cover flex-shrink-0" />}
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm truncate">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">{formatCurrency(item.totalPrice)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQty(item.id, -1)}>
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="w-6 text-center font-medium text-sm">{item.quantity}</span>
+                        <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQty(item.id, 1)}>
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            {cart.length > 0 && (
+              <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-background">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-semibold">Total</span>
+                  <span className="font-bold text-xl">{formatCurrency(cartTotal)}</span>
+                </div>
+                <Button className="w-full h-12 text-base" onClick={() => { setOrderDialogOpen(true); }}>
+                  <ArrowRight className="h-4 w-4 mr-2" /> Proceed to Order
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <PlaceOrderDialog
+        open={orderDialogOpen}
+        onOpenChange={setOrderDialogOpen}
+        cart={cart}
+        cartTotal={cartTotal}
+        onOrderPlaced={() => { setCart([]); setShowCart(false); setOrderDialogOpen(false); }}
       />
     </div>
   );
@@ -455,6 +575,112 @@ function AddItemDialog({ open, onOpenChange, categories, editingItem }: {
             </Button>
           </DialogFooter>
         </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function PlaceOrderDialog({ open, onOpenChange, cart, cartTotal, onOrderPlaced }: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  cart: CartItem[];
+  cartTotal: number;
+  onOrderPlaced: () => void;
+}) {
+  const [submitting, setSubmitting] = useState(false);
+  const [orderType, setOrderType] = useState("DINE_IN");
+  const [guestCount, setGuestCount] = useState("1");
+  const [notes, setNotes] = useState("");
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: orderType,
+          guestCount: parseInt(guestCount) || 1,
+          notes: notes || undefined,
+          subtotal: cartTotal,
+          total: cartTotal,
+          items: cart.map(c => ({
+            menuItemId: c.id,
+            name: c.name,
+            quantity: c.quantity,
+            unitPrice: c.unitPrice,
+            totalPrice: c.totalPrice,
+          })),
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Order #${data.data.orderNumber} placed!`);
+        onOrderPlaced();
+      } else {
+        toast.error(data.error || "Failed to place order");
+      }
+    } catch {
+      toast.error("Failed to place order");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[450px]">
+        <DialogHeader>
+          <DialogTitle>Place Order</DialogTitle>
+          <DialogDescription>Confirm your order details</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-2">
+          <div className="grid gap-2">
+            <Label>Order Type</Label>
+            <Select value={orderType} onValueChange={setOrderType}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="DINE_IN">Dine In</SelectItem>
+                <SelectItem value="TAKEOUT">Takeout</SelectItem>
+                <SelectItem value="DELIVERY">Delivery</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid gap-2">
+            <Label>Guest Count</Label>
+            <Input type="number" min={1} value={guestCount} onChange={e => setGuestCount(e.target.value)} />
+          </div>
+          <div className="grid gap-2">
+            <Label>Notes</Label>
+            <textarea
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              className="flex h-20 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
+              placeholder="Any special instructions..."
+            />
+          </div>
+          <div className="border-t pt-3">
+            <p className="text-sm font-medium mb-2">Items ({cart.reduce((s, c) => s + c.quantity, 0)})</p>
+            {cart.map(item => (
+              <div key={item.id} className="flex items-center justify-between text-sm py-1">
+                <span>{item.name} x{item.quantity}</span>
+                <span>{formatCurrency(item.totalPrice)}</span>
+              </div>
+            ))}
+          </div>
+          <div className="border-t pt-3 flex items-center justify-between font-semibold">
+            <span>Total</span>
+            <span className="text-lg">{formatCurrency(cartTotal)}</span>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button onClick={handleSubmit} disabled={submitting}>
+            {submitting ? <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Placing...</> : <><Send className="h-4 w-4 mr-1" /> Place Order</>}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

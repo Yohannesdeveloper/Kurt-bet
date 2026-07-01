@@ -19,14 +19,7 @@ const COLORS = {
   dark: "#1B1B1B",
 };
 
-const dishes = [
-  { name: "Tere Sega", desc: "Premium raw beef slices with mitmita and senafich", price: 400, popular: true },
-  { name: "Kurt", desc: "Fresh raw beef cubes seasoned with mitmita and niter kibbeh", price: 350, popular: true },
-  { name: "Kitfo", desc: "Minced raw beef marinated in mitmita and cardamom", price: 300, popular: true },
-  { name: "Gored Gored", desc: "Large cubes of raw beef with awaze dipping sauce", price: 320, popular: false },
-  { name: "Tibs", desc: "Sautéed beef with onions and rosemary", price: 280, popular: false },
-  { name: "Dulet", desc: "Minced tripe and liver with onions and mitmita", price: 200, popular: false },
-];
+interface MenuDish { id: string; name: string; description: string; price: number; image?: string; isAvailable: boolean; }
 
 const features = [
   { icon: UtensilsCrossed, title: "Fresh Premium Beef Daily", desc: "100% fresh Ethiopian beef sourced daily from local farms" },
@@ -40,7 +33,7 @@ const features = [
 const testimonials = [
   { name: "Sarah M.", text: "The most incredible Ethiopian dining experience outside of Addis Ababa. The kurt is absolutely world-class.", rating: 5 },
   { name: "David K.", text: "I've traveled across Ethiopia and this place captures the authentic taste perfectly. A true gem.", rating: 5 },
-  { name: "Meron T.", text: "Finally, a restaurant that honors our traditional Tere Sega with such care and excellence.", rating: 5 },
+  { name: "Meron T.", text: "Finally, a restaurant that honors our traditions with such care and excellence.", rating: 5 },
   { name: "James R.", text: "The atmosphere, the food, the coffee ceremony — every detail is perfection. Highly recommended.", rating: 5 },
 ];
 
@@ -51,16 +44,16 @@ const whyChooseUs = [
 ];
 
 const galleryImages = [
-  { label: "Traditional Serving", color: "from-amber-900/60 to-amber-950/60" },
-  { label: "Fresh Meat Preparation", color: "from-red-900/60 to-red-950/60" },
-  { label: "Restaurant Interior", color: "from-stone-900/60 to-stone-950/60" },
-  { label: "Coffee Ceremony", color: "from-amber-800/60 to-amber-950/60" },
-  { label: "Happy Customers", color: "from-emerald-900/60 to-emerald-950/60" },
-  { label: "Traditional Decor", color: "from-yellow-900/60 to-yellow-950/60" },
+  { label: "Kurt Bet Special", image: "/images/kurt.jpg", color: "from-amber-900/60 to-amber-950/60" },
+  { label: "Kitfo", image: "/images/kifo.jpg", color: "from-red-900/60 to-red-950/60" },
+  { label: "Tibs", image: "/images/tibs.jpg", color: "from-stone-900/60 to-stone-950/60" },
+  { label: "Gored Gored", image: "/images/gored gored.jpg", color: "from-amber-800/60 to-amber-950/60" },
+  { label: "Awaze Tibs", image: "/images/Awaze Tibs.jpg", color: "from-emerald-900/60 to-emerald-950/60" },
+  { label: "Zilzil Tibs", image: "/images/zilzil tibs.jpg", color: "from-yellow-900/60 to-yellow-950/60" },
 ];
 
 const specialOffers = [
-  { title: "Weekend Special", desc: "15% off on all Tere Sega orders", badge: "Weekend" },
+  { title: "Weekend Special", desc: "15% off on all orders above 1000 ETB", badge: "Weekend" },
   { title: "Family Package", desc: "Sample platter for 4 with coffee ceremony", badge: "Popular" },
   { title: "Coffee & Kurt", desc: "Traditional coffee ceremony + Kurt combo", badge: "Best Value" },
 ];
@@ -121,7 +114,7 @@ function FloatingNav() {
         scrolled ? "bg-white/90 backdrop-blur-xl shadow-lg" : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#A12222] to-[#C89B3C] flex items-center justify-center">
             <UtensilsCrossed className="w-5 h-5 text-white" />
@@ -132,14 +125,14 @@ function FloatingNav() {
           {links.map(l => (
             <a key={l} href={`#${l.toLowerCase()}`} className={`text-sm tracking-wider uppercase ${scrolledStyles} ${hoverStyles}`}>{l}</a>
           ))}
+          <a href="/dashboard" className="px-5 py-2.5 rounded-full bg-[#C89B3C] text-white text-sm font-semibold hover:bg-[#A12222] transition-all duration-300 shadow-lg hover:shadow-xl">
+            Dashboard
+          </a>
           {isAuthenticated && (
-            <a href="/dashboard" className={`text-sm tracking-wider uppercase font-semibold ${scrolledStyles} ${hoverStyles}`}>
-              Dashboard
+            <a href="/orders" className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white text-sm font-semibold hover:shadow-xl hover:shadow-[#C89B3C]/30 transition-all duration-300">
+              My Orders
             </a>
           )}
-          <a href={isAuthenticated ? "/orders" : "/menu"} className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white text-sm font-semibold hover:shadow-xl hover:shadow-[#C89B3C]/30 transition-all duration-300">
-            {isAuthenticated ? "My Orders" : "Reserve a Table"}
-          </a>
         </div>
         <button className="md:hidden text-[#C89B3C]" onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -152,10 +145,12 @@ function FloatingNav() {
               {links.map(l => (
                 <a key={l} href={`#${l.toLowerCase()}`} onClick={() => setMenuOpen(false)} className="block text-[#3E2723] font-medium">{l}</a>
               ))}
-              {isAuthenticated && <a href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-[#3E2723] font-medium">Dashboard</a>}
-              <a href={isAuthenticated ? "/orders" : "/menu"} onClick={() => setMenuOpen(false)} className="block text-center px-6 py-3 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white font-semibold">
-                {isAuthenticated ? "My Orders" : "Reserve a Table"}
-              </a>
+              <a href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-[#3E2723] font-medium">Dashboard</a>
+              {isAuthenticated && (
+                <a href="/orders" onClick={() => setMenuOpen(false)} className="block text-center px-6 py-3 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white font-semibold">
+                  My Orders
+                </a>
+              )}
             </div>
           </motion.div>
         )}
@@ -168,9 +163,7 @@ function HeroSection() {
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#1B1B1B]">
       <div className="absolute inset-0 bg-gradient-to-br from-[#3E2723]/90 via-[#1B1B1B]/95 to-[#A12222]/80 z-10" />
-      <motion.div
-        animate={{ scale: [1, 1.05, 1], rotate: [0, 2, -2, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      <div
         className="absolute inset-0 opacity-20"
         style={{
           backgroundImage: `radial-gradient(circle at 30% 50%, #C89B3C 0%, transparent 50%), radial-gradient(circle at 70% 30%, #A12222 0%, transparent 40%), radial-gradient(circle at 50% 80%, #3E2723 0%, transparent 50%)`,
@@ -178,29 +171,29 @@ function HeroSection() {
       />
       <div className="absolute inset-0 opacity-5" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23C89B3C' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` }} />
 
-      <div className="relative z-20 text-center px-6 max-w-6xl mx-auto">
+      <div className="relative z-20 text-center px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 max-w-[1600px] mx-auto">
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="mb-6">
           <span className="inline-block px-6 py-2 rounded-full border border-[#C89B3C]/40 text-[#C89B3C] text-sm tracking-widest uppercase bg-[#C89B3C]/10 backdrop-blur-sm">
-            Since 2024
+            Authentic Ethiopian Cuisine
           </span>
         </motion.div>
-        <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold text-white leading-tight mb-6">
+        <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold text-white leading-tight mb-6">
           Experience Authentic
           <br />
-          <span className="bg-gradient-to-r from-[#C89B3C] via-[#F5D980] to-[#C89B3C] bg-clip-text text-transparent">Ethiopian Tere Sega</span>
+          <span className="bg-gradient-to-r from-[#C89B3C] via-[#F5D980] to-[#C89B3C] bg-clip-text text-transparent">Ethiopian Cuisine</span>
           <br />
           Like Never Before
         </motion.h1>
-        <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="text-lg md:text-xl text-white/70 max-w-3xl mx-auto mb-10 leading-relaxed">
+        <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/70 max-w-3xl mx-auto mb-8 lg:mb-10 leading-relaxed">
           Freshly prepared every day using premium Ethiopian beef, traditional spices, and generations of culinary heritage passed down through our family.
         </motion.p>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a href="/menu" className="group px-8 py-4 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white font-semibold text-lg hover:shadow-2xl hover:shadow-[#C89B3C]/40 transition-all duration-500 hover:scale-105">
-            Reserve a Table
+            View Our Menu
             <ArrowRight className="inline ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </a>
-          <a href="/menu" className="group px-8 py-4 rounded-full border-2 border-white/30 text-white font-semibold text-lg hover:bg-white/10 hover:border-white/50 transition-all duration-300">
-            View Menu
+          <a href="/dashboard" className="group px-8 py-4 rounded-full border-2 border-white/30 text-white font-semibold text-lg hover:bg-white/10 hover:border-white/50 transition-all duration-300">
+            Order Now
           </a>
         </motion.div>
       </div>
@@ -216,12 +209,12 @@ function HeroSection() {
 
 function FeatureHighlights() {
   return (
-    <section className="py-28 px-6 bg-[#F8F4EE]">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#F8F4EE]">
+      <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
           <SectionTitle label="Why Choose Us" title="The Kurt Bet Experience" subtitle="Every detail crafted to bring you the authentic taste of Ethiopia" />
         </AnimatedSection>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
           {features.map((f, i) => (
             <AnimatedSection key={f.title} delay={i * 0.1}>
               <motion.div whileHover={{ y: -8 }} className="group p-8 rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-[#C89B3C]/20">
@@ -241,9 +234,9 @@ function FeatureHighlights() {
 
 function AboutSection() {
   return (
-    <section id="about" className="py-28 px-6 bg-white">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+    <section id="about" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-white">
+      <div className="max-w-[1600px] mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
           <AnimatedSection>
             <div className="relative">
               <div className="aspect-[4/5] rounded-3xl bg-gradient-to-br from-[#3E2723] to-[#1B1B1B] overflow-hidden shadow-2xl">
@@ -293,36 +286,41 @@ function AboutSection() {
 }
 
 function SignatureDishes() {
-  const [active, setActive] = useState(0);
+  const [dishes, setDishes] = useState<MenuDish[]>([]);
+  useEffect(() => {
+    fetch("/api/menu").then(r => r.json()).then(d => {
+      if (d.success) setDishes((d.data.items || []).filter((i: any) => i.isAvailable !== false).slice(0, 6));
+    }).catch(() => {});
+  }, []);
   return (
-    <section id="menu" className="py-28 px-6 bg-[#F8F4EE]">
-      <div className="max-w-7xl mx-auto">
+    <section id="menu" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#F8F4EE]">
+      <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
           <SectionTitle label="Signature Dishes" title="Our Specialties" subtitle="Handcrafted with premium Ethiopian ingredients and generations of tradition" />
         </AnimatedSection>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {dishes.map((dish, i) => (
-            <AnimatedSection key={dish.name} delay={i * 0.1}>
+            <AnimatedSection key={dish.id} delay={i * 0.1}>
               <motion.div whileHover={{ y: -8 }} className="group rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-500">
-                <div className="relative h-56 bg-gradient-to-br from-[#3E2723] to-[#1B1B1B] overflow-hidden">
-                  <div className="absolute inset-0 opacity-30 group-hover:opacity-50 transition-opacity duration-500" style={{
-                    backgroundImage: `radial-gradient(circle at 50% 50%, #C89B3C 0%, transparent 70%)`,
-                  }} />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <UtensilsCrossed className="w-12 h-12 text-[#C89B3C] opacity-50 group-hover:opacity-80 group-hover:scale-110 transition-all duration-500" />
-                  </div>
-                  {dish.popular && (
-                    <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-[#C89B3C] text-white text-xs font-bold shadow-lg">
-                      Most Popular
+                <div className="relative h-56 overflow-hidden bg-gradient-to-br from-[#3E2723] to-[#1B1B1B]">
+                  {dish.image ? (
+                    <img src={dish.image} alt={dish.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <UtensilsCrossed className="w-12 h-12 text-[#C89B3C] opacity-50" />
                     </div>
                   )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-[#C89B3C] text-white text-xs font-bold shadow-lg">
+                    Bestseller
+                  </div>
                 </div>
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-xl font-bold text-[#3E2723]">{dish.name}</h3>
-                    <span className="text-2xl font-bold text-[#C89B3C]">${dish.price}</span>
+                    <span className="text-2xl font-bold text-[#C89B3C]">{dish.price} ETB</span>
                   </div>
-                  <p className="text-[#3E2723]/70 text-sm leading-relaxed">{dish.desc}</p>
+                  <p className="text-[#3E2723]/70 text-sm leading-relaxed line-clamp-2">{dish.description}</p>
                 </div>
               </motion.div>
             </AnimatedSection>
@@ -343,11 +341,11 @@ function LiveKitchenSection() {
   ];
 
   return (
-    <section className="py-28 px-6 bg-[#1B1B1B] relative overflow-hidden">
+    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#1B1B1B] relative overflow-hidden">
       <div className="absolute inset-0 opacity-10" style={{
         backgroundImage: `radial-gradient(circle at 30% 50%, #C89B3C 0%, transparent 50%), radial-gradient(circle at 70% 80%, #A12222 0%, transparent 40%)`,
       }} />
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-[1600px] mx-auto relative z-10">
         <AnimatedSection>
           <div className="text-center mb-16">
             <span className="text-sm tracking-[0.3em] uppercase text-[#C89B3C] font-medium">Live Kitchen</span>
@@ -381,12 +379,12 @@ function LiveKitchenSection() {
 
 function WhyChooseUs() {
   return (
-    <section className="py-28 px-6 bg-white">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-white">
+      <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
           <SectionTitle label="Why Choose Us" title="Excellence in Every Detail" />
         </AnimatedSection>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 lg:gap-4">
           {whyChooseUs.map((item, i) => (
             <AnimatedSection key={item} delay={i * 0.05}>
               <motion.div whileHover={{ scale: 1.03 }} className="p-6 rounded-2xl bg-[#F8F4EE] border border-transparent hover:border-[#C89B3C]/30 transition-all duration-300 text-center group">
@@ -406,12 +404,12 @@ function WhyChooseUs() {
 function GallerySection() {
   const [selected, setSelected] = useState<number | null>(null);
   return (
-    <section id="gallery" className="py-28 px-6 bg-[#F8F4EE]">
-      <div className="max-w-7xl mx-auto">
+    <section id="gallery" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#F8F4EE]">
+      <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
           <SectionTitle label="Gallery" title="Our World" subtitle="Step inside the Kurt Bet experience" />
         </AnimatedSection>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-3 lg:gap-4">
           {galleryImages.map((img, i) => (
             <motion.div
               key={img.label} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }}
@@ -419,7 +417,8 @@ function GallerySection() {
               className={`relative aspect-square rounded-2xl overflow-hidden cursor-pointer group ${i === 0 ? "md:col-span-2 md:row-span-2" : ""}`}
               onClick={() => setSelected(i)}
             >
-              <div className={`absolute inset-0 bg-gradient-to-br ${img.color} group-hover:scale-105 transition-transform duration-700`} />
+              <img src={img.image} alt={img.label} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+              <div className={`absolute inset-0 bg-gradient-to-br ${img.color} mix-blend-overlay`} />
               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/30">
                 <ExternalLink className="w-8 h-8 text-white" />
               </div>
@@ -433,8 +432,8 @@ function GallerySection() {
       <AnimatePresence>
         {selected !== null && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-6" onClick={() => setSelected(null)}>
-            <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }} className="max-w-4xl w-full aspect-video rounded-3xl bg-gradient-to-br from-[#3E2723] to-[#1B1B1B] flex items-center justify-center" onClick={e => e.stopPropagation()}>
-              <p className="text-white text-2xl font-bold">{galleryImages[selected].label}</p>
+            <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} exit={{ scale: 0.8 }} className="max-w-4xl w-full aspect-video rounded-3xl overflow-hidden" onClick={e => e.stopPropagation()}>
+              <img src={galleryImages[selected].image} alt={galleryImages[selected].label} className="w-full h-full object-cover" />
             </motion.div>
             <button className="absolute top-6 right-6 text-white/70 hover:text-white" onClick={() => setSelected(null)}><X className="w-8 h-8" /></button>
           </motion.div>
@@ -451,11 +450,11 @@ function TestimonialsSection() {
     return () => clearInterval(t);
   }, []);
   return (
-    <section className="py-28 px-6 bg-[#1B1B1B] relative overflow-hidden">
+    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#1B1B1B] relative overflow-hidden">
       <div className="absolute inset-0 opacity-5" style={{
         backgroundImage: `radial-gradient(circle at 80% 20%, #C89B3C 0%, transparent 40%)`,
       }} />
-      <div className="max-w-4xl mx-auto relative z-10">
+      <div className="max-w-4xl lg:max-w-5xl mx-auto relative z-10">
         <AnimatedSection>
           <div className="text-center mb-12">
             <span className="text-sm tracking-[0.3em] uppercase text-[#C89B3C] font-medium">Testimonials</span>
@@ -493,12 +492,12 @@ function TestimonialsSection() {
 
 function CultureSection() {
   return (
-    <section className="py-28 px-6 bg-[#F8F4EE]">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#F8F4EE]">
+      <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
           <SectionTitle label="Our Heritage" title="Ethiopian Culinary Tradition" subtitle="Centuries of culture, hospitality, and flavor" />
         </AnimatedSection>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           {[
             { title: "History of Kurt", desc: "Kurt (or Kitfo) has been a cornerstone of Ethiopian cuisine for centuries, originating in the highlands where fresh raw beef was celebrated as a symbol of prosperity and tradition." },
             { title: "Tere Sega Tradition", desc: "Tere Sega — literally 'fresh meat' — represents the pinnacle of Ethiopian culinary art, prepared with precision and served with respect for ancient customs." },
@@ -520,11 +519,11 @@ function CultureSection() {
 
 function SpecialOffers() {
   return (
-    <section className="py-28 px-6 bg-gradient-to-br from-[#3E2723] to-[#1B1B1B] relative overflow-hidden">
+    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-gradient-to-br from-[#3E2723] to-[#1B1B1B] relative overflow-hidden">
       <div className="absolute inset-0 opacity-10" style={{
         backgroundImage: `radial-gradient(circle at 50% 50%, #C89B3C 0%, transparent 60%)`,
       }} />
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-[1600px] mx-auto relative z-10">
         <AnimatedSection>
           <div className="text-center mb-16">
             <span className="text-sm tracking-[0.3em] uppercase text-[#C89B3C] font-medium">Special Offers</span>
@@ -532,7 +531,7 @@ function SpecialOffers() {
             <div className="w-20 h-1 bg-[#C89B3C] mx-auto mt-6 rounded-full" />
           </div>
         </AnimatedSection>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6">
           {specialOffers.map((offer, i) => (
             <AnimatedSection key={offer.title} delay={i * 0.15}>
               <motion.div whileHover={{ y: -8 }} className="p-8 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-[#C89B3C]/30 transition-all duration-300 text-center group">
@@ -553,12 +552,12 @@ function SpecialOffers() {
 
 function LocationSection() {
   return (
-    <section className="py-28 px-6 bg-[#F8F4EE]">
-      <div className="max-w-7xl mx-auto">
+    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#F8F4EE]">
+      <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
           <SectionTitle label="Visit Us" title="Find Kurt Bet" />
         </AnimatedSection>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <AnimatedSection>
             <div className="rounded-3xl overflow-hidden shadow-2xl aspect-[4/3] bg-gradient-to-br from-[#3E2723] to-[#1B1B1B] flex items-center justify-center">
               <MapPin className="w-16 h-16 text-[#C89B3C]" />
@@ -594,9 +593,9 @@ function LocationSection() {
 
 function Footer() {
   return (
-    <footer className="py-16 px-6 bg-[#1B1B1B] text-white/60">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+    <footer className="py-12 lg:py-16 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#1B1B1B] text-white/60">
+      <div className="max-w-[1600px] mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-10 mb-8 lg:mb-12">
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#A12222] to-[#C89B3C] flex items-center justify-center">

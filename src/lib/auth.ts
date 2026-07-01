@@ -85,10 +85,11 @@ export const authOptions: NextAuthOptions = {
         }
 
         const DEMO_USERS: Record<string, { name: string; role: string; firstName: string; lastName: string }> = {
-          "admin@restaurant.com":  { name: "Admin User",    role: "ADMIN",  firstName: "Admin",  lastName: "User" },
-          "waiter@restaurant.com": { name: "Meron Tefera",  role: "WAITER", firstName: "Meron",  lastName: "Tefera" },
-          "kitchen@restaurant.com":{ name: "Bereket Hailu", role: "KITCHEN",firstName: "Bereket",lastName: "Hailu" },
-          "client@restaurant.com": { name: "Client User",   role: "CLIENT", firstName: "Client", lastName: "User" },
+          "admin@restaurant.com":   { name: "Admin User",     role: "ADMIN",   firstName: "Admin",   lastName: "User" },
+          "waiter@restaurant.com":  { name: "Meron Tefera",   role: "WAITER",  firstName: "Meron",   lastName: "Tefera" },
+          "kitchen@restaurant.com": { name: "Bereket Hailu",  role: "KITCHEN", firstName: "Bereket", lastName: "Hailu" },
+          "client@restaurant.com":  { name: "Client User",    role: "CLIENT",  firstName: "Client",  lastName: "User" },
+          "butcher@restaurant.com": { name: "Butcher User",   role: "BUTCHER", firstName: "Butcher", lastName: "User" },
         };
         const demo = DEMO_USERS[credentials.email];
         const passwordOk = credentials.email === "admin@restaurant.com"
@@ -156,9 +157,10 @@ export function requireOwner(session: any): boolean {
 export function hasPermission(role: string, requiredRole: string): boolean {
   const hierarchy: Record<string, number> = {
     CLIENT: 1,
-    KITCHEN: 2,
-    WAITER: 3,
-    ADMIN: 4,
+    BUTCHER: 2,
+    KITCHEN: 3,
+    WAITER: 4,
+    ADMIN: 5,
   };
   return (hierarchy[role] || 0) >= (hierarchy[requiredRole] || 0);
 }
@@ -166,6 +168,7 @@ export function hasPermission(role: string, requiredRole: string): boolean {
 export function getRoleDashboard(role: string): string {
   const dashboards: Record<string, string> = {
     ADMIN: "/dashboard/admin",
+    BUTCHER: "/dashboard/butcher",
     CLIENT: "/dashboard/client",
     KITCHEN: "/dashboard/kitchen",
     WAITER: "/dashboard/waiter",

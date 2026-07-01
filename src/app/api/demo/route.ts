@@ -8,6 +8,7 @@ export async function POST() {
       delDemoJSON(".demo-orders.json"),
       delDemoJSON(".demo-deleted-items.json"),
       delDemoJSON(".demo-reservations.json"),
+      delDemoJSON(".demo-butcher-orders.json"),
     ]);
     return NextResponse.json({ success: true, message: "Demo data reset" });
   } catch {

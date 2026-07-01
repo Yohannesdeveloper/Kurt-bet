@@ -1,0 +1,67 @@
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 3.7s
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 20.6s (4446 modules)
+ ✓ Compiled in 1849ms (2225 modules)
+ ○ Compiling / ...
+ ✓ Compiled / in 1998ms (4431 modules)
+ GET / 200 in 2420ms
+ GET / 200 in 52ms
+ GET / 200 in 51ms
+ GET / 200 in 63ms
+ GET /dashboard 200 in 180ms
+ GET /dashboard 200 in 117ms
+ GET / 200 in 135ms
+ ○ Compiling /api/auth/[...nextauth] ...
+ ✓ Compiled /api/auth/[...nextauth] in 3.3s (2542 modules)
+ GET /api/auth/session 200 in 4789ms
+ GET /api/auth/session 200 in 51ms
+ ○ Compiling /api/menu ...
+ ✓ Compiled /api/menu in 1469ms (2643 modules)
+ GET /api/menu 200 in 2867ms
+ GET /dashboard 200 in 367ms
+ GET /api/menu 200 in 100ms
+ GET /api/auth/session 200 in 166ms
+ GET /api/auth/session 200 in 20ms
+ ○ Compiling /menu ...
+ ✓ Compiled /menu in 3.3s (5022 modules)
+ GET /menu 200 in 3874ms
+ GET /dashboard 200 in 159ms
+ GET /dashboard 200 in 139ms
+ GET /api/auth/session 200 in 166ms
+ GET /api/auth/session 200 in 40ms
+ ✓ Compiled in 3.7s (4530 modules)
+ GET /dashboard 200 in 184ms
+ ✓ Compiled in 1082ms (2313 modules)
+ GET /dashboard 500 in 254ms
+ ○ Compiling /_not-found ...
+ ✓ Compiled /_not-found in 3.8s (4844 modules)
+ GET /api/auth/session 200 in 3784ms
+ GET /_next/static/webpack/ae210172afa1cb83.webpack.hot-update.json 404 in 3331ms
+ GET /api/auth/session 200 in 253ms
+ GET /dashboard 200 in 283ms
+ GET /api/auth/session 200 in 41ms
+ GET /api/auth/session 200 in 21ms
+ ✓ Compiled in 1829ms (4858 modules)
+ GET /dashboard 200 in 900ms
+ GET /api/auth/session 200 in 120ms
+ GET /api/auth/session 200 in 22ms
+ GET /dashboard 200 in 153ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 4.7s (4760 modules)
+ GET /_next/static/css/app/layout.css?v=1782900961346 500 in 13809ms
+ GET /_next/static/chunks/webpack.js?v=1782900961346 500 in 13788ms
+ GET /_next/static/chunks/app-pages-internals.js 500 in 13740ms
+ GET /_next/static/chunks/main-app.js?v=1782900961346 500 in 13764ms
+ GET /_next/static/chunks/vendors-_app-pages-browser_node_modules_next_dist_client_components_client-page_js-_app-pages-7d523d.js 500 in 13748ms
+ GET /_next/static/chunks/commons.js 500 in 13618ms
+ GET /_next/static/chunks/app/dashboard/page.js 500 in 155ms
+ GET /_next/static/chunks/vendors-_app-pages-browser_node_modules_next_dist_api_app-dynamic_js-_app-pages-browser_node_-6b0d1c.js 500 in 146ms
+ GET /_next/static/chunks/app/dashboard/layout.js 500 in 145ms
+ GET /_next/static/chunks/vendors-_app-pages-browser_node_modules_next_font_google_target_css_path_src_app_layout_tsx_i-3e2790.js 500 in 143ms
+ GET /dashboard 500 in 367ms
+ GET /dashboard 500 in 192ms

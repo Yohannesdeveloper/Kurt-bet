@@ -6,7 +6,7 @@ import { ClipboardList, Users, CreditCard, Clock, Plus, Table, CheckCircle } fro
 import { motion } from "framer-motion";
 
 const stats = [
-  { label: "My Tables", value: "0", icon: Table, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
+  { label: "My Tables", value: "0", icon: Table, color: "from-[#C89B3C] to-[#3E2723]", bgColor: "bg-[#C89B3C]/10", iconColor: "text-[#C89B3C]" },
   { label: "Active Orders", value: "0", icon: ClipboardList, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
   { label: "Payments Pending", value: "0", icon: CreditCard, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
   { label: "Orders Completed", value: "0", icon: CheckCircle, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-500/10", iconColor: "text-purple-600" },

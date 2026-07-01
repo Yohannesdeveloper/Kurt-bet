@@ -1,0 +1,856 @@
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⨯ src\app\dashboard\page.tsx (81:11) @ Store
+ ⨯ ReferenceError: Store is not defined
+    at eval (./src/app/dashboard/page.tsx:158:15)
+    at (ssr)/./src/app/dashboard/page.tsx (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js:108:1)
+    at Object.__webpack_require__ [as require] (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:33:42)
+digest: "1640911138"
+[0m [90m 79 |[39m   { icon[33m:[39m [33mHome[39m[33m,[39m label[33m:[39m [32m"Dashboard"[39m[33m,[39m href[33m:[39m [32m"/dashboard"[39m }[33m,[39m[0m
+[0m [90m 80 |[39m   { icon[33m:[39m [33mUtensilsCrossed[39m[33m,[39m label[33m:[39m [32m"Menu"[39m[33m,[39m href[33m:[39m [32m"/menu"[39m }[33m,[39m[0m
+[0m[31m[1m>[22m[39m[90m 81 |[39m   { icon[33m:[39m [33mStore[39m[33m,[39m label[33m:[39m [32m"Tables"[39m[33m,[39m href[33m:[39m [32m"/tables"[39m }[33m,[39m[0m
+[0m [90m    |[39m           [31m[1m^[22m[39m[0m
+[0m [90m 82 |[39m   { icon[33m:[39m [33mReceipt[39m[33m,[39m label[33m:[39m [32m"Orders"[39m[33m,[39m href[33m:[39m [32m"/orders"[39m }[33m,[39m[0m
+[0m [90m 83 |[39m   { icon[33m:[39m [33mCookingPot[39m[33m,[39m label[33m:[39m [32m"Kitchen"[39m[33m,[39m href[33m:[39m [32m"/kds"[39m }[33m,[39m[0m
+[0m [90m 84 |[39m   { icon[33m:[39m [33mClipboardList[39m[33m,[39m label[33m:[39m [32m"Inventory"[39m[33m,[39m href[33m:[39m [32m"/inventory"[39m }[33m,[39m[0m
+ ⨯ src\app\dashboard\page.tsx (81:11) @ Store
+ ⨯ ReferenceError: Store is not defined
+    at eval (./src/app/dashboard/page.tsx:158:15)
+    at (ssr)/./src/app/dashboard/page.tsx (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js:108:1)
+    at Object.__webpack_require__ [as require] (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:33:42)
+digest: "1640911138"
+[0m [90m 79 |[39m   { icon[33m:[39m [33mHome[39m[33m,[39m label[33m:[39m [32m"Dashboard"[39m[33m,[39m href[33m:[39m [32m"/dashboard"[39m }[33m,[39m[0m
+[0m [90m 80 |[39m   { icon[33m:[39m [33mUtensilsCrossed[39m[33m,[39m label[33m:[39m [32m"Menu"[39m[33m,[39m href[33m:[39m [32m"/menu"[39m }[33m,[39m[0m
+[0m[31m[1m>[22m[39m[90m 81 |[39m   { icon[33m:[39m [33mStore[39m[33m,[39m label[33m:[39m [32m"Tables"[39m[33m,[39m href[33m:[39m [32m"/tables"[39m }[33m,[39m[0m
+[0m [90m    |[39m           [31m[1m^[22m[39m[0m
+[0m [90m 82 |[39m   { icon[33m:[39m [33mReceipt[39m[33m,[39m label[33m:[39m [32m"Orders"[39m[33m,[39m href[33m:[39m [32m"/orders"[39m }[33m,[39m[0m
+[0m [90m 83 |[39m   { icon[33m:[39m [33mCookingPot[39m[33m,[39m label[33m:[39m [32m"Kitchen"[39m[33m,[39m href[33m:[39m [32m"/kds"[39m }[33m,[39m[0m
+[0m [90m 84 |[39m   { icon[33m:[39m [33mClipboardList[39m[33m,[39m label[33m:[39m [32m"Inventory"[39m[33m,[39m href[33m:[39m [32m"/inventory"[39m }[33m,[39m[0m
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2662
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2704)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2090:30)
+    at async pipe.req.req (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2056:30)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:374:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\dashboard\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2662
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2704)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2090:30)
+    at async pipe.req.req (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2056:30)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:374:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\dashboard\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2662
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2704)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2090:30)
+    at async pipe.req.req (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2056:30)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:374:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\dashboard\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2662
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2704)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2090:30)
+    at async pipe.req.req (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2056:30)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:374:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\dashboard\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2662
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2704)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2090:30)
+    at async pipe.req.req (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2056:30)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:374:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\dashboard\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2662
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2704)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2090:30)
+    at async pipe.req.req (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2056:30)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:374:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\dashboard\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2662
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2704)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2090:30)
+    at async pipe.req.req (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2056:30)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:374:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\_not-found\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2662
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2704)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2090:30)
+    at async pipe.req.req (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2056:30)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:374:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\_not-found\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2662
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2704)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2090:30)
+    at async pipe.req.req (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2056:30)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:374:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\_not-found\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2662
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js:1:2704)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderErrorToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2090:30)
+    at async pipe.req.req (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:2056:30)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:374:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\_not-found\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ]
+}
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js:1:24898
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js:1:24944)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\_not-found\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/dashboard'
+}
+ ⨯ Error: Cannot find module './351.js'
+Require stack:
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js
+- C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\_not-found\page.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\build\utils.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-middleware.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\hot-reloader-webpack.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-utils\setup-dev-bundler.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js
+- C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1421:15)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1059:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1064:22)
+    at Module._load (node:internal/modules/cjs/loader:1227:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at __webpack_require__.f.require (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:198:28)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:111:40
+    at Array.reduce (<anonymous>)
+    at __webpack_require__.e (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:110:67)
+    at Array.map (<anonymous>)
+    at __webpack_require__.X (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\webpack-runtime.js:162:22)
+    at C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js:1:24898
+    at Object.<anonymous> (C:\Users\Yohannes\Final year project\restaurant-os\.next\server\app\dashboard\page.js:1:24944)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1504:12)
+    at mod.require (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require-hook.js:65:28)
+    at require (node:internal/modules/helpers:152:16)
+    at requirePage (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\require.js:109:84)
+    at C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:84
+    at async loadComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\load-components.js:103:26)
+    at async DevServer.findPageComponentsImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:714:36)
+    at async DevServer.findPageComponents (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:577:20)
+    at async DevServer.renderPageComponent (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:1910:24)
+    at async DevServer.renderToResponseImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:1962:32)
+    at async DevServer.pipeImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:922:25)
+    at async NextNodeServer.handleCatchallRenderRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\next-server.js:272:17)
+    at async DevServer.handleRequestImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\base-server.js:818:17)
+    at async C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:339:20
+    at async Span.traceAsyncFn (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\trace\trace.js:154:20)
+    at async DevServer.handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\dev\next-dev-server.js:336:24)
+    at async invokeRender (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:179:21)
+    at async handleRequest (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:359:24)
+    at async requestHandlerImpl (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\router-server.js:383:13)
+    at async Server.requestListener (C:\Users\Yohannes\Final year project\restaurant-os\node_modules\next\dist\server\lib\start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\webpack-runtime.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\.next\\server\\app\\_not-found\\page.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\require.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\load-components.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\build\\utils.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-middleware.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\dev\\hot-reloader-webpack.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-utils\\setup-dev-bundler.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\router-server.js',
+    'C:\\Users\\Yohannes\\Final year project\\restaurant-os\\node_modules\\next\\dist\\server\\lib\\start-server.js'
+  ],
+  page: '/dashboard'
+}
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\Yohannes\Final year project\restaurant-os\.next\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\Users\Yohannes\Final year project\restaurant-os\.next\cache\webpack\client-development-fallback\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\Yohannes\Final year project\restaurant-os\.next\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\Users\Yohannes\Final year project\restaurant-os\.next\cache\webpack\client-development-fallback\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\Yohannes\Final year project\restaurant-os\.next\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\Users\Yohannes\Final year project\restaurant-os\.next\cache\webpack\client-development-fallback\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\Yohannes\Final year project\restaurant-os\.next\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\Users\Yohannes\Final year project\restaurant-os\.next\cache\webpack\client-development-fallback\0.pack.gz'
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename 'C:\Users\Yohannes\Final year project\restaurant-os\.next\cache\webpack\client-development-fallback\0.pack.gz_' -> 'C:\Users\Yohannes\Final year project\restaurant-os\.next\cache\webpack\client-development-fallback\0.pack.gz'

@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 
 const stats = [
-  { label: "Active Orders", value: "0", icon: Clock, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
+  { label: "Active Orders", value: "0", icon: Clock, color: "from-[#C89B3C] to-[#3E2723]", bgColor: "bg-[#C89B3C]/10", iconColor: "text-[#C89B3C]" },
   { label: "Total Orders", value: "0", icon: ShoppingBag, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
   { label: "Loyalty Points", value: "0", icon: UtensilsCrossed, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
 ];

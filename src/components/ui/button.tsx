@@ -14,9 +14,9 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-sm focus-visible:ring-2 focus-visible:ring-offset-2",
         ghost: "hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-offset-2",
         link: "text-primary underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-offset-2",
-        premium: "bg-gradient-to-r from-primary to-emerald-500 text-white shadow-lg hover:shadow-xl hover:from-primary/90 hover:to-emerald-600 transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-offset-2",
+        premium: "bg-gradient-to-r from-primary to-[#C89B3C] text-white shadow-lg hover:shadow-xl hover:from-primary/90 hover:to-[#B8892E] transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-offset-2",
         glass: "bg-white/10 backdrop-blur-xl border border-white/20 text-white hover:bg-white/20 shadow-lg focus-visible:ring-2 focus-visible:ring-offset-2",
-        glow: "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(34,197,94,0.3)] hover:shadow-[0_0_30px_rgba(34,197,94,0.5)] focus-visible:ring-2 focus-visible:ring-offset-2",
+        glow: "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(200,155,60,0.3)] hover:shadow-[0_0_30px_rgba(200,155,60,0.5)] focus-visible:ring-2 focus-visible:ring-offset-2",
       },
       size: {
         default: "h-10 px-4 py-2",

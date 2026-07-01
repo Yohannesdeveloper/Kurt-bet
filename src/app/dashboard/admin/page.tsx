@@ -6,7 +6,7 @@ import { TrendingUp, Users, ChefHat, ClipboardList, DollarSign, Settings, BarCha
 import { motion } from "framer-motion";
 
 const stats = [
-  { label: "Total Revenue", value: "$0.00", icon: DollarSign, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
+  { label: "Total Revenue", value: "$0.00", icon: DollarSign, color: "from-[#C89B3C] to-[#3E2723]", bgColor: "bg-[#C89B3C]/10", iconColor: "text-[#C89B3C]" },
   { label: "Total Orders", value: "0", icon: ClipboardList, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
   { label: "Active Users", value: "0", icon: Users, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
   { label: "Kitchen Queue", value: "0", icon: ChefHat, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-500/10", iconColor: "text-purple-600" },
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
                   <div className={`h-10 w-10 lg:h-12 lg:w-12 rounded-xl ${s.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                     <s.icon className={`h-5 w-5 lg:h-6 lg:w-6 ${s.iconColor}`} />
                   </div>
-                  <TrendingUp className="h-4 w-4 text-emerald-600" />
+                  <TrendingUp className="h-4 w-4 text-[#C89B3C]" />
                 </div>
                 <p className="text-xs lg:text-sm text-muted-foreground font-medium mb-1">{s.label}</p>
                 <p className="text-2xl lg:text-3xl font-bold tracking-tight">{s.value}</p>

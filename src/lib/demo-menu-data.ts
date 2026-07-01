@@ -11,14 +11,13 @@ export const demoCategories = [
 ];
 
 export const demoItems = [
-  { id: "item-1", name: "Kurt (ኩርት)", price: 350, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Fresh raw beef cubes seasoned with mitmita and niter kibbeh — our signature dish", isAvailable: true, preparationTime: 8, variants: [], extras: [] },
-  { id: "item-2", name: "Kitfo (ክትፎ)", price: 300, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Minced raw beef marinated in mitmita, niter kibbeh and cardamom", isAvailable: true, preparationTime: 8, variants: [], extras: [] },
-  { id: "item-3", name: "Gored Gored (ጎረድ ጎረድ)", price: 320, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Large cubes of raw beef served with awaze dipping sauce", isAvailable: true, preparationTime: 8, variants: [], extras: [] },
-  { id: "item-4", name: "Tere Sega (ጥሬ ሥጋ)", price: 400, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Premium raw beef slices served straight with mitmita and senafich", isAvailable: true, preparationTime: 5, variants: [], extras: [] },
-  { id: "item-51", name: "Special Kitfo (ስፔሻል ክትፎ)", price: 450, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Premium kitfo with extra niter kibbeh, mitmita and cottage cheese on the side", isAvailable: true, preparationTime: 10, variants: [], extras: [] },
-  { id: "item-5", name: "Tibs (ጥብስ)", price: 280, categoryId: "cat-2", category: { id: "cat-2", name: "የበሰለ ሥጋ (Cooked Meat)" }, description: "Sautéed beef with onions, jalapeños, tomatoes and rosemary", isAvailable: true, preparationTime: 18, variants: [], extras: [] },
-  { id: "item-6", name: "Awaze Tibs (አዋዜ ጥብስ)", price: 300, categoryId: "cat-2", category: { id: "cat-2", name: "የበሰለ ሥጋ (Cooked Meat)" }, description: "Beef tibs simmered in spicy awaze sauce", isAvailable: true, preparationTime: 20, variants: [], extras: [] },
-  { id: "item-7", name: "Zilzil Tibs (ዝልዝል ጥብስ)", price: 320, categoryId: "cat-2", category: { id: "cat-2", name: "የበሰለ ሥጋ (Cooked Meat)" }, description: "Thinly sliced beef strips sautéed with garlic and peppers", isAvailable: true, preparationTime: 18, variants: [], extras: [] },
+  { id: "item-1", name: "Kurt (ኩርት)", price: 350, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Fresh raw beef cubes seasoned with mitmita and niter kibbeh — our signature dish", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/kurt.jpg" },
+  { id: "item-2", name: "Kitfo (ክትፎ)", price: 300, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Minced raw beef marinated in mitmita, niter kibbeh and cardamom", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/kifo.jpg" },
+  { id: "item-3", name: "Gored Gored (ጎረድ ጎረድ)", price: 320, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Large cubes of raw beef served with awaze dipping sauce", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/gored gored.jpg" },
+  { id: "item-4", name: "Zelzl Sega (ዝልዝል ሥጋ)", price: 400, categoryId: "cat-1", category: { id: "cat-1", name: "ጥሬ ሥጋ (Raw Meat)" }, description: "Thinly sliced raw beef strips seasoned with traditional spices", isAvailable: true, preparationTime: 5, variants: [], extras: [], image: "/images/zilzil tibs.jpg" },
+  { id: "item-5", name: "Tibs (ጥብስ)", price: 280, categoryId: "cat-2", category: { id: "cat-2", name: "የበሰለ ሥጋ (Cooked Meat)" }, description: "Sautéed beef with onions, jalapeños, tomatoes and rosemary", isAvailable: true, preparationTime: 18, variants: [], extras: [], image: "/images/tibs.jpg" },
+  { id: "item-6", name: "Awaze Tibs (አዋዜ ጥብስ)", price: 300, categoryId: "cat-2", category: { id: "cat-2", name: "የበሰለ ሥጋ (Cooked Meat)" }, description: "Beef tibs simmered in spicy awaze sauce", isAvailable: true, preparationTime: 20, variants: [], extras: [], image: "/images/Awaze Tibs.jpg" },
+  { id: "item-7", name: "Zilzil Tibs (ዝልዝል ጥብስ)", price: 320, categoryId: "cat-2", category: { id: "cat-2", name: "የበሰለ ሥጋ (Cooked Meat)" }, description: "Thinly sliced beef strips sautéed with garlic and peppers", isAvailable: true, preparationTime: 18, variants: [], extras: [], image: "/images/zilzil tibs.jpg" },
   { id: "item-8", name: "Shekla Tibs (ሸክላ ጥብስ)", price: 380, categoryId: "cat-2", category: { id: "cat-2", name: "የበሰለ ሥጋ (Cooked Meat)" }, description: "Beef tibs served sizzling in a traditional clay pot", isAvailable: true, preparationTime: 25, variants: [], extras: [] },
   { id: "item-9", name: "Dulet (ዱለት)", price: 200, categoryId: "cat-2", category: { id: "cat-2", name: "የበሰለ ሥጋ (Cooked Meat)" }, description: "Minced tripe, liver and beef sautéed with onions and mitmita", isAvailable: true, preparationTime: 15, variants: [], extras: [] },
   { id: "item-10", name: "Lamb Tibs", price: 350, categoryId: "cat-2", category: { id: "cat-2", name: "የበሰለ ሥጋ (Cooked Meat)" }, description: "Tender lamb cubes sautéed with rosemary and garlic", isAvailable: true, preparationTime: 20, variants: [], extras: [] },
@@ -75,7 +74,7 @@ export async function ensureDemoItemsSeeded() {
   const persistedIds = new Set(persisted.map((pi: any) => pi.id));
   const hasStaleHardcoded = persisted.some((pi: any) => {
     const hc = hcIndex.get(pi.id);
-    return hc && (hc.price !== pi.price || hc.name !== pi.name);
+    return hc && (hc.price !== pi.price || hc.name !== pi.name || hc.image !== pi.image);
   });
   const missingHardcoded = demoItems.some((di: any) => !persistedIds.has(di.id));
 

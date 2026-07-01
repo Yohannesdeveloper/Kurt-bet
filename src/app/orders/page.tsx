@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Plus, Filter, Inbox, Minus, X, Loader2, ShoppingCart, Check, Clock, UtensilsCrossed } from "lucide-react";
+import { Search, Plus, Filter, Inbox, Minus, X, Loader2, ShoppingCart, Check, Clock, UtensilsCrossed, ChefHat, MapPin, Users, FileText } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
@@ -86,6 +86,7 @@ export default function OrdersPage() {
   const userRole = (session?.user as { role?: string })?.role || "CLIENT";
   const isAdmin = userRole === "ADMIN";
   const canApprove = userRole === "ADMIN" || userRole === "WAITER";
+  const canCreateOrder = userRole === "ADMIN" || userRole === "WAITER";
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -157,7 +158,7 @@ export default function OrdersPage() {
           <Button variant="outline" size="icon" className="h-10 lg:h-11 w-10 lg:w-11 flex-shrink-0">
             <Filter className="h-4 w-4" />
           </Button>
-          {isAdmin && (
+          {canCreateOrder && (
             <Button
               variant="premium"
               onClick={() => setDialogOpen(true)}
@@ -196,7 +197,7 @@ export default function OrdersPage() {
                   </div>
                   <p className="text-lg font-semibold mb-2">No orders yet</p>
                   <p className="text-sm mb-6">Orders will appear here once placed</p>
-                  {isAdmin && (
+                  {canCreateOrder && (
                     <Button
                       variant="premium"
                       onClick={() => setDialogOpen(true)}
@@ -207,65 +208,15 @@ export default function OrdersPage() {
                   )}
                 </div>
               ) : (
-                <div className="divide-y">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
                   {filtered.map((order, index) => (
-                    <motion.div
+                    <OrderCard
                       key={order.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="flex items-center justify-between py-4 px-4 hover:bg-muted/50 rounded-xl transition-all duration-200 group cursor-pointer"
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 rounded-xl overflow-hidden flex-shrink-0 group-hover:scale-110 transition-transform duration-200">
-                          {order.items[0]?.menuItem?.image ? (
-                            <img src={order.items[0].menuItem.image} alt="" className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-primary/20 to-emerald-500/20">
-                              <UtensilsCrossed className="h-5 w-5 text-primary" />
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <p className="font-semibold text-base">#{order.orderNumber}</p>
-                            <Badge className={statusStyles[order.status] || ""}>
-                              {order.status}
-                            </Badge>
-                            <Badge className={approvedBadge(order.approved)}>
-                              {order.approved ? "Approved" : "Pending"}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {order.type} · {order.guestCount} {order.guestCount === 1 ? "guest" : "guests"}
-                            {order.table && ` · ${order.table.name || `Table ${order.table.number}`}`}
-                          </p>
-                          <p className="text-xs text-muted-foreground mt-0.5">
-                            {order.items.length} item{order.items.length !== 1 ? "s" : ""}
-                            {order.waiter && ` · ${order.waiter.firstName} ${order.waiter.lastName}`}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right flex items-center gap-3">
-                        <div>
-                          <p className="font-bold text-lg">{formatCurrency(order.total)}</p>
-                          <p className="text-xs text-muted-foreground flex items-center gap-1 justify-end">
-                            <Clock className="h-3 w-3" />
-                            {new Date(order.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                          </p>
-                        </div>
-                        {canApprove && (
-                          <Button
-                            variant={order.approved ? "outline" : "default"}
-                            size="sm"
-                            onClick={(e) => { e.stopPropagation(); handleApprove(order.id, !order.approved); }}
-                            className={`h-8 text-xs ${order.approved ? "" : "bg-emerald-600 hover:bg-emerald-700 text-white"}`}
-                          >
-                            {order.approved ? "Unapprove" : "Approve"}
-                          </Button>
-                        )}
-                      </div>
-                    </motion.div>
+                      order={order}
+                      index={index}
+                      canApprove={canApprove}
+                      onApprove={handleApprove}
+                    />
                   ))}
                 </div>
               )}
@@ -278,6 +229,200 @@ export default function OrdersPage() {
         setOrders(prev => [order, ...prev]);
       }} />
     </div>
+  );
+}
+
+function OrderCard({ order, index, canApprove, onApprove }: {
+  order: Order;
+  index: number;
+  canApprove: boolean;
+  onApprove: (id: string, approve: boolean) => void;
+}) {
+  const [detailOpen, setDetailOpen] = useState(false);
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, delay: index * 0.05 }}
+      >
+        <Card
+          onClick={() => setDetailOpen(true)}
+          className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#C89B3C]/30 cursor-pointer relative overflow-hidden"
+        >
+          {/* Image header */}
+          <div className="relative w-full h-40 overflow-hidden bg-muted">
+            {order.items[0]?.menuItem?.image ? (
+              <img
+                src={order.items[0].menuItem.image}
+                alt=""
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#3E2723] to-[#C89B3C]/30">
+                <UtensilsCrossed className="h-10 w-10 text-[#C89B3C]" />
+              </div>
+            )}
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-8">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="font-bold text-lg text-white drop-shadow-sm">#{order.orderNumber}</p>
+                    <Badge className={`${statusStyles[order.status] || ""} text-[10px] px-1.5 py-0`}>
+                      {order.status}
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-white/80 mt-0.5">
+                    {order.type.replace("_", " ")} · {order.guestCount} {order.guestCount === 1 ? "guest" : "guests"}
+                    {order.table && ` · ${order.table.name || `Table ${order.table.number}`}`}
+                  </p>
+                </div>
+                <Badge className={approvedBadge(order.approved)}>
+                  {order.approved ? "Approved" : "Pending"}
+                </Badge>
+              </div>
+            </div>
+          </div>
+
+          {/* Body */}
+          <div className="p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <p className="text-sm text-muted-foreground">
+                {order.items.length} item{order.items.length !== 1 ? "s" : ""}
+              </p>
+              <p className="font-bold text-base">{formatCurrency(order.total)}</p>
+            </div>
+            {order.waiter && (
+              <p className="text-xs text-muted-foreground flex items-center gap-1">
+                <ChefHat className="h-3 w-3" />
+                {order.waiter.firstName} {order.waiter.lastName}
+              </p>
+            )}
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              {new Date(order.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            </p>
+          </div>
+
+          {/* Actions */}
+          {canApprove && (
+            <div className="px-4 pb-4 pt-0">
+              <Button
+                variant={order.approved ? "outline" : "default"}
+                size="sm"
+                onClick={(e) => { e.stopPropagation(); onApprove(order.id, !order.approved); }}
+                className={`w-full h-8 text-xs ${order.approved ? "" : "bg-emerald-600 hover:bg-emerald-700 text-white"}`}
+              >
+                {order.approved ? "Unapprove" : "Approve"}
+              </Button>
+            </div>
+          )}
+        </Card>
+      </motion.div>
+
+      <OrderDetailDialog
+        order={order}
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+      />
+    </>
+  );
+}
+
+function OrderDetailDialog({ order, open, onClose }: { order: Order; open: boolean; onClose: () => void }) {
+  return (
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
+      <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#A12222] to-[#C89B3C] flex items-center justify-center shadow-md">
+              <UtensilsCrossed className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <DialogTitle className="text-lg">Order #{order.orderNumber}</DialogTitle>
+              <DialogDescription>
+                {new Date(order.createdAt).toLocaleString()}
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="space-y-4">
+          {/* Status badges */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <Badge className={statusStyles[order.status] || ""}>{order.status}</Badge>
+            <Badge className={approvedBadge(order.approved)}>
+              {order.approved ? "Approved" : "Pending Approval"}
+            </Badge>
+          </div>
+
+          {/* Order info */}
+          <div className="grid grid-cols-2 gap-3 p-4 rounded-xl bg-[#F8F4EE]">
+            <div>
+              <p className="text-xs text-[#3E2723]/50">Type</p>
+              <p className="text-sm font-semibold text-[#3E2723]">{order.type.replace("_", " ")}</p>
+            </div>
+            <div>
+              <p className="text-xs text-[#3E2723]/50">Guests</p>
+              <p className="text-sm font-semibold text-[#3E2723]">{order.guestCount}</p>
+            </div>
+            {order.table && (
+              <div>
+                <p className="text-xs text-[#3E2723]/50">Table</p>
+                <p className="text-sm font-semibold text-[#3E2723]">{order.table.name || `Table ${order.table.number}`}</p>
+              </div>
+            )}
+            {order.waiter && (
+              <div>
+                <p className="text-xs text-[#3E2723]/50">Waiter</p>
+                <p className="text-sm font-semibold text-[#3E2723]">{order.waiter.firstName} {order.waiter.lastName}</p>
+              </div>
+            )}
+          </div>
+
+          {/* Items */}
+          <div>
+            <p className="text-sm font-semibold text-[#3E2723] mb-2">Items ({order.items.length})</p>
+            <div className="space-y-2">
+              {order.items.map((item) => (
+                <div key={item.id} className="flex items-center gap-3 p-2 rounded-lg bg-white border border-gray-100">
+                  {item.menuItem?.image ? (
+                    <img src={item.menuItem.image} alt="" className="h-12 w-12 rounded-lg object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-[#C89B3C]/20 to-[#A12222]/20 flex items-center justify-center flex-shrink-0">
+                      <UtensilsCrossed className="h-5 w-5 text-[#C89B3C]" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#3E2723]">{item.name}</p>
+                    <p className="text-xs text-[#3E2723]/50">x{item.quantity}</p>
+                  </div>
+                  <p className="text-sm font-semibold text-[#C89B3C]">{formatCurrency(item.totalPrice)}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Total */}
+          <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-gradient-to-r from-[#3E2723] to-[#1B1B1B] text-white">
+            <span className="text-sm font-medium">Total</span>
+            <span className="text-lg font-bold">{formatCurrency(order.total)}</span>
+          </div>
+
+          {/* Notes */}
+          {order.notes && (
+            <div className="p-3 rounded-xl bg-amber-50 border border-amber-200">
+              <p className="text-xs font-medium text-amber-800 flex items-center gap-1 mb-1">
+                <FileText className="h-3.5 w-3.5" />
+                Notes
+              </p>
+              <p className="text-sm text-amber-900">{order.notes}</p>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

@@ -12,7 +12,7 @@ const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
 const statsConfig = {
   NEW:       { label: "Pending Orders",   value: "0", icon: Clock,       color: "from-amber-500 to-orange-600",    bgColor: "bg-amber-500/10",  iconColor: "text-amber-600" },
   PREPARING: { label: "In Progress",      value: "0", icon: Flame,       color: "from-orange-500 to-red-600",     bgColor: "bg-orange-500/10",  iconColor: "text-orange-600" },
-  READY:     { label: "Ready to Serve",   value: "0", icon: CheckCircle, color: "from-emerald-500 to-green-600",  bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
+  READY:     { label: "Ready to Serve",   value: "0", icon: CheckCircle, color: "from-[#C89B3C] to-[#3E2723]",  bgColor: "bg-[#C89B3C]/10", iconColor: "text-[#C89B3C]" },
   SERVED:    { label: "Served Today",     value: "0", icon: Timer,       color: "from-blue-500 to-cyan-600",     bgColor: "bg-blue-500/10",   iconColor: "text-blue-600" },
 };
 
@@ -50,7 +50,7 @@ export default function KitchenDashboard() {
           <p className="text-muted-foreground mt-1">Manage incoming orders and kitchen queue</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="h-2 w-2 rounded-full bg-[#C89B3C] animate-pulse" />
           <ChefHat className="h-5 w-5 text-primary" />
           <span className="text-sm font-medium">{total} active</span>
         </div>

@@ -63,10 +63,10 @@ export default function LoginPage() {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 via-white to-emerald-100 dark:from-gray-900 dark:via-gray-900 dark:to-emerald-950 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F8F4EE] via-white to-[#F8F4EE] dark:from-gray-900 dark:via-gray-900 dark:to-[#3E2723]/20 p-4 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-grid-pattern opacity-[0.03]" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-b from-emerald-200/20 to-transparent rounded-full blur-3xl" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-gradient-to-b from-[#C89B3C]/10 to-transparent rounded-full blur-3xl" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -80,7 +80,7 @@ export default function LoginPage() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-primary to-emerald-500 shadow-2xl shadow-emerald-500/30 mb-6 animate-float">
+          <div className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-[#C89B3C] to-[#3E2723] shadow-2xl shadow-[#C89B3C]/30 mb-6 animate-float">
             <UtensilsCrossed className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold tracking-tight mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
@@ -94,7 +94,7 @@ export default function LoginPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="border-0 shadow-2xl shadow-emerald-900/10 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80">
+          <Card className="border-0 shadow-2xl shadow-[#3E2723]/10 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl">Welcome back</CardTitle>
               <CardDescription className="text-base">Enter your credentials to access your dashboard</CardDescription>

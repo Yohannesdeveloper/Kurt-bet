@@ -14,11 +14,12 @@ type ButcherOrder = {
   portionSize: string;
   quantity: number;
   notes: string;
-  status: "PENDING" | "APPROVED" | "REJECTED" | "SENT_TO_KITCHEN";
+  status: "PENDING" | "APPROVED" | "REJECTED" | "SENT_TO_KITCHEN" | "KITCHEN_RECEIVED";
   createdAt: string;
   approvedAt?: string;
   rejectedAt?: string;
   sentToKitchenAt?: string;
+  receivedAt?: string;
 };
 
 function generateId(): string {
@@ -85,9 +86,6 @@ export async function PATCH(req: NextRequest) {
   }
 
   const role = (session.user as { role?: string }).role;
-  if (role !== "ADMIN" && role !== "BUTCHER") {
-    return NextResponse.json({ success: false, error: "Butcher or Admin access required" }, { status: 403 });
-  }
 
   const body = await req.json();
   const { id, status } = body;
@@ -96,7 +94,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ success: false, error: "id and status are required" }, { status: 400 });
   }
 
-  if (!["APPROVED", "REJECTED", "SENT_TO_KITCHEN"].includes(status)) {
+  if (!["APPROVED", "REJECTED", "SENT_TO_KITCHEN", "KITCHEN_RECEIVED"].includes(status)) {
     return NextResponse.json({ success: false, error: "Invalid status" }, { status: 400 });
   }
 
@@ -111,6 +109,7 @@ export async function PATCH(req: NextRequest) {
   if (status === "APPROVED") orders[index].approvedAt = now;
   if (status === "REJECTED") orders[index].rejectedAt = now;
   if (status === "SENT_TO_KITCHEN") orders[index].sentToKitchenAt = now;
+  if (status === "KITCHEN_RECEIVED") orders[index].receivedAt = now;
 
   await writeDemoJSON(DEMO_FILE, orders);
   return NextResponse.json({ success: true, data: orders[index] });

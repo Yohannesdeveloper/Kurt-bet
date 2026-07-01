@@ -331,7 +331,7 @@ export default function KDSPage() {
                             {bo.notes && <p className="text-xs text-ethiopian-coffee/50 italic">"{bo.notes}"</p>}
                           </div>
                           <div className="flex items-center gap-2 pt-2 border-t border-ethiopian-gold/10">
-                            <Button size="sm" variant="premium" onClick={() => handleButcherStatus(bo.id, "SENT_TO_KITCHEN")} className="h-8 text-xs gap-1">
+                            <Button size="sm" variant="premium" onClick={() => handleButcherStatus(bo.id, "KITCHEN_RECEIVED")} className="h-8 text-xs gap-1">
                               <CheckCircle className="h-3 w-3" /> {t("kds.received")}
                             </Button>
                           </div>

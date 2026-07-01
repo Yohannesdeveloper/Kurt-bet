@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type CSSProperties } from "react";
+import { useState, useEffect, useRef, type CSSProperties } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   Search, ShoppingCart, User, MapPin, Star, Clock,
@@ -8,7 +8,7 @@ import {
   Heart, Percent, Menu, X, ChevronLeft,
   ChevronRight as ChevronRightIcon, Sparkles, Flame,
   Zap, TrendingUp, Store, CookingPot, ClipboardList, Users, LogOut,
-  Beef, Check, XCircle, Send
+  Beef, Check, XCircle, Send, Minus, Plus
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import toast from "react-hot-toast";
@@ -91,7 +91,14 @@ const navItems = [
 
 function Header({ onCartClick }: { onCartClick: () => void }) {
   const [searchFocused, setSearchFocused] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
   const { data: session } = useSession();
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && searchRef.current?.value.trim()) {
+      window.location.href = `/menu?search=${encodeURIComponent(searchRef.current.value.trim())}`;
+    }
+  };
 
   return (
     <motion.header
@@ -121,15 +128,6 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
             </span>
           </motion.div>
 
-          {/* Location */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#C89B3C]/10 to-[#A12222]/10 text-[#3E2723]/70 hover:text-[#C89B3C] cursor-pointer transition-colors border border-[#C89B3C]/20"
-          >
-            <MapPin className="w-4 h-4" />
-            <span className="text-sm font-medium">Addis Ababa, Ethiopia</span>
-          </motion.div>
-
           {/* Search Bar */}
           <div className="hidden md:flex flex-1 max-w-xl lg:max-w-2xl xl:max-w-3xl mx-4 lg:mx-8">
             <motion.div
@@ -143,10 +141,12 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
                 <Search className={`w-5 h-5 transition-colors ${searchFocused ? "text-[#C89B3C]" : "text-gray-400"}`} />
               </motion.div>
               <input
+                ref={searchRef}
                 type="text"
                 placeholder="Search for food, restaurants, cuisines..."
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
+                onKeyDown={handleSearchKeyDown}
                 className="w-full pl-12 pr-4 py-3 rounded-full bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-transparent focus:border-[#C89B3C]/50 focus:bg-white focus:shadow-lg focus:shadow-[#C89B3C]/20 outline-none transition-all duration-300 text-sm"
               />
               {searchFocused && (
@@ -160,6 +160,15 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
               )}
             </motion.div>
           </div>
+
+          {/* Location */}
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#C89B3C]/10 to-[#A12222]/10 text-[#3E2723]/70 hover:text-[#C89B3C] cursor-pointer transition-colors border border-[#C89B3C]/20"
+          >
+            <MapPin className="w-4 h-4" />
+            <span className="text-sm font-medium">Addis Ababa, Ethiopia</span>
+          </motion.div>
 
           {/* Right Actions */}
           <div className="flex items-center gap-3">
@@ -213,7 +222,7 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
   );
 }
 
-function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean; onClose: () => void; currentView: string; onNavigate: (view: string) => void }) {
   return (
     <>
       {/* Overlay */}
@@ -289,14 +298,21 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
           {/* Navigation */}
           <nav className="space-y-2 flex-1">
             {navItems.map((item, index) => (
-              <motion.a
+              <button
                 key={item.label}
-                href={item.href}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                whileHover={{ x: 5 }}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-[#3E2723]/70 hover:bg-gradient-to-r hover:from-[#C89B3C]/10 hover:to-[#A12222]/10 hover:text-[#C89B3C] transition-all duration-200 group border border-transparent hover:border-[#C89B3C]/20"
+                onClick={() => {
+                  if (item.href.startsWith("/dashboard")) {
+                    onNavigate(item.href.replace("/dashboard/", "").replace("/dashboard", "home") || "home");
+                  } else {
+                    window.location.href = item.href;
+                  }
+                  onClose();
+                }}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group border border-transparent ${
+                  currentView === (item.href.replace("/dashboard/", "").replace("/dashboard", "home") || "home")
+                    ? "bg-gradient-to-r from-[#C89B3C]/10 to-[#A12222]/10 text-[#C89B3C] border-[#C89B3C]/20"
+                    : "text-[#3E2723]/70 hover:bg-gradient-to-r hover:from-[#C89B3C]/10 hover:to-[#A12222]/10 hover:text-[#C89B3C] hover:border-[#C89B3C]/20"
+                }`}
               >
                 <motion.div
                   whileHover={{ rotate: 15, scale: 1.1 }}
@@ -310,7 +326,7 @@ function Sidebar({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) 
                   />
                 </motion.div>
                 <span className="font-medium">{item.label}</span>
-              </motion.a>
+              </button>
             ))}
           </nav>
 
@@ -419,6 +435,7 @@ function HeroBanner() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => window.location.href = "/menu"}
               className="group relative px-8 py-4 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white font-semibold shadow-lg hover:shadow-2xl hover:shadow-[#C89B3C]/40 transition-all duration-300 overflow-hidden"
             >
               <motion.div
@@ -588,6 +605,7 @@ function RestaurantCard({ restaurant, index }: { restaurant: typeof restaurants[
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
       whileHover={{ y: -10 }}
+      onClick={() => window.location.href = "/menu"}
       className="group cursor-pointer"
     >
       <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 mb-4 shadow-lg group-hover:shadow-2xl transition-all duration-300">
@@ -645,6 +663,7 @@ function RestaurantCard({ restaurant, index }: { restaurant: typeof restaurants[
         <motion.button
           initial={{ y: 20, opacity: 0 }}
           whileHover={{ y: 0, opacity: 1 }}
+          onClick={() => window.location.href = "/menu"}
           className="absolute bottom-3 left-3 right-3 px-4 py-2 rounded-full bg-white text-[#3E2723] font-semibold text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
         >
           Order Now
@@ -719,6 +738,174 @@ function PopularRestaurants() {
           <RestaurantCard key={restaurant.name} restaurant={restaurant} index={index} />
         ))}
       </div>
+    </section>
+  );
+}
+
+function ButcherOrderForm() {
+  const { data: session } = useSession();
+  const [meatType, setMeatType] = useState("Beef");
+  const [portionSize, setPortionSize] = useState("1/2 kg");
+  const [quantity, setQuantity] = useState(1);
+  const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
+  const portionOptions = ["1/3 kg", "1/2 kg", "1 kg", "2 kg", "3 kg", "5 kg"];
+  const meatPrices: Record<string, Record<string, number>> = {
+    Beef:    { "1/3 kg": 250, "1/2 kg": 350, "1 kg": 650, "2 kg": 1200, "3 kg": 1700, "5 kg": 2500 },
+    Lamb:    { "1/3 kg": 280, "1/2 kg": 400, "1 kg": 750, "2 kg": 1400, "3 kg": 2000, "5 kg": 3000 },
+    Goat:    { "1/3 kg": 300, "1/2 kg": 420, "1 kg": 800, "2 kg": 1500, "3 kg": 2200, "5 kg": 3500 },
+    Chicken: { "1/3 kg": 180, "1/2 kg": 250, "1 kg": 450, "2 kg": 850,  "3 kg": 1200, "5 kg": 1800 },
+  };
+
+  const unitPrice = meatPrices[meatType]?.[portionSize] || 0;
+  const total = unitPrice * quantity;
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/butcher-orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ meatType, portionSize, quantity, notes }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Butcher order #${data.data.orderNumber} placed!`);
+        setMeatType("Beef");
+        setPortionSize("1/2 kg");
+        setQuantity(1);
+        setNotes("");
+      } else {
+        toast.error(data.error || "Failed to place order");
+      }
+    } catch {
+      toast.error("Failed to place order");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <section className="py-4">
+      <div className="flex items-center gap-3 mb-6">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="p-2.5 rounded-xl bg-gradient-to-br from-[#A12222] to-[#C89B3C] text-white shadow-lg"
+        >
+          <Beef className="w-6 h-6" />
+        </motion.div>
+        <div>
+          <h2 className="text-2xl font-bold text-[#3E2723]">Butcher Shop</h2>
+          <p className="text-xs text-[#3E2723]/60">Order fresh meat cuts by portion</p>
+        </div>
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-[#C89B3C]/10"
+      >
+        {/* Meat Type */}
+        <div className="mb-6">
+          <label className="block text-sm font-semibold text-[#3E2723] mb-3">Select Meat Type</label>
+          <div className="flex flex-wrap gap-2">
+            {meatTypes.map((type) => (
+              <button
+                key={type}
+                onClick={() => { setMeatType(type); setPortionSize("1/2 kg"); }}
+                className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                  meatType === type
+                    ? "bg-[#A12222] text-white shadow-md scale-105"
+                    : "bg-[#F8F4EE] text-[#3E2723] hover:bg-[#C89B3C]/20"
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Portion Size */}
+        <div className="mb-6">
+          <label className="block text-sm font-semibold text-[#3E2723] mb-3">Portion Size</label>
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            {portionOptions.map((size) => {
+              const price = meatPrices[meatType]?.[size] || 0;
+              return (
+                <button
+                  key={size}
+                  onClick={() => setPortionSize(size)}
+                  className={`flex flex-col items-center px-3 py-3 rounded-xl text-sm font-medium transition-all ${
+                    portionSize === size
+                      ? "bg-[#C89B3C] text-white shadow-md scale-105 border-2 border-[#C89B3C]"
+                      : "bg-[#F8F4EE] text-[#3E2723] hover:bg-[#C89B3C]/20 border-2 border-transparent"
+                  }`}
+                >
+                  <span>{size}</span>
+                  <span className={`text-xs mt-1 ${portionSize === size ? "text-white/80" : "text-[#C89B3C]"}`}>
+                    ETB {price}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Quantity + Total */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label className="block text-sm font-semibold text-[#3E2723] mb-3">Quantity</label>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="w-12 h-12 rounded-xl bg-[#F8F4EE] text-[#3E2723] hover:bg-[#C89B3C]/20 transition-all flex items-center justify-center"
+              >
+                <Minus className="w-5 h-5" />
+              </button>
+              <span className="text-3xl font-bold text-[#C89B3C] min-w-[3rem] text-center">{quantity}</span>
+              <button
+                onClick={() => setQuantity(Math.min(20, quantity + 1))}
+                className="w-12 h-12 rounded-xl bg-[#F8F4EE] text-[#3E2723] hover:bg-[#C89B3C]/20 transition-all flex items-center justify-center"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-[#3E2723] mb-3">Total</label>
+            <div className="p-4 rounded-xl bg-gradient-to-r from-[#3E2723] to-[#1B1B1B] text-white">
+              <p className="text-xs opacity-80">{quantity} x {portionSize} {meatType}</p>
+              <p className="text-2xl font-bold">ETB {total.toLocaleString()}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Notes */}
+        <div className="mb-6">
+          <label className="block text-sm font-semibold text-[#3E2723] mb-3">Special Instructions (optional)</label>
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            placeholder="E.g., cut into small cubes, mince finely, remove bones..."
+            className="w-full px-4 py-3 rounded-xl bg-[#F8F4EE] text-[#3E2723] placeholder:text-[#3E2723]/40 text-sm border border-transparent focus:border-[#C89B3C] focus:outline-none transition-all resize-none"
+            rows={3}
+          />
+        </div>
+
+        {/* Submit */}
+        <motion.button
+          onClick={handleSubmit}
+          disabled={submitting}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="w-full sm:w-auto px-10 py-3.5 rounded-xl bg-gradient-to-r from-[#A12222] to-[#C89B3C] text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+        >
+          {submitting ? "Placing Order..." : `Place Order - ETB ${total.toLocaleString()}`}
+        </motion.button>
+      </motion.div>
     </section>
   );
 }
@@ -867,6 +1054,7 @@ function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [currentView, setCurrentView] = useState("home");
 
   return (
     <div className="min-h-screen bg-[#F8F4EE]">
@@ -885,14 +1073,20 @@ export default function DashboardPage() {
 
           {/* Sidebar */}
           <div className="hidden lg:block w-64 xl:w-72 2xl:w-80 flex-shrink-0">
-            <Sidebar isOpen={false} onClose={() => {}} />
+            <Sidebar isOpen={false} onClose={() => {}} currentView={currentView} onNavigate={setCurrentView} />
           </div>
 
           {/* Main Content */}
           <div className="flex-1 min-w-0 pb-20 lg:pb-0">
-            <HeroBanner />
-            <CategoriesSection />
-            <PopularRestaurants />
+            {currentView === "home" ? (
+              <>
+                <HeroBanner />
+                <CategoriesSection />
+                <PopularRestaurants />
+              </>
+            ) : currentView === "butcher-shop" ? (
+              <ButcherOrderForm />
+            ) : null}
           </div>
         </div>
       </div>
@@ -901,7 +1095,7 @@ export default function DashboardPage() {
 
       {/* Mobile Sidebar */}
       <div className="lg:hidden">
-        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} currentView={currentView} onNavigate={setCurrentView} />
       </div>
     </div>
   );

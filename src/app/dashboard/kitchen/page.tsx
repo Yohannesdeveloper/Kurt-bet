@@ -3,21 +3,23 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChefHat, Clock, CheckCircle, AlertCircle, Flame, Timer, CookingPot } from "lucide-react";
+import { ChefHat, Clock, CheckCircle, AlertCircle, Flame, Timer, CookingPot, Beef } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 
 const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
 
-const statsConfig = {
-  NEW:       { label: "Pending Orders",   value: "0", icon: Clock,       color: "from-amber-500 to-orange-600",    bgColor: "bg-amber-500/10",  iconColor: "text-amber-600" },
-  PREPARING: { label: "In Progress",      value: "0", icon: Flame,       color: "from-orange-500 to-red-600",     bgColor: "bg-orange-500/10",  iconColor: "text-orange-600" },
-  READY:     { label: "Ready to Serve",   value: "0", icon: CheckCircle, color: "from-[#C89B3C] to-[#3E2723]",  bgColor: "bg-[#C89B3C]/10", iconColor: "text-[#C89B3C]" },
-  SERVED:    { label: "Served Today",     value: "0", icon: Timer,       color: "from-blue-500 to-cyan-600",     bgColor: "bg-blue-500/10",   iconColor: "text-blue-600" },
-};
+  const statsConfig = {
+    NEW:       { label: "Pending Orders",   value: "0", icon: Clock,       color: "from-amber-500 to-orange-600",    bgColor: "bg-amber-500/10",  iconColor: "text-amber-600" },
+    PREPARING: { label: "In Progress",      value: "0", icon: Flame,       color: "from-orange-500 to-red-600",     bgColor: "bg-orange-500/10",  iconColor: "text-orange-600" },
+    READY:     { label: "Ready to Serve",   value: "0", icon: CheckCircle, color: "from-[#C89B3C] to-[#3E2723]",  bgColor: "bg-[#C89B3C]/10", iconColor: "text-[#C89B3C]" },
+    SERVED:    { label: "Served Today",     value: "0", icon: Timer,       color: "from-blue-500 to-cyan-600",     bgColor: "bg-blue-500/10",   iconColor: "text-blue-600" },
+    BUTCHER:   { label: "Butcher Orders",  value: "0", icon: Beef,        color: "from-[#A12222] to-[#C89B3C]",  bgColor: "bg-red-500/10",   iconColor: "text-[#A12222]" },
+  };
 
 export default function KitchenDashboard() {
   const [counts, setCounts] = useState<Record<string, number>>({ NEW: 0, PREPARING: 0, READY: 0, SERVED: 0 });
+  const [butcherCount, setButcherCount] = useState(0);
 
   const fetchCounts = useCallback(() => {
     fetch("/api/orders?status=NEW,PREPARING,READY,SERVED")
@@ -30,6 +32,10 @@ export default function KitchenDashboard() {
         }
       })
       .catch(() => {});
+    fetch("/api/butcher-orders?status=SENT_TO_KITCHEN")
+      .then(r => r.json())
+      .then(d => { if (d.success) setButcherCount(d.data.length); })
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -38,7 +44,7 @@ export default function KitchenDashboard() {
     return () => clearInterval(interval);
   }, [fetchCounts]);
 
-  const total = Object.values(counts).reduce((a, b) => a + b, 0);
+  const total = Object.values(counts).reduce((a, b) => a + b, 0) + butcherCount;
 
   return (
     <div className="space-y-8">
@@ -56,7 +62,7 @@ export default function KitchenDashboard() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
         {STATUS_ORDER.map((status, index) => {
           const s = statsConfig[status as keyof typeof statsConfig];
           return (
@@ -80,6 +86,24 @@ export default function KitchenDashboard() {
             </motion.div>
           );
         })}
+        {/* Butcher stat */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.5 }}
+        >
+          <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-2 hover:border-red-300">
+            <CardContent className="p-4 lg:p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-xl bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Beef className="h-5 w-5 lg:h-6 lg:w-6 text-[#A12222]" />
+                </div>
+              </div>
+              <p className="text-xs lg:text-sm text-muted-foreground font-medium mb-1">Butcher Orders</p>
+              <p className="text-2xl lg:text-3xl font-bold tracking-tight">{butcherCount}</p>
+            </CardContent>
+          </Card>
+        </motion.div>
       </div>
 
       <motion.div

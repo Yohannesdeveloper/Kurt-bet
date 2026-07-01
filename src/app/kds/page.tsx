@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat } from "lucide-react";
+import { CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat, Beef, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
@@ -138,8 +138,20 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
   );
 });
 
+interface ButcherOrder {
+  id: string;
+  orderNumber: number;
+  customerName: string;
+  meatType: string;
+  portionSize: string;
+  quantity: number;
+  notes: string;
+  status: string;
+}
+
 export default function KDSPage() {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchOrders = useCallback(() => {
@@ -148,18 +160,47 @@ export default function KDSPage() {
       .then(d => {
         if (d.success) setOrders(d.data);
       })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+      .catch(() => {});
   }, []);
 
-  useEffect(() => {
+  const fetchButcherOrders = useCallback(() => {
+    fetch("/api/butcher-orders?status=SENT_TO_KITCHEN")
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) setButcherOrders(d.data);
+      })
+      .catch(() => {});
+  }, []);
+
+  const refresh = useCallback(() => {
     fetchOrders();
-    const interval = setInterval(fetchOrders, 5000);
+    fetchButcherOrders();
+    setLoading(false);
+  }, [fetchOrders, fetchButcherOrders]);
+
+  useEffect(() => {
+    refresh();
+    const interval = setInterval(refresh, 5000);
     return () => clearInterval(interval);
-  }, [fetchOrders]);
+  }, [refresh]);
 
   const handleStatusUpdate = (id: string, newStatus: string) => {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
+  };
+
+  const handleButcherStatus = async (id: string, newStatus: string) => {
+    try {
+      const res = await fetch("/api/butcher-orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+      const d = await res.json();
+      if (d.success) {
+        toast.success(`Butcher order #${d.data.orderNumber} updated`);
+        fetchButcherOrders();
+      }
+    } catch {}
   };
 
   const grouped = STATUS_ORDER.map(status => ({
@@ -170,7 +211,7 @@ export default function KDSPage() {
     orders: orders.filter(o => o.status === status),
   }));
 
-  const hasOrders = orders.length > 0;
+  const hasOrders = orders.length > 0 || butcherOrders.length > 0;
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden">
@@ -185,7 +226,7 @@ export default function KDSPage() {
           </div>
           <div>
             <h1 className="text-lg font-bold tracking-tight">Kitchen Display</h1>
-            <p className="text-xs text-muted-foreground">{orders.length} orders active</p>
+            <p className="text-xs text-muted-foreground">{orders.length + butcherOrders.length} orders active</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -206,7 +247,7 @@ export default function KDSPage() {
             <p className="text-sm">Orders from the POS will appear here</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 h-full">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 h-full">
             {grouped.map(grp => (
               <div key={grp.status} className="flex flex-col min-h-0">
                 <div className="flex items-center gap-2 mb-3 px-1">
@@ -228,6 +269,70 @@ export default function KDSPage() {
                 </div>
               </div>
             ))}
+            {/* Butcher column */}
+            <div className="flex flex-col min-h-0">
+              <div className="flex items-center gap-2 mb-3 px-1">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#A12222]" />
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Butcher</h2>
+                <Badge variant="secondary" className="text-xs ml-auto">{butcherOrders.length}</Badge>
+              </div>
+              <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pr-1">
+                <AnimatePresence mode="popLayout">
+                  {butcherOrders.map((bo) => (
+                    <motion.div
+                      key={bo.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                    >
+                      <Card className="border-l-4 border-red-300 bg-red-50 shadow-sm hover:shadow-md transition-shadow">
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <Beef className="h-4 w-4 text-[#A12222]" />
+                                <span className="font-bold text-base">#{bo.orderNumber}</span>
+                                <Badge variant="outline" className="text-xs text-red-600 border-red-300">Butcher</Badge>
+                              </div>
+                              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                <span className="flex items-center gap-1"><Clock className="h-3 w-3" />Sent to Kitchen</span>
+                                <span>{bo.customerName}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="space-y-1 mb-3">
+                            <div className="flex items-center gap-2 text-sm">
+                              <span className="font-medium text-[#A12222]">{bo.meatType}</span>
+                              <span className="text-muted-foreground">· {bo.portionSize}</span>
+                              <span className="font-semibold">×{bo.quantity}</span>
+                            </div>
+                            {bo.notes && (
+                              <p className="text-xs text-muted-foreground italic">"{bo.notes}"</p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 pt-2 border-t border-border/50">
+                            <Button
+                              size="sm"
+                              variant="default"
+                              onClick={() => handleButcherStatus(bo.id, "SENT_TO_KITCHEN")}
+                              className="h-8 text-xs gap-1 bg-green-600 hover:bg-green-700"
+                            >
+                              <CheckCircle className="h-3 w-3" /> Received
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                {butcherOrders.length === 0 && (
+                  <div className="flex items-center justify-center h-20 text-xs text-muted-foreground border border-dashed rounded-xl">
+                    Empty
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>

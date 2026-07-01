@@ -46,6 +46,12 @@ export default function MenuPage() {
   const canAddItem = ["ADMIN", "WAITER", "KITCHEN"].includes(userRole);
   const canEditDelete = userRole === "ADMIN";
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("search");
+    if (q) setSearchQuery(q);
+  }, []);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);

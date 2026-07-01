@@ -46,9 +46,7 @@ export default function LoginPage() {
         const response = await fetch("/api/auth/session");
         const session = await response.json();
         
-        const userRole = session?.user?.role || "CLIENT";
-        const dashboardPath = getRoleDashboard(userRole);
-        router.push(dashboardPath);
+        router.push("/");
         router.refresh();
       }
     } catch {

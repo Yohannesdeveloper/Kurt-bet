@@ -101,6 +101,9 @@ function SectionTitle({ label, title, subtitle }: { label: string; title: string
 function FloatingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { data: session } = useSession();
+  const userRole = (session?.user as { role?: string })?.role;
+  const isAuthenticated = !!session;
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener("scroll", onScroll);
@@ -108,6 +111,8 @@ function FloatingNav() {
   }, []);
 
   const links = ["Home", "About", "Menu", "Gallery", "Contact"];
+  const scrolledStyles = scrolled ? "text-[#3E2723]/80" : "text-white/80";
+  const hoverStyles = "hover:text-[#C89B3C] transition-colors";
 
   return (
     <motion.nav
@@ -125,12 +130,15 @@ function FloatingNav() {
         </div>
         <div className="hidden md:flex items-center gap-8">
           {links.map(l => (
-            <a key={l} href={`#${l.toLowerCase()}`} className={`text-sm tracking-wider uppercase hover:text-[#C89B3C] transition-colors ${scrolled ? "text-[#3E2723]/80" : "text-white/80"}`}>
-              {l}
-            </a>
+            <a key={l} href={`#${l.toLowerCase()}`} className={`text-sm tracking-wider uppercase ${scrolledStyles} ${hoverStyles}`}>{l}</a>
           ))}
-          <a href="/menu" className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white text-sm font-semibold hover:shadow-xl hover:shadow-[#C89B3C]/30 transition-all duration-300">
-            Reserve a Table
+          {isAuthenticated && (
+            <a href="/dashboard" className={`text-sm tracking-wider uppercase font-semibold ${scrolledStyles} ${hoverStyles}`}>
+              Dashboard
+            </a>
+          )}
+          <a href={isAuthenticated ? "/orders" : "/menu"} className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white text-sm font-semibold hover:shadow-xl hover:shadow-[#C89B3C]/30 transition-all duration-300">
+            {isAuthenticated ? "My Orders" : "Reserve a Table"}
           </a>
         </div>
         <button className="md:hidden text-[#C89B3C]" onClick={() => setMenuOpen(!menuOpen)}>
@@ -144,7 +152,10 @@ function FloatingNav() {
               {links.map(l => (
                 <a key={l} href={`#${l.toLowerCase()}`} onClick={() => setMenuOpen(false)} className="block text-[#3E2723] font-medium">{l}</a>
               ))}
-              <a href="/menu" className="block text-center px-6 py-3 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white font-semibold">Reserve a Table</a>
+              {isAuthenticated && <a href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-[#3E2723] font-medium">Dashboard</a>}
+              <a href={isAuthenticated ? "/orders" : "/menu"} onClick={() => setMenuOpen(false)} className="block text-center px-6 py-3 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white font-semibold">
+                {isAuthenticated ? "My Orders" : "Reserve a Table"}
+              </a>
             </div>
           </motion.div>
         )}
@@ -638,12 +649,6 @@ function Footer() {
   );
 }
 
-function AuthenticatedHome() {
-  const router = useRouter();
-  useEffect(() => { router.push("/dashboard"); }, [router]);
-  return null;
-}
-
 export default function HomePage() {
   const { status } = useSession();
   if (status === "loading") return (
@@ -653,7 +658,6 @@ export default function HomePage() {
       </motion.div>
     </div>
   );
-  if (status === "authenticated") return <AuthenticatedHome />;
   return (
     <div className="bg-[#F8F4EE]">
       <FloatingNav />

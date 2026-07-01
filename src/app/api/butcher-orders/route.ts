@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
     portionSize,
     quantity,
     notes: notes || "",
-    status: "PENDING",
+    status: "SENT_TO_KITCHEN",
     createdAt: new Date().toISOString(),
   };
 

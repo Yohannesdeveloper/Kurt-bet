@@ -20,10 +20,10 @@ export default function ButcherShopPage() {
   const { t } = useTranslation();
   const { data: session } = useSession();
   const meatTypeLabels: Record<string, string> = {
-    Beef: t("butcher.beef"),
-    Lamb: t("butcher.lamb"),
-    Goat: t("butcher.goat"),
-    Chicken: t("butcher.chicken"),
+    Beef: t("butcher.meatBeef"),
+    Lamb: t("butcher.meatLamb"),
+    Goat: t("butcher.meatGoat"),
+    Chicken: t("butcher.meatChicken"),
   };
   const [meatType, setMeatType] = useState("Beef");
   const [portionSize, setPortionSize] = useState("1/2 kg");

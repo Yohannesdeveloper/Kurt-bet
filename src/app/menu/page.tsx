@@ -25,6 +25,7 @@ import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/lib/i18n";
 import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
 import { fetchMenu, addItem, updateItem as updateItemAction, removeItem, optimisticToggleAvailability } from "@/lib/store/features/menuSlice";
 import type { MenuItem, MenuCategory } from "@/lib/store/features/menuSlice";
@@ -40,7 +41,19 @@ interface CartItem {
 
 export default function MenuPage() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const { items, categories, loading } = useAppSelector(s => s.menu);
+
+  const descMap: Record<string, string> = {
+    "item-1": "menu.kurtDesc",
+    "item-2": "menu.kitfoDesc",
+    "item-3": "menu.goredDesc",
+    "item-4": "menu.zelzlDesc",
+    "item-5": "menu.tibsDesc",
+    "item-6": "menu.awazeDesc",
+  };
+  const itemDesc = (item: { id: string; description?: string }) =>
+    descMap[item.id] ? t(descMap[item.id]) : (item.description || "");
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role || "CLIENT";
   const canAddItem = ["ADMIN", "WAITER", "KITCHEN"].includes(userRole);
@@ -121,7 +134,7 @@ export default function MenuPage() {
             <UtensilsCrossed className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">Menu</h1>
+            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">{t("menu.title")}</h1>
             <p className="text-sm text-muted-foreground">{items.length} items · {categories.length} categories</p>
           </div>
         </div>
@@ -129,7 +142,7 @@ export default function MenuPage() {
           <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search menu..."
+              placeholder={t("menu.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 h-10 lg:h-11 w-full sm:w-64 transition-all duration-200 focus:w-72"
@@ -151,7 +164,7 @@ export default function MenuPage() {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-sm text-muted-foreground">Loading menu...</p>
+            <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
           </div>
         </div>
       ) : filtered.length === 0 ? (
@@ -165,7 +178,7 @@ export default function MenuPage() {
                 <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
                   <UtensilsCrossed className="h-10 w-10" />
                 </div>
-                <p className="text-lg font-semibold mb-2">No menu items</p>
+                <p className="text-lg font-semibold mb-2">{t("common.noResults")}</p>
                 <p className="text-sm mb-6">Add your first menu item to get started</p>
                 {canAddItem && (
                   <Button
@@ -211,7 +224,7 @@ export default function MenuPage() {
                               <div className="flex-1 min-w-0">
                                 <p className="font-semibold text-sm lg:text-base text-white drop-shadow-sm">{item.name}</p>
                                 {item.description && (
-                                  <p className="text-xs text-white/80 line-clamp-1 mt-0.5">{item.description}</p>
+                                  <p className="text-xs text-white/80 line-clamp-1 mt-0.5">{itemDesc(item)}</p>
                                 )}
                               </div>
                               {canEditDelete && (
@@ -250,7 +263,7 @@ export default function MenuPage() {
                             <div className="flex-1 min-w-0">
                               <p className="font-semibold text-sm lg:text-base">{item.name}</p>
                               {item.description && (
-                                <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{item.description}</p>
+                                <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{itemDesc(item)}</p>
                               )}
                             </div>
                             {canEditDelete && (
@@ -337,7 +350,7 @@ export default function MenuPage() {
                               </div>
                             ) : (
                               <Button size="sm" variant="outline" className="h-7 text-xs" onClick={(e) => { e.stopPropagation(); addToCart(item); }}>
-                                <Plus className="h-3 w-3 mr-1" /> Add to Order
+                                <Plus className="h-3 w-3 mr-1" /> {t("menu.addToCart")}
                               </Button>
                             )}
                           </div>
@@ -377,14 +390,14 @@ export default function MenuPage() {
         <div className="fixed inset-0 z-50 bg-black/50" onClick={() => setShowCart(false)}>
           <div className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-background shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b">
-              <h2 className="font-bold text-lg">Your Order</h2>
+              <h2 className="font-bold text-lg">{t("cart.title")}</h2>
               <Button variant="ghost" size="icon" onClick={() => setShowCart(false)}>
                 <X className="h-5 w-5" />
               </Button>
             </div>
             <div className="overflow-y-auto p-4" style={{ maxHeight: "calc(100vh - 190px)" }}>
               {cart.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">Cart is empty</p>
+                <p className="text-center text-muted-foreground py-8">{t("cart.empty")}</p>
               ) : (
                 <div className="space-y-3">
                   {cart.map(item => (
@@ -413,11 +426,11 @@ export default function MenuPage() {
             {cart.length > 0 && (
               <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-background">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-semibold">Total</span>
+                  <span className="font-semibold">{t("cart.total")}</span>
                   <span className="font-bold text-xl">{formatCurrency(cartTotal)}</span>
                 </div>
                 <Button className="w-full h-12 text-base" onClick={() => { setOrderDialogOpen(true); }}>
-                  <ArrowRight className="h-4 w-4 mr-2" /> Proceed to Order
+                  <ArrowRight className="h-4 w-4 mr-2" /> {t("cart.checkout")}
                 </Button>
               </div>
             )}
@@ -443,6 +456,7 @@ function AddItemDialog({ open, onOpenChange, categories, editingItem }: {
   editingItem: MenuItem | null;
 }) {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -538,7 +552,7 @@ function AddItemDialog({ open, onOpenChange, categories, editingItem }: {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="price" className="text-sm font-medium">Price *</Label>
+                <Label htmlFor="price" className="text-sm font-medium">{t("menu.price")} *</Label>
                 <Input id="price" type="number" step="0.01" min="0" value={price} onChange={e => setPrice(e.target.value)} placeholder="0.00" required className="h-11" />
               </div>
               <div className="grid gap-2">
@@ -547,7 +561,7 @@ function AddItemDialog({ open, onOpenChange, categories, editingItem }: {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label className="text-sm font-medium">Category *</Label>
+              <Label className="text-sm font-medium">{t("menu.category")} *</Label>
               <Select value={categoryId} onValueChange={setCategoryId}>
                 <SelectTrigger className="h-11">
                   <SelectValue placeholder="Select category" />
@@ -575,7 +589,7 @@ function AddItemDialog({ open, onOpenChange, categories, editingItem }: {
             </div>
           </div>
           <DialogFooter className="mt-6 gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11">Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11">{t("common.cancel")}</Button>
             <Button type="submit" variant="premium" disabled={submitting} className="h-11">
               {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Adding...</> : "Add Item"}
             </Button>
@@ -594,6 +608,7 @@ function PlaceOrderDialog({ open, onOpenChange, cart, cartTotal, onOrderPlaced }
   onOrderPlaced: () => void;
 }) {
   const [submitting, setSubmitting] = useState(false);
+  const { t } = useTranslation();
   const [orderType, setOrderType] = useState("DINE_IN");
   const [guestCount, setGuestCount] = useState("1");
   const [notes, setNotes] = useState("");
@@ -668,7 +683,7 @@ function PlaceOrderDialog({ open, onOpenChange, cart, cartTotal, onOrderPlaced }
             />
           </div>
           <div className="border-t pt-3">
-            <p className="text-sm font-medium mb-2">Items ({cart.reduce((s, c) => s + c.quantity, 0)})</p>
+            <p className="text-sm font-medium mb-2">{t("orders.items")} ({cart.reduce((s, c) => s + c.quantity, 0)})</p>
             {cart.map(item => (
               <div key={item.id} className="flex items-center justify-between text-sm py-1">
                 <span>{item.name} x{item.quantity}</span>
@@ -677,12 +692,12 @@ function PlaceOrderDialog({ open, onOpenChange, cart, cartTotal, onOrderPlaced }
             ))}
           </div>
           <div className="border-t pt-3 flex items-center justify-between font-semibold">
-            <span>Total</span>
+            <span>{t("orders.total")}</span>
             <span className="text-lg">{formatCurrency(cartTotal)}</span>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>{t("common.cancel")}</Button>
           <Button onClick={handleSubmit} disabled={submitting}>
             {submitting ? <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Placing...</> : <><Send className="h-4 w-4 mr-1" /> Place Order</>}
           </Button>

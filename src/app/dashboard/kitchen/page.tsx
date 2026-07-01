@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChefHat, Clock, CheckCircle, AlertCircle, Flame, Timer, CookingPot, Beef } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/lib/i18n";
 import Link from "next/link";
 
 const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
@@ -18,6 +19,14 @@ const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
   };
 
 export default function KitchenDashboard() {
+  const { t } = useTranslation();
+  const statusLabels: Record<string, string> = {
+    NEW: t("orders.pending"),
+    PREPARING: t("orders.preparing"),
+    READY: t("orders.ready"),
+    SERVED: t("orders.delivered"),
+    BUTCHER: t("dashboard.butcherOrders"),
+  };
   const [counts, setCounts] = useState<Record<string, number>>({ NEW: 0, PREPARING: 0, READY: 0, SERVED: 0 });
   const [butcherCount, setButcherCount] = useState(0);
 
@@ -51,7 +60,7 @@ export default function KitchenDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Kitchen Dashboard
+            {t("nav.kitchen")} Dashboard
           </h1>
           <p className="text-muted-foreground mt-1">Manage incoming orders and kitchen queue</p>
         </div>
@@ -79,7 +88,7 @@ export default function KitchenDashboard() {
                       <s.icon className={`h-5 w-5 lg:h-6 lg:w-6 ${s.iconColor}`} />
                     </div>
                   </div>
-                  <p className="text-xs lg:text-sm text-muted-foreground font-medium mb-1">{s.label}</p>
+                  <p className="text-xs lg:text-sm text-muted-foreground font-medium mb-1">{statusLabels[status]}</p>
                   <p className="text-2xl lg:text-3xl font-bold tracking-tight">{counts[status]}</p>
                 </CardContent>
               </Card>
@@ -99,7 +108,7 @@ export default function KitchenDashboard() {
                   <Beef className="h-5 w-5 lg:h-6 lg:w-6 text-[#A12222]" />
                 </div>
               </div>
-              <p className="text-xs lg:text-sm text-muted-foreground font-medium mb-1">Butcher Orders</p>
+              <p className="text-xs lg:text-sm text-muted-foreground font-medium mb-1">{t("dashboard.butcherOrders")}</p>
               <p className="text-2xl lg:text-3xl font-bold tracking-tight">{butcherCount}</p>
             </CardContent>
           </Card>
@@ -122,7 +131,7 @@ export default function KitchenDashboard() {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
               {STATUS_ORDER.map((status) => {
                 const colors: Record<string, string> = { NEW: "bg-amber-500", PREPARING: "bg-blue-500", READY: "bg-orange-500", SERVED: "bg-green-500" };
-                const labels: Record<string, string> = { NEW: "Pending", PREPARING: "Preparing", READY: "Ready", SERVED: "Served" };
+                const labels: Record<string, string> = { NEW: t("orders.pending"), PREPARING: t("orders.preparing"), READY: t("orders.ready"), SERVED: t("orders.delivered") };
                 return (
                   <div key={status} className="text-center">
                     <div className={`h-12 w-12 rounded-full ${colors[status]} flex items-center justify-center mx-auto mb-2`}>
@@ -145,7 +154,7 @@ export default function KitchenDashboard() {
                   Array.from({ length: Math.min(counts[status], 3) }).map((_, i) => (
                     <div key={`${status}-${i}`} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                       <div className={`h-2 w-2 rounded-full ${statsConfig[status as keyof typeof statsConfig].bgColor}`} />
-                      <span className="text-sm font-medium">{statsConfig[status as keyof typeof statsConfig].label}</span>
+                      <span className="text-sm font-medium">{statusLabels[status]}</span>
                       <span className="text-xs text-muted-foreground ml-auto">In queue</span>
                     </div>
                   ))

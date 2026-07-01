@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { UtensilsCrossed, Eye, EyeOff, Loader2, Sparkles, Shield, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/lib/i18n";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -84,9 +86,9 @@ export default function LoginPage() {
             <UtensilsCrossed className="h-10 w-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold tracking-tight mb-2 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-            Restaurant OS
+            {t("app.name")}
           </h1>
-          <p className="text-muted-foreground text-lg">Enterprise Restaurant Management</p>
+          <p className="text-muted-foreground text-lg">{t("app.tagline")}</p>
         </motion.div>
 
         <motion.div
@@ -96,7 +98,7 @@ export default function LoginPage() {
         >
           <Card className="border-0 shadow-2xl shadow-[#3E2723]/10 backdrop-blur-xl bg-white/80 dark:bg-gray-900/80">
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl">Welcome back</CardTitle>
+              <CardTitle className="text-2xl">{t("auth.welcomeBack")}</CardTitle>
               <CardDescription className="text-base">Enter your credentials to access your dashboard</CardDescription>
             </CardHeader>
             <CardContent>
@@ -112,7 +114,7 @@ export default function LoginPage() {
                 )}
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Email</label>
+                  <label className="text-sm font-medium">{t("auth.email")}</label>
                   <Input
                     type="email"
                     placeholder="name@restaurant.com"
@@ -125,7 +127,7 @@ export default function LoginPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Password</label>
+                  <label className="text-sm font-medium">{t("auth.password")}</label>
                   <div className="relative">
                     <Input
                       type={showPassword ? "text" : "password"}
@@ -155,10 +157,10 @@ export default function LoginPage() {
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing in...
+                      {t("common.loading")}
                     </>
                   ) : (
-                    "Sign in"
+                    t("auth.signIn")
                   )}
                 </Button>
               </form>

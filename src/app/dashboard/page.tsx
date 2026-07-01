@@ -11,7 +11,9 @@ import {
   Beef, Check, XCircle, Send, Minus, Plus
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import toast from "react-hot-toast";
+import { useTranslation } from "@/lib/i18n";
 
 const COLORS = {
   primary: "#3E2723",
@@ -21,78 +23,29 @@ const COLORS = {
   dark: "#1B1B1B",
 };
 
-const categories = [
-  { name: "Tere Sega", count: 28, image: "/images/kurt.jpg", color: "from-red-600 to-red-800", bg: "bg-red-50" },
-  { name: "Kitfo", count: 24, image: "/images/kifo.jpg", color: "from-amber-600 to-amber-800", bg: "bg-amber-50" },
-  { name: "Tibs", count: 32, image: "/images/tibs.jpg", color: "from-orange-600 to-orange-800", bg: "bg-orange-50" },
-  { name: "Gored Gored", count: 19, image: "/images/gored gored.jpg", color: "from-stone-600 to-stone-800", bg: "bg-stone-50" },
-  { name: "Awaze Tibs", count: 15, image: "/images/Awaze Tibs.jpg", color: "from-red-700 to-red-900", bg: "bg-red-50" },
-  { name: "Zilzil Tibs", count: 22, image: "/images/zilzil tibs.jpg", color: "from-amber-700 to-amber-900", bg: "bg-amber-50" },
-];
+const categoryKeys = ["tereSega", "kitfo", "tibs", "goredGored", "awazeTibs", "zilzilTibs"] as const;
+const categoryMeta: Record<string, { count: number; image: string; color: string; bg: string }> = {
+  tereSega: { count: 28, image: "/images/kurt.jpg", color: "from-red-600 to-red-800", bg: "bg-red-50" },
+  kitfo: { count: 24, image: "/images/kifo.jpg", color: "from-amber-600 to-amber-800", bg: "bg-amber-50" },
+  tibs: { count: 32, image: "/images/tibs.jpg", color: "from-orange-600 to-orange-800", bg: "bg-orange-50" },
+  goredGored: { count: 19, image: "/images/gored gored.jpg", color: "from-stone-600 to-stone-800", bg: "bg-stone-50" },
+  awazeTibs: { count: 15, image: "/images/Awaze Tibs.jpg", color: "from-red-700 to-red-900", bg: "bg-red-50" },
+  zilzilTibs: { count: 22, image: "/images/zilzil tibs.jpg", color: "from-amber-700 to-amber-900", bg: "bg-amber-50" },
+};
 
-const restaurants = [
-  {
-    name: "Kurt Bet Special",
-    rating: 4.9,
-    deliveryTime: "30-45",
-    price: "ETB 500",
-    image: "/images/kurt.jpg",
-    color: "from-red-700 to-red-900",
-    tags: ["Tere Sega", "Traditional"],
-    featured: true,
-    discount: "20% OFF"
-  },
-  {
-    name: "Addis Kitfo House",
-    rating: 4.8,
-    deliveryTime: "25-40",
-    price: "ETB 450",
-    image: "/images/kifo.jpg",
-    color: "from-amber-700 to-amber-900",
-    tags: ["Kitfo", "Authentic"],
-    featured: true,
-    discount: "15% OFF"
-  },
-  {
-    name: "Tibs Palace",
-    rating: 4.7,
-    deliveryTime: "35-50",
-    price: "ETB 380",
-    image: "/images/tibs.jpg",
-    color: "from-orange-700 to-orange-900",
-    tags: ["Tibs", "Spicy"],
-    featured: false,
-    discount: null
-  },
-  {
-    name: "Gored Gored House",
-    rating: 4.6,
-    deliveryTime: "20-35",
-    price: "ETB 420",
-    image: "/images/gored gored.jpg",
-    color: "from-stone-700 to-stone-900",
-    tags: ["Gored Gored", "Fresh"],
-    featured: false,
-    discount: null
-  },
-];
-
-const navItems = [
-  { icon: Home, label: "Dashboard", href: "/dashboard" },
-  { icon: UtensilsCrossed, label: "Menu", href: "/menu" },
-  { icon: Store, label: "Tables", href: "/tables" },
-  { icon: Receipt, label: "Orders", href: "/orders" },
-  { icon: CookingPot, label: "Kitchen", href: "/kds" },
-  { icon: ClipboardList, label: "Inventory", href: "/inventory" },
-  { icon: Users, label: "Employees", href: "/employees" },
-  { icon: Percent, label: "Reports", href: "/reports" },
-  { icon: Beef, label: "Butcher Shop", href: "/dashboard/butcher-shop" },
-];
+const restaurantKeys = ["kurtBetSpecial", "addisKitfoHouse", "tibsPalace", "goredGoredHouse"] as const;
+const restaurantMeta: Record<string, { rating: number; deliveryTime: string; price: string; image: string; color: string; tagKeys: string[]; featured: boolean; discount: string | null }> = {
+  kurtBetSpecial: { rating: 4.9, deliveryTime: "30-45", price: "ETB 500", image: "/images/kurt.jpg", color: "from-red-700 to-red-900", tagKeys: ["tereSega", "traditional"], featured: true, discount: "20% OFF" },
+  addisKitfoHouse: { rating: 4.8, deliveryTime: "25-40", price: "ETB 450", image: "/images/kifo.jpg", color: "from-amber-700 to-amber-900", tagKeys: ["kitfo", "authentic"], featured: true, discount: "15% OFF" },
+  tibsPalace: { rating: 4.7, deliveryTime: "35-50", price: "ETB 380", image: "/images/tibs.jpg", color: "from-orange-700 to-orange-900", tagKeys: ["tibs", "spicy"], featured: false, discount: null },
+  goredGoredHouse: { rating: 4.6, deliveryTime: "20-35", price: "ETB 420", image: "/images/gored gored.jpg", color: "from-stone-700 to-stone-900", tagKeys: ["goredGored", "fresh"], featured: false, discount: null },
+};
 
 function Header({ onCartClick }: { onCartClick: () => void }) {
   const [searchFocused, setSearchFocused] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const { data: session } = useSession();
+  const { t } = useTranslation();
 
   const handleSearchKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && searchRef.current?.value.trim()) {
@@ -124,7 +77,7 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
               />
             </div>
             <span className="font-bold text-xl text-[#3E2723] bg-gradient-to-r from-[#3E2723] to-[#C89B3C] bg-clip-text text-transparent">
-              Kurt Bet
+              {t("brand.name")}
             </span>
           </motion.div>
 
@@ -143,7 +96,7 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
               <input
                 ref={searchRef}
                 type="text"
-                placeholder="Search for food, restaurants, cuisines..."
+                placeholder={t("header.searchPlaceholder")}
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
                 onKeyDown={handleSearchKeyDown}
@@ -167,11 +120,12 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
             className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#C89B3C]/10 to-[#A12222]/10 text-[#3E2723]/70 hover:text-[#C89B3C] cursor-pointer transition-colors border border-[#C89B3C]/20"
           >
             <MapPin className="w-4 h-4" />
-            <span className="text-sm font-medium">Addis Ababa, Ethiopia</span>
+            <span className="text-sm font-medium">{t("header.location")}</span>
           </motion.div>
 
           {/* Right Actions */}
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
@@ -212,7 +166,7 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search for food, restaurants..."
+              placeholder={t("header.mobileSearchPlaceholder")}
               className="w-full pl-12 pr-4 py-3 rounded-full bg-gradient-to-r from-gray-50 to-gray-100 outline-none text-sm border border-gray-200 focus:border-[#C89B3C]/50 transition-colors"
             />
           </div>
@@ -223,6 +177,19 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
 }
 
 function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean; onClose: () => void; currentView: string; onNavigate: (view: string) => void }) {
+  const { t } = useTranslation();
+  const navItems = [
+    { icon: Home, label: t("nav.dashboard"), href: "/dashboard", key: "dashboard" },
+    { icon: UtensilsCrossed, label: t("nav.menu"), href: "/menu", key: "menu" },
+    { icon: Store, label: t("nav.tables"), href: "/tables", key: "tables" },
+    { icon: Receipt, label: t("nav.orders"), href: "/orders", key: "orders" },
+    { icon: CookingPot, label: t("nav.kitchen"), href: "/kds", key: "kitchen" },
+    { icon: ClipboardList, label: t("nav.inventory"), href: "/inventory", key: "inventory" },
+    { icon: Users, label: t("nav.employees"), href: "/employees", key: "employees" },
+    { icon: Percent, label: t("nav.reports"), href: "/reports", key: "reports" },
+    { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher-shop", key: "butcher-shop" },
+  ];
+
   return (
     <>
       {/* Overlay */}
@@ -259,7 +226,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
               />
             </div>
             <span className="font-bold text-xl bg-gradient-to-r from-[#3E2723] to-[#C89B3C] bg-clip-text text-transparent">
-              Kurt Bet
+              {t("brand.name")}
             </span>
           </motion.div>
 
@@ -281,16 +248,16 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-2">
                 <Flame className="w-4 h-4" />
-                <p className="text-xs font-semibold tracking-wider uppercase">Limited Time</p>
+                <p className="text-xs font-semibold tracking-wider uppercase">{t("sidebar.limitedTime")}</p>
               </div>
-              <p className="text-2xl font-bold mb-1">Get 50% OFF</p>
-              <p className="text-sm opacity-90 mb-3">on your first order</p>
+              <p className="text-2xl font-bold mb-1">{t("sidebar.get50Off")}</p>
+              <p className="text-sm opacity-90 mb-3">{t("sidebar.onFirstOrder")}</p>
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-xs font-semibold cursor-pointer border border-white/30"
               >
-                Code: FOOD50
+                {t("sidebar.codeFood50")}
               </motion.div>
             </div>
           </motion.div>
@@ -299,7 +266,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
           <nav className="space-y-2 flex-1">
             {navItems.map((item, index) => (
               <button
-                key={item.label}
+                key={item.key}
                 onClick={() => {
                   if (item.href.startsWith("/dashboard")) {
                     onNavigate(item.href.replace("/dashboard/", "").replace("/dashboard", "home") || "home");
@@ -340,8 +307,8 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
                 <LogOut className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-red-600">Logout</p>
-                <p className="text-xs text-red-500/70">End your session</p>
+                <p className="text-sm font-semibold text-red-600">{t("sidebar.logout")}</p>
+                <p className="text-xs text-red-500/70">{t("sidebar.endSession")}</p>
               </div>
             </button>
           </div>
@@ -352,6 +319,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
 }
 
 function HeroBanner() {
+  const { t } = useTranslation();
   return (
     <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#3E2723] via-[#1B1B1B] to-[#A12222] p-6 sm:p-8 lg:p-12 xl:p-16 text-white shadow-2xl">
       {/* Animated Background */}
@@ -417,19 +385,19 @@ function HeroBanner() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#C89B3C]/30 to-[#A12222]/30 border border-[#C89B3C]/50 backdrop-blur-sm mb-6"
             >
               <Zap className="w-4 h-4 text-[#C89B3C]" />
-              <span className="text-xs font-bold tracking-wider uppercase text-[#C89B3C]">Hot Deal</span>
+              <span className="text-xs font-bold tracking-wider uppercase text-[#C89B3C]">{t("hero.hotDeal")}</span>
             </motion.div>
 
             <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 leading-tight">
-              Delicious food,
+              {t("hero.title")}
               <br />
               <span className="bg-gradient-to-r from-[#C89B3C] via-[#F5D980] to-[#C89B3C] bg-clip-text text-transparent">
-                delivered fast
+                {t("hero.titleHighlight")}
               </span>
             </h1>
 
             <p className="text-white/80 text-sm sm:text-base lg:text-lg xl:text-xl mb-6 lg:mb-8 max-w-md lg:max-w-lg leading-relaxed">
-              Order from your favorite restaurants and get it delivered to your doorstep in minutes.
+              {t("hero.subtitle")}
             </p>
 
             <motion.button
@@ -444,7 +412,7 @@ function HeroBanner() {
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
               />
               <span className="relative flex items-center gap-2">
-                Order Now
+                {t("hero.orderNow")}
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </span>
             </motion.button>
@@ -483,7 +451,7 @@ function HeroBanner() {
               transition={{ duration: 3, repeat: Infinity }}
               className="absolute -top-4 -right-4 px-4 py-2 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white text-sm font-bold shadow-lg border-2 border-white/30"
             >
-              30% OFF
+              {t("hero.badge")}
             </motion.div>
 
             <motion.div
@@ -491,7 +459,7 @@ function HeroBanner() {
               transition={{ duration: 4, repeat: Infinity, delay: 1 }}
               className="absolute -bottom-4 -left-4 px-3 py-2 rounded-full bg-white/20 backdrop-blur-sm text-white text-xs font-semibold border border-white/30"
             >
-              Free Delivery
+              {t("hero.freeDelivery")}
             </motion.div>
 
             {/* Sparkle Effects */}
@@ -524,6 +492,7 @@ function HeroBanner() {
 }
 
 function CategoriesSection() {
+  const { t } = useTranslation();
   return (
     <section className="py-8">
       <div className="flex items-center justify-between mb-6">
@@ -532,7 +501,7 @@ function CategoriesSection() {
           animate={{ opacity: 1, x: 0 }}
           className="text-2xl font-bold bg-gradient-to-r from-[#3E2723] to-[#C89B3C] bg-clip-text text-transparent"
         >
-          Categories
+          {t("dashboard.categories")}
         </motion.h2>
         <motion.a
           initial={{ opacity: 0, x: 20 }}
@@ -540,29 +509,31 @@ function CategoriesSection() {
           href="/menu"
           className="text-[#C89B3C] font-semibold text-sm flex items-center gap-1 hover:gap-2 transition-all group"
         >
-          View All <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          {t("common.viewAll")} <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </motion.a>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 lg:gap-6">
-        {categories.map((category, index) => (
+        {categoryKeys.map((key, index) => {
+          const cat = categoryMeta[key];
+          return (
           <motion.div
-            key={category.name}
+            key={key}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: index * 0.05 }}
             whileHover={{ y: -8 }}
             className="group cursor-pointer"
           >
-            <div className={`relative aspect-square rounded-2xl bg-gradient-to-br ${category.color} p-4 flex items-center justify-center mb-3 shadow-lg group-hover:shadow-2xl group-hover:scale-105 transition-all duration-300 overflow-hidden`}>
+            <div className={`relative aspect-square rounded-2xl bg-gradient-to-br ${cat.color} p-4 flex items-center justify-center mb-3 shadow-lg group-hover:shadow-2xl group-hover:scale-105 transition-all duration-300 overflow-hidden`}>
               <motion.div
                 animate={{ rotate: [0, 5, -5, 0] }}
                 transition={{ duration: 4, repeat: Infinity, delay: index * 0.2 }}
                 className="w-full h-full flex items-center justify-center"
               >
                 <img
-                  src={category.image}
-                  alt={category.name}
+                  src={cat.image}
+                  alt={t(`categories.${key}`)}
                   className="w-full h-full object-cover rounded-xl"
                 />
               </motion.div>
@@ -575,9 +546,8 @@ function CategoriesSection() {
                 whileHover={{ y: 0, opacity: 1 }}
                 className="absolute bottom-2 left-2 right-2 text-white text-xs font-semibold"
               >
-                Explore
+                {t("categories.explore")}
               </motion.div>
-              {/* Glow effect */}
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 whileHover={{ scale: 1.5, opacity: 0.3 }}
@@ -588,17 +558,19 @@ function CategoriesSection() {
               whileHover={{ scale: 1.05 }}
               className="text-center font-semibold text-[#3E2723] text-sm group-hover:text-[#C89B3C] transition-colors"
             >
-              {category.name}
+              {t(`categories.${key}`)}
             </motion.p>
-            <p className="text-center text-xs text-[#3E2723]/60">{category.count} restaurants</p>
           </motion.div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
 }
 
-function RestaurantCard({ restaurant, index }: { restaurant: typeof restaurants[0]; index: number }) {
+function RestaurantCard({ restKey, index }: { restKey: string; index: number }) {
+  const { t } = useTranslation();
+  const restaurant = restaurantMeta[restKey];
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -616,7 +588,7 @@ function RestaurantCard({ restaurant, index }: { restaurant: typeof restaurants[
         >
           <img
             src={restaurant.image}
-            alt={restaurant.name}
+            alt={t(`restaurant.${restKey}`)}
             className="w-full h-full object-cover"
           />
         </motion.div>
@@ -648,7 +620,7 @@ function RestaurantCard({ restaurant, index }: { restaurant: typeof restaurants[
             className="absolute bottom-3 right-3 px-2 py-1 rounded-full bg-white/90 backdrop-blur-sm flex items-center gap-1 shadow-md"
           >
             <TrendingUp className="w-3 h-3 text-[#C89B3C]" />
-            <span className="text-xs font-semibold text-[#3E2723]">Featured</span>
+            <span className="text-xs font-semibold text-[#3E2723]">{t("restaurant.featured")}</span>
           </motion.div>
         )}
 
@@ -666,7 +638,7 @@ function RestaurantCard({ restaurant, index }: { restaurant: typeof restaurants[
           onClick={() => window.location.href = "/menu"}
           className="absolute bottom-3 left-3 right-3 px-4 py-2 rounded-full bg-white text-[#3E2723] font-semibold text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
         >
-          Order Now
+          {t("restaurant.orderNow")}
         </motion.button>
       </div>
 
@@ -675,7 +647,7 @@ function RestaurantCard({ restaurant, index }: { restaurant: typeof restaurants[
           whileHover={{ scale: 1.02 }}
           className="font-bold text-[#3E2723] text-lg group-hover:text-[#C89B3C] transition-colors"
         >
-          {restaurant.name}
+          {t(`restaurant.${restKey}`)}
         </motion.h3>
 
         <div className="flex items-center gap-4 text-sm">
@@ -688,18 +660,18 @@ function RestaurantCard({ restaurant, index }: { restaurant: typeof restaurants[
           </motion.div>
           <div className="flex items-center gap-1 text-[#3E2723]/60">
             <Clock className="w-4 h-4" />
-            <span>{restaurant.deliveryTime} min</span>
+            <span>{t("restaurant.deliveryTime", { time: restaurant.deliveryTime })}</span>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {restaurant.tags.map((tag) => (
+          {restaurant.tagKeys.map((tagKey) => (
             <motion.span
-              key={tag}
+              key={tagKey}
               whileHover={{ scale: 1.05 }}
               className="px-2 py-1 rounded-full bg-gradient-to-r from-[#F8F4EE] to-[#F8F4EE]/50 text-xs text-[#3E2723]/70 border border-[#C89B3C]/20"
             >
-              {tag}
+              {t(`restaurant.${tagKey}`)}
             </motion.span>
           ))}
         </div>
@@ -709,12 +681,13 @@ function RestaurantCard({ restaurant, index }: { restaurant: typeof restaurants[
 }
 
 function PopularRestaurants() {
+  const { t } = useTranslation();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   return (
     <section className="py-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-[#3E2723]">Popular Restaurants</h2>
+        <h2 className="text-2xl font-bold text-[#3E2723]">{t("dashboard.popularRestaurants")}</h2>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
@@ -724,9 +697,9 @@ function PopularRestaurants() {
             <ChevronLeft className="w-5 h-5 text-[#3E2723]" />
           </button>
           <button
-            onClick={() => setCurrentIndex(Math.min(restaurants.length - 4, currentIndex + 1))}
+            onClick={() => setCurrentIndex(Math.min(restaurantKeys.length - 4, currentIndex + 1))}
             className="p-2 rounded-full border border-gray-200 hover:border-[#C89B3C] hover:bg-[#C89B3C]/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={currentIndex >= restaurants.length - 4}
+            disabled={currentIndex >= restaurantKeys.length - 4}
           >
             <ChevronRightIcon className="w-5 h-5 text-[#3E2723]" />
           </button>
@@ -734,8 +707,8 @@ function PopularRestaurants() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
-        {restaurants.map((restaurant, index) => (
-          <RestaurantCard key={restaurant.name} restaurant={restaurant} index={index} />
+        {restaurantKeys.map((key, index) => (
+          <RestaurantCard key={key} restKey={key} index={index} />
         ))}
       </div>
     </section>
@@ -744,6 +717,7 @@ function PopularRestaurants() {
 
 function ButcherOrderForm() {
   const { data: session } = useSession();
+  const { t } = useTranslation();
   const [meatType, setMeatType] = useState("Beef");
   const [portionSize, setPortionSize] = useState("1/2 kg");
   const [quantity, setQuantity] = useState(1);
@@ -772,16 +746,16 @@ function ButcherOrderForm() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Butcher order #${data.data.orderNumber} placed!`);
+        toast.success(t("butcher.orderPlaced", { orderNumber: data.data.orderNumber }));
         setMeatType("Beef");
         setPortionSize("1/2 kg");
         setQuantity(1);
         setNotes("");
       } else {
-        toast.error(data.error || "Failed to place order");
+        toast.error(data.error || t("butcher.failedToPlace"));
       }
     } catch {
-      toast.error("Failed to place order");
+      toast.error(t("butcher.failedToPlace"));
     } finally {
       setSubmitting(false);
     }
@@ -798,8 +772,8 @@ function ButcherOrderForm() {
           <Beef className="w-6 h-6" />
         </motion.div>
         <div>
-          <h2 className="text-2xl font-bold text-[#3E2723]">Butcher Shop</h2>
-          <p className="text-xs text-[#3E2723]/60">Order fresh meat cuts by portion</p>
+          <h2 className="text-2xl font-bold text-[#3E2723]">{t("butcher.title")}</h2>
+          <p className="text-xs text-[#3E2723]/60">{t("butcher.subtitle")}</p>
         </div>
       </div>
 
@@ -810,7 +784,7 @@ function ButcherOrderForm() {
       >
         {/* Meat Type */}
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-[#3E2723] mb-3">Select Meat Type</label>
+          <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.selectMeatType")}</label>
           <div className="flex flex-wrap gap-2">
             {meatTypes.map((type) => (
               <button
@@ -822,7 +796,7 @@ function ButcherOrderForm() {
                     : "bg-[#F8F4EE] text-[#3E2723] hover:bg-[#C89B3C]/20"
                 }`}
               >
-                {type}
+                {t(`butcher.meat${type}`)}
               </button>
             ))}
           </div>
@@ -830,7 +804,7 @@ function ButcherOrderForm() {
 
         {/* Portion Size */}
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-[#3E2723] mb-3">Portion Size</label>
+          <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.portionSize")}</label>
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {portionOptions.map((size) => {
               const price = meatPrices[meatType]?.[size] || 0;
@@ -857,7 +831,7 @@ function ButcherOrderForm() {
         {/* Quantity + Total */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <label className="block text-sm font-semibold text-[#3E2723] mb-3">Quantity</label>
+            <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.quantity")}</label>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -875,9 +849,9 @@ function ButcherOrderForm() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#3E2723] mb-3">Total</label>
+            <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.total")}</label>
             <div className="p-4 rounded-xl bg-gradient-to-r from-[#3E2723] to-[#1B1B1B] text-white">
-              <p className="text-xs opacity-80">{quantity} x {portionSize} {meatType}</p>
+              <p className="text-xs opacity-80">{quantity} x {portionSize} {t(`butcher.meat${meatType}`)}</p>
               <p className="text-2xl font-bold">ETB {total.toLocaleString()}</p>
             </div>
           </div>
@@ -885,11 +859,11 @@ function ButcherOrderForm() {
 
         {/* Notes */}
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-[#3E2723] mb-3">Special Instructions (optional)</label>
+          <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.specialInstructions")}</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="E.g., cut into small cubes, mince finely, remove bones..."
+            placeholder={t("butcher.instructionsPlaceholder")}
             className="w-full px-4 py-3 rounded-xl bg-[#F8F4EE] text-[#3E2723] placeholder:text-[#3E2723]/40 text-sm border border-transparent focus:border-[#C89B3C] focus:outline-none transition-all resize-none"
             rows={3}
           />
@@ -903,7 +877,7 @@ function ButcherOrderForm() {
           whileTap={{ scale: 0.98 }}
           className="w-full sm:w-auto px-10 py-3.5 rounded-xl bg-gradient-to-r from-[#A12222] to-[#C89B3C] text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
         >
-          {submitting ? "Placing Order..." : `Place Order - ETB ${total.toLocaleString()}`}
+          {submitting ? t("butcher.placingOrder") : t("butcher.placeOrderWithTotal", { total: total.toLocaleString() })}
         </motion.button>
       </motion.div>
     </section>
@@ -911,11 +885,12 @@ function ButcherOrderForm() {
 }
 
 function MobileNav() {
+  const { t } = useTranslation();
   const mobileNavItems = [
-    { icon: Home, label: "Home", href: "/dashboard" },
-    { icon: Receipt, label: "Orders", href: "/orders" },
-    { icon: Heart, label: "Favorites", href: "/menu" },
-    { icon: User, label: "Profile", href: "/settings" },
+    { icon: Home, label: t("nav.home"), href: "/dashboard" },
+    { icon: Receipt, label: t("nav.orders"), href: "/orders" },
+    { icon: Heart, label: t("nav.favorites"), href: "/menu" },
+    { icon: User, label: t("nav.profile"), href: "/settings" },
   ];
 
   return (
@@ -957,11 +932,12 @@ function MobileNav() {
 
 function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { data: session } = useSession();
+  const { t } = useTranslation();
   const [submitting, setSubmitting] = useState(false);
-  const cartItems = [
+  const [cartItems, setCartItems] = useState([
     { name: "Kurt Special", qty: 2, price: 450 },
     { name: "Kitfo", qty: 1, price: 350 },
-  ];
+  ]);
   const total = cartItems.reduce((s, i) => s + i.qty * i.price, 0);
 
   const handleCheckout = async () => {
@@ -998,13 +974,13 @@ function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Order #${data.data.orderNumber} placed!`);
+        toast.success(t("cart.orderPlaced", { orderNumber: data.data.orderNumber }));
         onClose();
       } else {
-        toast.error(data.error || "Failed to place order");
+        toast.error(data.error || t("cart.failedToPlace"));
       }
     } catch {
-      toast.error("Failed to place order");
+      toast.error(t("cart.failedToPlace"));
     } finally {
       setSubmitting(false);
     }
@@ -1016,7 +992,7 @@ function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
       <div className={`fixed top-0 right-0 h-full w-80 sm:w-96 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4 border-b">
-            <h2 className="text-lg font-bold text-[#3E2723]">Your Cart</h2>
+            <h2 className="text-lg font-bold text-[#3E2723]">{t("cart.yourCart")}</h2>
             <button onClick={onClose} className="p-1 rounded-full hover:bg-gray-100">
               <X className="w-5 h-5" />
             </button>
@@ -1026,23 +1002,28 @@ function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
               <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-[#F8F4EE]">
                 <div>
                   <p className="text-sm font-semibold text-[#3E2723]">{item.name}</p>
-                  <p className="text-xs text-[#3E2723]/60">Qty: {item.qty}</p>
+                  <p className="text-xs text-[#3E2723]/60">{t("cart.qty", { qty: item.qty })}</p>
                 </div>
-                <p className="text-sm font-bold text-[#C89B3C]">ETB {item.qty * item.price}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-bold text-[#C89B3C]">{t("common.currency")} {item.qty * item.price}</p>
+                  <button onClick={() => setCartItems(prev => prev.filter((_, j) => j !== i))} className="p-1 rounded-full hover:bg-red-100 hover:text-red-500 transition-colors text-gray-400">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>
           <div className="p-4 border-t space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-[#3E2723]">Total</span>
-              <span className="text-lg font-bold text-[#C89B3C]">ETB {total}</span>
+              <span className="text-sm font-semibold text-[#3E2723]">{t("cart.total")}</span>
+              <span className="text-lg font-bold text-[#C89B3C]">{t("common.currency")} {total}</span>
             </div>
             <button
               onClick={handleCheckout}
               disabled={submitting}
               className="w-full py-3 rounded-xl bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
             >
-              {submitting ? "Placing Order..." : "Checkout"}
+              {submitting ? t("cart.placingOrder") : t("cart.checkout")}
             </button>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/components/auth-provider";
 import { QueryProvider } from "@/components/query-provider";
 import { ReduxProvider } from "@/lib/store/provider";
+import { TranslationProvider } from "@/lib/i18n";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
@@ -56,7 +57,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AuthProvider>
             <QueryProvider>
               <ReduxProvider>
-                {children}
+                <TranslationProvider>
+                  {children}
+                </TranslationProvider>
               </ReduxProvider>
               <Toaster
                 position="top-right"

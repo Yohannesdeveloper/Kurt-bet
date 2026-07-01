@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,7 @@ const categoryOptions = ["Vegetables", "Meat", "Spices", "Dairy", "Grains", "Bev
 const unitOptions = ["kg", "g", "L", "mL", "pcs", "dozen", "sack", "bottle"];
 
 export default function InventoryPage() {
+  const { t } = useTranslation();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -56,16 +58,16 @@ export default function InventoryPage() {
 
   const handleSubmit = () => {
     if (!itemId.trim() || !name.trim() || !quantity || !unit || !category) {
-      toast.error("Please fill in all fields");
+      toast.error(t("inventory.fillAllFields"));
       return;
     }
     if (items.some((i) => i.id === itemId.trim())) {
-      toast.error("Item ID already exists");
+      toast.error(t("inventory.itemIdExists"));
       return;
     }
     const qty = parseFloat(quantity);
     if (isNaN(qty) || qty < 0) {
-      toast.error("Quantity must be a valid positive number");
+      toast.error(t("inventory.invalidQuantity"));
       return;
     }
     const newItem: InventoryItem = {
@@ -76,14 +78,14 @@ export default function InventoryPage() {
       category,
     };
     setItems((prev) => [newItem, ...prev]);
-    toast.success("Inventory item added");
+    toast.success(t("inventory.added"));
     setDialogOpen(false);
     resetForm();
   };
 
   const handleDelete = (id: string) => {
     setItems((prev) => prev.filter((i) => i.id !== id));
-    toast.success("Item removed");
+    toast.success(t("inventory.removed"));
   };
 
   const filtered = items.filter(
@@ -107,15 +109,15 @@ export default function InventoryPage() {
             <Package className="h-5 w-5 lg:h-6 lg:w-6 text-[#C89B3C]" />
           </div>
           <div>
-            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">Inventory</h1>
-            <p className="text-sm text-muted-foreground">Track stock levels</p>
+            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">{t("inventory.title")}</h1>
+            <p className="text-sm text-muted-foreground">{t("inventory.subtitle")}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 lg:gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search inventory..."
+              placeholder={t("inventory.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 h-10 lg:h-11 w-full sm:w-64"
@@ -129,17 +131,17 @@ export default function InventoryPage() {
             }}
             className="h-10 lg:h-11 flex-shrink-0"
           >
-            <Plus className="h-4 w-4 mr-2" /> Add Item
+            <Plus className="h-4 w-4 mr-2" /> {t("inventory.addItem")}
           </Button>
         </div>
       </motion.div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {[
-          { label: "Total Items", value: totalValue.toString(), icon: Package, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
-          { label: "Categories", value: new Set(items.map(i => i.category)).size.toString(), icon: Package, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-500/10", iconColor: "text-purple-600" },
-          { label: "Low Stock", value: items.filter(i => i.quantity < 10).toString(), icon: AlertTriangle, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },
-          { label: "Total Value", value: items.length.toString(), icon: TrendingDown, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
+          { label: t("inventory.totalItems"), value: totalValue.toString(), icon: Package, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
+          { label: t("inventory.categories"), value: new Set(items.map(i => i.category)).size.toString(), icon: Package, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-500/10", iconColor: "text-purple-600" },
+          { label: t("inventory.lowStock"), value: items.filter(i => i.quantity < 10).toString(), icon: AlertTriangle, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },
+          { label: t("inventory.totalValue"), value: items.length.toString(), icon: TrendingDown, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
         ].map((stat, index) => (
           <motion.div
             key={stat.label}
@@ -173,9 +175,9 @@ export default function InventoryPage() {
               <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
                 <Inbox className="h-10 w-10 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">No inventory items yet</h3>
+              <h3 className="text-lg font-semibold mb-2">{t("inventory.noItems")}</h3>
               <p className="text-sm text-muted-foreground mb-6">
-                Add your first item to start tracking stock.
+                {t("inventory.addFirstItem")}
               </p>
               <Button
                 variant="premium"
@@ -185,7 +187,7 @@ export default function InventoryPage() {
                   setDialogOpen(true);
                 }}
               >
-                <Plus className="h-4 w-4 mr-2" /> Add Item
+                <Plus className="h-4 w-4 mr-2" /> {t("inventory.addItem")}
               </Button>
             </CardContent>
           </Card>
@@ -202,12 +204,12 @@ export default function InventoryPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b bg-muted/50">
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Item ID</th>
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Name</th>
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Quantity</th>
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Unit</th>
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Category</th>
-                      <th className="text-right p-4 text-sm font-semibold text-muted-foreground">Action</th>
+                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("inventory.itemId")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("inventory.name")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("inventory.quantity")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("inventory.unit")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("inventory.category")}</th>
+                      <th className="text-right p-4 text-sm font-semibold text-muted-foreground">{t("inventory.action")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -243,46 +245,46 @@ export default function InventoryPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-[450px]">
           <DialogHeader>
-            <DialogTitle>Add Inventory Item</DialogTitle>
-            <DialogDescription>Fill in the item details below</DialogDescription>
+            <DialogTitle>{t("inventory.addItem")}</DialogTitle>
+            <DialogDescription>{t("inventory.addItemDescription")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="grid gap-2">
-              <Label htmlFor="itemId">Item ID</Label>
+              <Label htmlFor="itemId">{t("inventory.itemId")}</Label>
               <Input
                 id="itemId"
-                placeholder="e.g. ITM-001"
+                placeholder={t("inventory.itemIdPlaceholder")}
                 value={itemId}
                 onChange={(e) => setItemId(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="name">Item Name</Label>
+              <Label htmlFor="name">{t("inventory.itemName")}</Label>
               <Input
                 id="name"
-                placeholder="Enter item name"
+                placeholder={t("inventory.itemNamePlaceholder")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="quantity">Quantity</Label>
+                <Label htmlFor="quantity">{t("inventory.quantity")}</Label>
                 <Input
                   id="quantity"
                   type="number"
                   min={0}
                   step={0.1}
-                  placeholder="0"
+                  placeholder={t("inventory.quantityPlaceholder")}
                   value={quantity}
                   onChange={(e) => setQuantity(e.target.value)}
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="unit">Unit</Label>
+                <Label htmlFor="unit">{t("inventory.unit")}</Label>
                 <Select value={unit} onValueChange={setUnit}>
                   <SelectTrigger id="unit">
-                    <SelectValue placeholder="Select unit" />
+                    <SelectValue placeholder={t("inventory.selectUnit")} />
                   </SelectTrigger>
                   <SelectContent>
                     {unitOptions.map((u) => (
@@ -293,10 +295,10 @@ export default function InventoryPage() {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">{t("inventory.category")}</Label>
               <Select value={category} onValueChange={setCategory}>
                 <SelectTrigger id="category">
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={t("inventory.selectCategory")} />
                 </SelectTrigger>
                 <SelectContent>
                   {categoryOptions.map((c) => (
@@ -308,10 +310,10 @@ export default function InventoryPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button variant="premium" onClick={handleSubmit}>
-              Add Item
+              {t("inventory.addItem")}
             </Button>
           </DialogFooter>
         </DialogContent>

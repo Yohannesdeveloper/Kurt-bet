@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat, Beef, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
+import { useTranslation } from "@/lib/i18n";
 
 interface OrderItem {
   id: string;
@@ -51,8 +52,17 @@ function formatTime(iso: string) {
 }
 
 const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Order; onStatusUpdate: (id: string, status: string) => void }) {
+  const { t } = useTranslation();
   const s = STATUS_FLOW[order.status] || STATUS_FLOW.NEW;
   const [updating, setUpdating] = useState(false);
+
+  const statusTLabel: Record<string, string> = {
+    NEW: t("orders.pending"),
+    PREPARING: t("orders.preparing"),
+    READY: t("orders.ready"),
+    SERVED: t("orders.delivered"),
+    CANCELLED: t("orders.cancelled"),
+  };
 
   const handleStatus = async (newStatus: string) => {
     setUpdating(true);
@@ -81,7 +91,7 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
               <div className="flex items-center gap-2 mb-1">
                 <span className={`h-2.5 w-2.5 rounded-full ${s.dot}`} />
                 <span className="font-bold text-base">#{order.orderNumber}</span>
-                <Badge variant="outline" className={`text-xs ${s.color}`}>{s.label}</Badge>
+                <Badge variant="outline" className={`text-xs ${s.color}`}>{statusTLabel[order.status]}</Badge>
               </div>
               <div className="flex items-center gap-3 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(order.createdAt)}</span>
@@ -117,7 +127,7 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
                 onClick={() => handleStatus(s.next!)}
                 className="h-8 text-xs gap-1"
               >
-                {updating ? "..." : <><ChevronRight className="h-3 w-3" /> {STATUS_FLOW[s.next]?.label}</>}
+                {updating ? "..." : <><ChevronRight className="h-3 w-3" /> {statusTLabel[s.next!]}</>}
               </Button>
             )}
             {order.status !== "CANCELLED" && order.status !== "SERVED" && (
@@ -128,7 +138,7 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
                 onClick={() => handleStatus("CANCELLED")}
                 className="h-8 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 ml-auto"
               >
-                <XCircle className="h-3 w-3 mr-1" />Cancel
+                <XCircle className="h-3 w-3 mr-1" />{t("common.cancel")}
               </Button>
             )}
           </div>
@@ -150,6 +160,7 @@ interface ButcherOrder {
 }
 
 export default function KDSPage() {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
   const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -203,9 +214,15 @@ export default function KDSPage() {
     } catch {}
   };
 
+  const colLabel: Record<string, string> = {
+    NEW: t("kds.newOrders"),
+    PREPARING: t("kds.preparing"),
+    READY: t("kds.ready"),
+    SERVED: t("orders.delivered"),
+  };
   const grouped = STATUS_ORDER.map(status => ({
     status,
-    label: STATUS_FLOW[status]?.label || status,
+    label: colLabel[status] || STATUS_FLOW[status]?.label || status,
     color: STATUS_FLOW[status]?.color || "",
     dot: STATUS_FLOW[status]?.dot || "",
     orders: orders.filter(o => o.status === status),
@@ -225,7 +242,7 @@ export default function KDSPage() {
             <CookingPot className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h1 className="text-lg font-bold tracking-tight">Kitchen Display</h1>
+            <h1 className="text-lg font-bold tracking-tight">{t("kds.title")}</h1>
             <p className="text-xs text-muted-foreground">{orders.length + butcherOrders.length} orders active</p>
           </div>
         </div>
@@ -238,13 +255,13 @@ export default function KDSPage() {
       <div className="flex-1 overflow-auto p-4 lg:p-6">
         {loading ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-sm text-muted-foreground">Loading orders...</p>
+            <p className="text-sm text-muted-foreground">{t("common.loading")}</p>
           </div>
         ) : !hasOrders ? (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
             <ChefHat className="h-16 w-16 mb-4 opacity-30" />
-            <p className="text-lg font-semibold">No pending orders</p>
-            <p className="text-sm">Orders from the POS will appear here</p>
+            <p className="text-lg font-semibold">{t("orders.pending")}</p>
+            <p className="text-sm">{t("orders.noOrders")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 h-full">
@@ -263,7 +280,7 @@ export default function KDSPage() {
                   </AnimatePresence>
                   {grp.orders.length === 0 && (
                     <div className="flex items-center justify-center h-20 text-xs text-muted-foreground border border-dashed rounded-xl">
-                      Empty
+                      {t("orders.noOrders")}
                     </div>
                   )}
                 </div>
@@ -273,7 +290,7 @@ export default function KDSPage() {
             <div className="flex flex-col min-h-0">
               <div className="flex items-center gap-2 mb-3 px-1">
                 <span className="h-2.5 w-2.5 rounded-full bg-[#A12222]" />
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Butcher</h2>
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{t("kds.butcher")}</h2>
                 <Badge variant="secondary" className="text-xs ml-auto">{butcherOrders.length}</Badge>
               </div>
               <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pr-1">
@@ -293,10 +310,10 @@ export default function KDSPage() {
                               <div className="flex items-center gap-2 mb-1">
                                 <Beef className="h-4 w-4 text-[#A12222]" />
                                 <span className="font-bold text-base">#{bo.orderNumber}</span>
-                                <Badge variant="outline" className="text-xs text-red-600 border-red-300">Butcher</Badge>
+                                <Badge variant="outline" className="text-xs text-red-600 border-red-300">{t("kds.butcher")}</Badge>
                               </div>
                               <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1"><Clock className="h-3 w-3" />Sent to Kitchen</span>
+                                <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{t("butcher.sentToKitchen")}</span>
                                 <span>{bo.customerName}</span>
                               </div>
                             </div>
@@ -318,7 +335,7 @@ export default function KDSPage() {
                               onClick={() => handleButcherStatus(bo.id, "SENT_TO_KITCHEN")}
                               className="h-8 text-xs gap-1 bg-green-600 hover:bg-green-700"
                             >
-                              <CheckCircle className="h-3 w-3" /> Received
+                              <CheckCircle className="h-3 w-3" /> {t("kds.received")}
                             </Button>
                           </div>
                         </CardContent>
@@ -328,7 +345,7 @@ export default function KDSPage() {
                 </AnimatePresence>
                 {butcherOrders.length === 0 && (
                   <div className="flex items-center justify-center h-20 text-xs text-muted-foreground border border-dashed rounded-xl">
-                    Empty
+                    {t("orders.noOrders")}
                   </div>
                 )}
               </div>

@@ -72,6 +72,29 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       return NextResponse.json({ success: false, error: "Forbidden" }, { status: 403 });
     }
 
+    // Handle item removal
+    if (body.removeItemId) {
+      const order = await prisma.order.findUnique({
+        where: { id: params.id },
+        include: { items: true },
+      });
+      if (!order) {
+        return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
+      }
+      const updatedItems = order.items.filter(i => i.id !== body.removeItemId);
+      const subtotal = updatedItems.reduce((s, i) => s + i.totalPrice, 0);
+      const updated = await prisma.order.update({
+        where: { id: params.id },
+        data: {
+          items: { deleteMany: { id: body.removeItemId } },
+          subtotal,
+          total: subtotal,
+        },
+        include: { items: true },
+      });
+      return NextResponse.json({ success: true, data: updated });
+    }
+
     const order = await prisma.order.update({
       where: { id: params.id },
       data: {
@@ -100,6 +123,18 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     }));
     const idx = demoOrders.findIndex((o: any) => o.id === params.id);
     if (idx === -1) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
+
+    // Handle item removal in demo mode
+    if (body.removeItemId) {
+      const oldItems = demoOrders[idx].items || [];
+      const newItems = oldItems.filter((i: any) => i.id !== body.removeItemId);
+      const subtotal = newItems.reduce((s: number, i: any) => s + i.totalPrice, 0);
+      demoOrders[idx] = { ...demoOrders[idx], items: newItems, subtotal, total: subtotal, updatedAt: new Date().toISOString() };
+      demoOrdersMap[idx] = { ...demoOrdersMap[idx], items: newItems, subtotal, total: subtotal, updatedAt: new Date().toISOString() };
+      await writeDemoJSON(DEMO_FILE, demoOrders);
+      return NextResponse.json({ success: true, data: demoOrdersMap[idx] });
+    }
+
     demoOrders[idx] = { ...demoOrders[idx], ...body, updatedAt: new Date().toISOString() };
     if (body.status === "COMPLETED" || body.status === "CANCELLED") {
       demoOrders[idx].completedAt = new Date().toISOString();

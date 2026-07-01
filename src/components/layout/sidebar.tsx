@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import { useSession, signOut } from "next-auth/react";
 import { useState, memo, useMemo, useCallback } from "react";
 import { useTheme } from "next-themes";
+import { useTranslation } from "@/lib/i18n";
 
 // Dynamic icon imports for better code splitting
 const LayoutDashboard = dynamic(() => import('lucide-react').then(mod => ({ default: mod.LayoutDashboard })), { ssr: false });
@@ -27,53 +28,56 @@ const Moon = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Mo
 const Beef = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Beef })), { ssr: false });
 const Send = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Send })), { ssr: false });
 
-const navItemsByRole: Record<string, Array<{ href: string; label: string; icon: any }>> = {
+interface NavItemType { href: string; label: string; tKey: string; icon: any; }
+
+const navItemsByRole: Record<string, NavItemType[]> = {
   ADMIN: [
-    { href: "/dashboard/admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/orders", label: "Orders", icon: ClipboardList },
-    { href: "/kds", label: "Kitchen", icon: CookingPot },
-    { href: "/tables", label: "Tables", icon: Store },
-    { href: "/menu", label: "Menu", icon: UtensilsCrossed },
-    { href: "/payments", label: "Payments", icon: CreditCard },
-    { href: "/dashboard/butcher", label: "Butcher", icon: Beef },
-    { href: "/customers", label: "Customers", icon: Users },
-    { href: "/reports", label: "Reports", icon: BarChart3 },
-    { href: "/settings", label: "Settings", icon: Settings },
+    { href: "/dashboard/admin", label: "Dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },
+    { href: "/orders", label: "Orders", tKey: "nav.orders", icon: ClipboardList },
+    { href: "/kds", label: "Kitchen", tKey: "nav.kitchen", icon: CookingPot },
+    { href: "/tables", label: "Tables", tKey: "nav.tables", icon: Store },
+    { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },
+    { href: "/payments", label: "Payments", tKey: "nav.payments", icon: CreditCard },
+    { href: "/dashboard/butcher", label: "Butcher", tKey: "nav.butcher", icon: Beef },
+    { href: "/customers", label: "Customers", tKey: "nav.customers", icon: Users },
+    { href: "/reports", label: "Reports", tKey: "nav.reports", icon: BarChart3 },
+    { href: "/settings", label: "Settings", tKey: "nav.settings", icon: Settings },
   ],
   CLIENT: [
-    { href: "/dashboard/client", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/menu", label: "Menu", icon: UtensilsCrossed },
-    { href: "/orders", label: "My Orders", icon: ClipboardList },
-    { href: "/dashboard/butcher-shop", label: "Butcher Shop", icon: Beef },
-    { href: "/reservations", label: "Reservations", icon: Store },
+    { href: "/dashboard/client", label: "Dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },
+    { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },
+    { href: "/orders", label: "My Orders", tKey: "nav.myOrders", icon: ClipboardList },
+    { href: "/dashboard/butcher-shop", label: "Butcher Shop", tKey: "nav.butcherShop", icon: Beef },
+    { href: "/reservations", label: "Reservations", tKey: "nav.reservations", icon: Store },
   ],
   BUTCHER: [
-    { href: "/dashboard/butcher", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/dashboard/butcher?status=PENDING", label: "Pending Orders", icon: Beef },
-    { href: "/kds", label: "Kitchen Display", icon: CookingPot },
-    { href: "/menu", label: "Menu", icon: UtensilsCrossed },
+    { href: "/dashboard/butcher", label: "Dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },
+    { href: "/dashboard/butcher?status=PENDING", label: "Pending Orders", tKey: "butcher.pending", icon: Beef },
+    { href: "/kds", label: "Kitchen Display", tKey: "kds.title", icon: CookingPot },
+    { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },
   ],
   KITCHEN: [
-    { href: "/dashboard/kitchen", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/kds", label: "Kitchen Display", icon: CookingPot },
-    { href: "/menu", label: "Menu", icon: UtensilsCrossed },
+    { href: "/dashboard/kitchen", label: "Dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },
+    { href: "/kds", label: "Kitchen Display", tKey: "kds.title", icon: CookingPot },
+    { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },
   ],
   WAITER: [
-    { href: "/dashboard/waiter", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/orders", label: "Orders", icon: ClipboardList },
-    { href: "/tables", label: "Tables", icon: Store },
-    { href: "/menu", label: "Menu", icon: UtensilsCrossed },
-    { href: "/payments", label: "Payments", icon: CreditCard },
+    { href: "/dashboard/waiter", label: "Dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },
+    { href: "/orders", label: "Orders", tKey: "nav.orders", icon: ClipboardList },
+    { href: "/tables", label: "Tables", tKey: "nav.tables", icon: Store },
+    { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },
+    { href: "/payments", label: "Payments", tKey: "nav.payments", icon: CreditCard },
   ],
 };
 
 const NavItem = memo(({ item, pathname, onClick }: { 
-  item: { href: string; label: string; icon: any }; 
+  item: NavItemType; 
   pathname: string; 
   onClick: () => void;
 }) => {
   const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
   const IconComponent = item.icon;
+  const { t } = useTranslation();
   
   return (
     <Link
@@ -90,7 +94,7 @@ const NavItem = memo(({ item, pathname, onClick }: {
         "h-4 w-4 transition-colors",
         isActive ? "text-[#C89B3C]" : "group-hover:text-[#C89B3C]"
       )} />}
-      <span className={isActive ? "text-[#C89B3C]" : ""}>{item.label}</span>
+      <span className={isActive ? "text-[#C89B3C]" : ""}>{t(item.tKey)}</span>
       {isActive && (
         <div className="ml-auto h-1.5 w-1.5 rounded-full bg-[#C89B3C] animate-pulse" />
       )}
@@ -104,6 +108,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { theme, setTheme } = useTheme();
+  const { t } = useTranslation();
   const [mobileOpen, setMobileOpen] = useState(false);
   
   const userRole = (session?.user as { role?: string })?.role || "CLIENT";
@@ -153,7 +158,7 @@ export function Sidebar() {
 
         <nav className="flex-1 space-y-1 p-4 overflow-y-auto">
           <div className="space-y-0.5">
-            {navItems.map((item: { href: string; label: string; icon: any }) => (
+            {navItems.map((item: NavItemType) => (
               <NavItem
                 key={item.href}
                 item={item}
@@ -195,7 +200,7 @@ export function Sidebar() {
           <div className="flex items-center gap-2">
             <div className="h-2 w-2 rounded-full bg-[#C89B3C] animate-pulse" />
             <span className="text-sm font-medium text-[#3E2723]">
-              {navItems.find((i: { href: string; label: string }) => pathname.startsWith(i.href))?.label || "Restaurant OS"}
+              {t(navItems.find((i: NavItemType) => pathname.startsWith(i.href))?.tKey || "app.name")}
             </span>
           </div>
           <Button

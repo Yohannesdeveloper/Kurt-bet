@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Beef, Minus, Plus } from "lucide-react";
 import toast from "react-hot-toast";
+import { useTranslation } from "@/lib/i18n";
 
 const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
 const portionOptions = ["1/3 kg", "1/2 kg", "1 kg", "2 kg", "3 kg", "5 kg"];
@@ -16,7 +17,14 @@ const meatPrices: Record<string, Record<string, number>> = {
 };
 
 export default function ButcherShopPage() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
+  const meatTypeLabels: Record<string, string> = {
+    Beef: t("butcher.beef"),
+    Lamb: t("butcher.lamb"),
+    Goat: t("butcher.goat"),
+    Chicken: t("butcher.chicken"),
+  };
   const [meatType, setMeatType] = useState("Beef");
   const [portionSize, setPortionSize] = useState("1/2 kg");
   const [quantity, setQuantity] = useState(1);
@@ -63,8 +71,8 @@ export default function ButcherShopPage() {
           <Beef className="w-6 h-6" />
         </motion.div>
         <div>
-          <h1 className="text-2xl font-bold text-[#3E2723]">Butcher Shop</h1>
-          <p className="text-sm text-[#3E2723]/60">Order fresh meat cuts by portion</p>
+          <h1 className="text-2xl font-bold text-[#3E2723]">{t("nav.butcherShop")}</h1>
+          <p className="text-sm text-[#3E2723]/60">{t("butcher.placeOrder")}</p>
         </div>
       </div>
 
@@ -75,7 +83,7 @@ export default function ButcherShopPage() {
       >
         {/* Meat Type */}
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-[#3E2723] mb-3">Select Meat Type</label>
+          <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.meatType")}</label>
           <div className="flex flex-wrap gap-2">
             {meatTypes.map((type) => (
               <button
@@ -87,7 +95,7 @@ export default function ButcherShopPage() {
                     : "bg-[#F8F4EE] text-[#3E2723] hover:bg-[#C89B3C]/20"
                 }`}
               >
-                {type}
+                {meatTypeLabels[type]}
               </button>
             ))}
           </div>
@@ -95,7 +103,7 @@ export default function ButcherShopPage() {
 
         {/* Portion Size */}
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-[#3E2723] mb-3">Select Portion Size</label>
+          <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.portionSize")}</label>
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {portionOptions.map((size) => {
               const price = meatPrices[meatType]?.[size] || 0;
@@ -122,7 +130,7 @@ export default function ButcherShopPage() {
         {/* Quantity + Total */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
           <div>
-            <label className="block text-sm font-semibold text-[#3E2723] mb-3">Quantity</label>
+            <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.quantity")}</label>
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -140,9 +148,9 @@ export default function ButcherShopPage() {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#3E2723] mb-3">Total</label>
+            <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("orders.total")}</label>
             <div className="p-4 rounded-xl bg-gradient-to-r from-[#3E2723] to-[#1B1B1B] text-white">
-              <p className="text-xs opacity-80">{quantity} x {portionSize} {meatType}</p>
+              <p className="text-xs opacity-80">{quantity} x {portionSize} {meatTypeLabels[meatType]}</p>
               <p className="text-2xl font-bold">ETB {total.toLocaleString()}</p>
             </div>
           </div>
@@ -150,7 +158,7 @@ export default function ButcherShopPage() {
 
         {/* Notes */}
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-[#3E2723] mb-3">Special Instructions (optional)</label>
+          <label className="block text-sm font-semibold text-[#3E2723] mb-3">{t("butcher.notes")}</label>
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
@@ -168,7 +176,7 @@ export default function ButcherShopPage() {
           whileTap={{ scale: 0.98 }}
           className="w-full sm:w-auto px-10 py-3.5 rounded-xl bg-gradient-to-r from-[#A12222] to-[#C89B3C] text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
         >
-          {submitting ? "Placing Order..." : `Place Order - ETB ${total.toLocaleString()}`}
+          {submitting ? t("common.loading") : `${t("butcher.placeOrder")} - ETB ${total.toLocaleString()}`}
         </motion.button>
       </motion.div>
     </div>

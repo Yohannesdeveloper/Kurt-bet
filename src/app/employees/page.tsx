@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "@/lib/i18n";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,6 +46,7 @@ const positionOptions = [
 ];
 
 export default function EmployeesPage() {
+  const { t } = useTranslation();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -63,12 +65,12 @@ export default function EmployeesPage() {
 
   const handleSubmit = () => {
     if (!name.trim() || !fatherName.trim() || !age || !position) {
-      toast.error("Please fill in all fields");
+      toast.error(t("employees.fillAllFields"));
       return;
     }
     const ageNum = parseInt(age);
     if (isNaN(ageNum) || ageNum < 18 || ageNum > 100) {
-      toast.error("Age must be between 18 and 100");
+      toast.error(t("employees.ageRange"));
       return;
     }
     const newEmployee: Employee = {
@@ -79,14 +81,14 @@ export default function EmployeesPage() {
       position,
     };
     setEmployees((prev) => [newEmployee, ...prev]);
-    toast.success("Employee added");
+    toast.success(t("employees.added"));
     setDialogOpen(false);
     resetForm();
   };
 
   const handleDelete = (id: string) => {
     setEmployees((prev) => prev.filter((e) => e.id !== id));
-    toast.success("Employee removed");
+    toast.success(t("employees.removed"));
   };
 
   const filtered = employees.filter(
@@ -107,15 +109,15 @@ export default function EmployeesPage() {
             <Users className="h-5 w-5 lg:h-6 lg:w-6 text-[#C89B3C]" />
           </div>
           <div>
-            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">Employees</h1>
-            <p className="text-sm text-muted-foreground">Manage your team</p>
+            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">{t("employees.title")}</h1>
+            <p className="text-sm text-muted-foreground">{t("employees.subtitle")}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 lg:gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search employees..."
+              placeholder={t("employees.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 h-10 lg:h-11 w-full sm:w-64"
@@ -129,16 +131,16 @@ export default function EmployeesPage() {
             }}
             className="h-10 lg:h-11 flex-shrink-0"
           >
-            <Plus className="h-4 w-4 mr-2" /> Add Employee
+            <Plus className="h-4 w-4 mr-2" /> {t("employees.addEmployee")}
           </Button>
         </div>
       </motion.div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
         {[
-          { label: "Total", value: employees.length.toString(), icon: Users, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
-          { label: "Active", value: employees.length.toString(), icon: UserCheck, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
-          { label: "Positions", value: new Set(employees.map(e => e.position)).size.toString(), icon: UserMinus, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },
+          { label: t("employees.total"), value: employees.length.toString(), icon: Users, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
+          { label: t("employees.active"), value: employees.length.toString(), icon: UserCheck, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
+          { label: t("employees.positions"), value: new Set(employees.map(e => e.position)).size.toString(), icon: UserMinus, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },
         ].map((stat, index) => (
           <motion.div
             key={stat.label}
@@ -172,9 +174,9 @@ export default function EmployeesPage() {
               <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
                 <Inbox className="h-10 w-10 text-muted-foreground" />
               </div>
-              <h3 className="text-lg font-semibold mb-2">No employees yet</h3>
+              <h3 className="text-lg font-semibold mb-2">{t("employees.noEmployees")}</h3>
               <p className="text-sm text-muted-foreground mb-6">
-                Add your first employee to start building your team.
+                {t("employees.addFirstEmployee")}
               </p>
               <Button
                 variant="premium"
@@ -184,7 +186,7 @@ export default function EmployeesPage() {
                   setDialogOpen(true);
                 }}
               >
-                <Plus className="h-4 w-4 mr-2" /> Add Employee
+                <Plus className="h-4 w-4 mr-2" /> {t("employees.addEmployee")}
               </Button>
             </CardContent>
           </Card>
@@ -201,11 +203,11 @@ export default function EmployeesPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b bg-muted/50">
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Name</th>
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Father&apos;s Name</th>
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Age</th>
-                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">Position</th>
-                      <th className="text-right p-4 text-sm font-semibold text-muted-foreground">Action</th>
+                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("employees.name")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("employees.fatherName")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("employees.age")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-muted-foreground">{t("employees.position")}</th>
+                      <th className="text-right p-4 text-sm font-semibold text-muted-foreground">{t("employees.action")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -240,45 +242,45 @@ export default function EmployeesPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="sm:max-w-[450px]">
           <DialogHeader>
-            <DialogTitle>Add Employee</DialogTitle>
-            <DialogDescription>Fill in the employee details below</DialogDescription>
+            <DialogTitle>{t("employees.addEmployee")}</DialogTitle>
+            <DialogDescription>{t("employees.addEmployeeDescription")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="grid gap-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">{t("employees.name")}</Label>
               <Input
                 id="name"
-                placeholder="Enter full name"
+                placeholder={t("employees.enterFullName")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="fatherName">Father&apos;s Name</Label>
+              <Label htmlFor="fatherName">{t("employees.fatherName")}</Label>
               <Input
                 id="fatherName"
-                placeholder="Enter father's name"
+                placeholder={t("employees.enterFatherName")}
                 value={fatherName}
                 onChange={(e) => setFatherName(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="age">Age</Label>
+              <Label htmlFor="age">{t("employees.age")}</Label>
               <Input
                 id="age"
                 type="number"
                 min={18}
                 max={100}
-                placeholder="Enter age"
+                placeholder={t("employees.enterAge")}
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="position">Position</Label>
+              <Label htmlFor="position">{t("employees.position")}</Label>
               <Select value={position} onValueChange={setPosition}>
                 <SelectTrigger id="position">
-                  <SelectValue placeholder="Select position" />
+                  <SelectValue placeholder={t("employees.selectPosition")} />
                 </SelectTrigger>
                 <SelectContent>
                   {positionOptions.map((p) => (
@@ -292,10 +294,10 @@ export default function EmployeesPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button variant="premium" onClick={handleSubmit}>
-              Add Employee
+              {t("employees.addEmployee")}
             </Button>
           </DialogFooter>
         </DialogContent>

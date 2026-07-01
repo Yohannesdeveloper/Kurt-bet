@@ -4,13 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, Users, ChefHat, ClipboardList, DollarSign, Settings, BarChart3, Shield, Plus } from "lucide-react";
 import { motion } from "framer-motion";
-
-const stats = [
-  { label: "Total Revenue", value: "$0.00", icon: DollarSign, color: "from-[#C89B3C] to-[#3E2723]", bgColor: "bg-[#C89B3C]/10", iconColor: "text-[#C89B3C]" },
-  { label: "Total Orders", value: "0", icon: ClipboardList, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
-  { label: "Active Users", value: "0", icon: Users, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
-  { label: "Kitchen Queue", value: "0", icon: ChefHat, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-500/10", iconColor: "text-purple-600" },
-];
+import { useTranslation } from "@/lib/i18n";
 
 const adminActions = [
   { label: "Manage Employees", icon: Users, href: "/employees", description: "Add, edit, or remove staff members" },
@@ -20,6 +14,13 @@ const adminActions = [
 ];
 
 export default function AdminDashboard() {
+  const { t } = useTranslation();
+  const stats = [
+    { label: t("dashboard.totalRevenue"), value: "$0.00", icon: DollarSign, color: "from-[#C89B3C] to-[#3E2723]", bgColor: "bg-[#C89B3C]/10", iconColor: "text-[#C89B3C]" },
+    { label: t("dashboard.totalOrders"), value: "0", icon: ClipboardList, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
+    { label: "Active Users", value: "0", icon: Users, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
+    { label: "Kitchen Queue", value: "0", icon: ChefHat, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-500/10", iconColor: "text-purple-600" },
+  ];
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -111,7 +112,7 @@ export default function AdminDashboard() {
                 <Button className="w-full justify-start gap-2" variant="default" asChild>
                   <a href="/orders">
                     <Plus className="h-4 w-4" />
-                    Create New Order
+                    {t("orders.newOrder")}
                   </a>
                 </Button>
                 <Button className="w-full justify-start gap-2" variant="outline" asChild>

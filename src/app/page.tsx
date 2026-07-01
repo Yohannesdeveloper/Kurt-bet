@@ -4,11 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { useTranslation } from "@/lib/i18n";
+import { QRCodeSVG } from "qrcode.react";
 import {
   UtensilsCrossed, Coffee, Leaf, Heart, Wine, Users,
   ChevronDown, Star, MapPin, Clock, Phone, ArrowRight,
   Check, Menu, X, Quote, Play, Instagram, Facebook,
-  ChevronLeft, ChevronRight, ExternalLink,
+  ChevronLeft, ChevronRight, ExternalLink, Smartphone,
 } from "lucide-react";
 
 const COLORS = {
@@ -21,28 +24,6 @@ const COLORS = {
 
 interface MenuDish { id: string; name: string; description: string; price: number; image?: string; isAvailable: boolean; }
 
-const features = [
-  { icon: UtensilsCrossed, title: "Fresh Premium Beef Daily", desc: "100% fresh Ethiopian beef sourced daily from local farms" },
-  { icon: Coffee, title: "Traditional Preparation", desc: "Time-honored recipes passed down through generations" },
-  { icon: Leaf, title: "Fresh Local Ingredients", desc: "Hand-picked spices and produce from Ethiopian markets" },
-  { icon: Heart, title: "Authentic Family Experience", desc: "Warm hospitality that feels like home" },
-  { icon: Wine, title: "Traditional Drinks", desc: "Fresh tej, tella, and Ethiopian coffee ceremony" },
-  { icon: Users, title: "Cultural Heritage", desc: "Dine with traditional music and Ethiopian decor" },
-];
-
-const testimonials = [
-  { name: "Sarah M.", text: "The most incredible Ethiopian dining experience outside of Addis Ababa. The kurt is absolutely world-class.", rating: 5 },
-  { name: "David K.", text: "I've traveled across Ethiopia and this place captures the authentic taste perfectly. A true gem.", rating: 5 },
-  { name: "Meron T.", text: "Finally, a restaurant that honors our traditions with such care and excellence.", rating: 5 },
-  { name: "James R.", text: "The atmosphere, the food, the coffee ceremony — every detail is perfection. Highly recommended.", rating: 5 },
-];
-
-const whyChooseUs = [
-  "100% Fresh Daily", "Premium Ethiopian Beef", "Traditional Recipes",
-  "Certified Hygiene", "Friendly Staff", "Fast Service",
-  "Beautiful Atmosphere", "Family Friendly",
-];
-
 const galleryImages = [
   { label: "Kurt Bet Special", image: "/images/kurt.jpg", color: "from-amber-900/60 to-amber-950/60" },
   { label: "Kitfo", image: "/images/kifo.jpg", color: "from-red-900/60 to-red-950/60" },
@@ -50,12 +31,6 @@ const galleryImages = [
   { label: "Gored Gored", image: "/images/gored gored.jpg", color: "from-amber-800/60 to-amber-950/60" },
   { label: "Awaze Tibs", image: "/images/Awaze Tibs.jpg", color: "from-emerald-900/60 to-emerald-950/60" },
   { label: "Zilzil Tibs", image: "/images/zilzil tibs.jpg", color: "from-yellow-900/60 to-yellow-950/60" },
-];
-
-const specialOffers = [
-  { title: "Weekend Special", desc: "15% off on all orders above 1000 ETB", badge: "Weekend" },
-  { title: "Family Package", desc: "Sample platter for 4 with coffee ceremony", badge: "Popular" },
-  { title: "Coffee & Kurt", desc: "Traditional coffee ceremony + Kurt combo", badge: "Best Value" },
 ];
 
 function useScrollAnimation() {
@@ -92,6 +67,7 @@ function SectionTitle({ label, title, subtitle }: { label: string; title: string
 }
 
 function FloatingNav() {
+  const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { data: session } = useSession();
@@ -103,7 +79,13 @@ function FloatingNav() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const links = ["Home", "About", "Menu", "Gallery", "Contact"];
+  const navLinks = [
+    { href: "#home", label: t("landing.home") },
+    { href: "#about", label: t("landing.about") },
+    { href: "#menu", label: t("nav.menu") },
+    { href: "#gallery", label: t("landing.gallery") },
+    { href: "#contact", label: t("landing.contact") },
+  ];
   const scrolledStyles = scrolled ? "text-[#3E2723]/80" : "text-white/80";
   const hoverStyles = "hover:text-[#C89B3C] transition-colors";
 
@@ -119,18 +101,19 @@ function FloatingNav() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#A12222] to-[#C89B3C] flex items-center justify-center">
             <UtensilsCrossed className="w-5 h-5 text-white" />
           </div>
-          <span className={`font-bold text-lg ${scrolled ? "text-[#3E2723]" : "text-white"}`}>Kurt Bet</span>
+          <span className={`font-bold text-lg ${scrolled ? "text-[#3E2723]" : "text-white"}`}>{t("app.name")}</span>
         </div>
         <div className="hidden md:flex items-center gap-8">
-          {links.map(l => (
-            <a key={l} href={`#${l.toLowerCase()}`} className={`text-sm tracking-wider uppercase ${scrolledStyles} ${hoverStyles}`}>{l}</a>
+          {navLinks.map(l => (
+            <a key={l.href} href={l.href} className={`text-sm tracking-wider uppercase ${scrolledStyles} ${hoverStyles}`}>{l.label}</a>
           ))}
+          <LanguageSwitcher light={!scrolled} />
           <a href="/dashboard" className="px-5 py-2.5 rounded-full bg-[#C89B3C] text-white text-sm font-semibold hover:bg-[#A12222] transition-all duration-300 shadow-lg hover:shadow-xl">
-            Dashboard
+            {t("nav.dashboard")}
           </a>
           {isAuthenticated && (
             <a href="/orders" className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white text-sm font-semibold hover:shadow-xl hover:shadow-[#C89B3C]/30 transition-all duration-300">
-              My Orders
+              {t("nav.myOrders")}
             </a>
           )}
         </div>
@@ -142,13 +125,14 @@ function FloatingNav() {
         {menuOpen && (
           <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="md:hidden bg-white/95 backdrop-blur-xl border-t overflow-hidden">
             <div className="px-6 py-4 space-y-3">
-              {links.map(l => (
-                <a key={l} href={`#${l.toLowerCase()}`} onClick={() => setMenuOpen(false)} className="block text-[#3E2723] font-medium">{l}</a>
+              {navLinks.map(l => (
+                <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)} className="block text-[#3E2723] font-medium">{l.label}</a>
               ))}
-              <a href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-[#3E2723] font-medium">Dashboard</a>
+              <a href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-[#3E2723] font-medium">{t("nav.dashboard")}</a>
+              <div className="pt-1"><LanguageSwitcher /></div>
               {isAuthenticated && (
                 <a href="/orders" onClick={() => setMenuOpen(false)} className="block text-center px-6 py-3 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white font-semibold">
-                  My Orders
+                  {t("nav.myOrders")}
                 </a>
               )}
             </div>
@@ -160,6 +144,7 @@ function FloatingNav() {
 }
 
 function HeroSection() {
+  const { t } = useTranslation();
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#1B1B1B]">
       <div className="absolute inset-0 bg-gradient-to-br from-[#3E2723]/90 via-[#1B1B1B]/95 to-[#A12222]/80 z-10" />
@@ -174,28 +159,24 @@ function HeroSection() {
       <div className="relative z-20 text-center px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 max-w-[1600px] mx-auto">
 
         <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }} className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold text-white leading-tight mb-6">
-          Experience Authentic
-          <br />
-          <span className="bg-gradient-to-r from-[#C89B3C] via-[#F5D980] to-[#C89B3C] bg-clip-text text-transparent">Ethiopian Cuisine</span>
-          <br />
-          Like Never Before
+          {t("landing.heroTitleFull")}
         </motion.h1>
         <motion.p initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }} className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/70 max-w-3xl mx-auto mb-8 lg:mb-10 leading-relaxed">
-          Freshly prepared every day using premium Ethiopian beef, traditional spices, and generations of culinary heritage passed down through our family.
+          {t("landing.heroTagline")}
         </motion.p>
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }} className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a href="/menu" className="group px-8 py-4 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white font-semibold text-lg hover:shadow-2xl hover:shadow-[#C89B3C]/40 transition-all duration-500 hover:scale-105">
-            View Our Menu
+            {t("hero.viewMenu")}
             <ArrowRight className="inline ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </a>
           <a href="/dashboard" className="group px-8 py-4 rounded-full border-2 border-white/30 text-white font-semibold text-lg hover:bg-white/10 hover:border-white/50 transition-all duration-300">
-            Order Now
+            {t("hero.orderNow")}
           </a>
         </motion.div>
       </div>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }} className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
         <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity }} className="flex flex-col items-center gap-2 text-white/50">
-          <span className="text-xs tracking-widest uppercase">Scroll</span>
+          <span className="text-xs tracking-widest uppercase">{t("common.scroll")}</span>
           <ChevronDown className="w-5 h-5" />
         </motion.div>
       </motion.div>
@@ -204,11 +185,20 @@ function HeroSection() {
 }
 
 function FeatureHighlights() {
+  const { t } = useTranslation();
+  const features = [
+    { icon: UtensilsCrossed, title: t("landing.feature1Title"), desc: t("landing.feature1Desc") },
+    { icon: Coffee, title: t("landing.feature2Title"), desc: t("landing.feature2Desc") },
+    { icon: Leaf, title: t("landing.feature3Title"), desc: t("landing.feature3Desc") },
+    { icon: Heart, title: t("landing.feature4Title"), desc: t("landing.feature4Desc") },
+    { icon: Wine, title: t("landing.feature5Title"), desc: t("landing.feature5Desc") },
+    { icon: Users, title: t("landing.feature6Title"), desc: t("landing.feature6Desc") },
+  ];
   return (
     <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#F8F4EE]">
       <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
-          <SectionTitle label="Why Choose Us" title="The Kurt Bet Experience" subtitle="Every detail crafted to bring you the authentic taste of Ethiopia" />
+          <SectionTitle label={t("landing.whyChooseUs")} title={t("landing.experienceTitle")} subtitle={t("landing.experienceSubtitle")} />
         </AnimatedSection>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6 xl:gap-8">
           {features.map((f, i) => (
@@ -229,6 +219,7 @@ function FeatureHighlights() {
 }
 
 function AboutSection() {
+  const { t } = useTranslation();
   return (
     <section id="about" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-white">
       <div className="max-w-[1600px] mx-auto">
@@ -239,34 +230,34 @@ function AboutSection() {
                 <div className="w-full h-full flex items-center justify-center">
                   <div className="text-center p-8">
                     <UtensilsCrossed className="w-16 h-16 text-[#C89B3C] mx-auto mb-4" />
-                    <p className="text-[#C89B3C] text-2xl font-bold">Generations of</p>
-                    <p className="text-white text-4xl font-bold">Excellence</p>
+                    <p className="text-[#C89B3C] text-2xl font-bold">{t("landing.generationsOf")}</p>
+                    <p className="text-white text-4xl font-bold">{t("landing.excellenceTitle")}</p>
                   </div>
                 </div>
               </div>
               <div className="absolute -bottom-6 -right-6 w-32 h-32 rounded-2xl bg-gradient-to-br from-[#C89B3C] to-[#A12222] flex items-center justify-center shadow-xl">
                 <p className="text-white text-center font-bold text-sm">
                   <span className="text-3xl">56+</span>
-                  <br />Years
+                  <br />{t("landing.yearsTradition")}
                 </p>
               </div>
             </div>
           </AnimatedSection>
           <AnimatedSection delay={0.2}>
-            <span className="text-sm tracking-[0.3em] uppercase text-[#C89B3C] font-medium">Our Story</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-3 text-[#3E2723]">A Legacy of Ethiopian Culinary Tradition</h2>
+            <span className="text-sm tracking-[0.3em] uppercase text-[#C89B3C] font-medium">{t("landing.ourStory")}</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-3 text-[#3E2723]">{t("landing.legacyTitle")}</h2>
             <div className="w-20 h-1 bg-[#C89B3C] mt-6 rounded-full" />
             <p className="text-lg text-[#3E2723]/70 mt-8 leading-relaxed">
-              Welcome to Kurt Bet, where the ancient tradition of Ethiopian Tere Sega meets modern luxury. Our family has been perfecting the art of raw beef preparation for generations, using time-honored recipes that celebrate the rich flavors of Ethiopia.
+              {t("landing.legacyDesc1")}
             </p>
             <p className="text-lg text-[#3E2723]/70 mt-4 leading-relaxed">
-              Every dish tells a story — from the premium Ethiopian beef we source daily to the traditional mitmita and niter kibbeh that give our cuisine its distinctive character. We invite you to experience the warmth of Ethiopian hospitality, the richness of our culture, and the unforgettable taste of authenticity.
+              {t("landing.legacyDesc2")}
             </p>
             <div className="grid grid-cols-3 gap-8 mt-10">
               {[
-                { value: "56+", label: "Years of Tradition", color: "text-[#C89B3C]" },
-                { value: "1K+", label: "Happy Guests", color: "text-[#A12222]" },
-                { value: "100%", label: "Fresh Daily", color: "text-green-600" },
+                { value: "56+", label: t("landing.yearsTradition"), color: "text-[#C89B3C]" },
+                { value: "1K+", label: t("landing.happyGuests"), color: "text-[#A12222]" },
+                { value: "100%", label: t("landing.freshDaily"), color: "text-green-600" },
               ].map(s => (
                 <div key={s.label}>
                   <p className={`text-4xl font-bold ${s.color}`}>{s.value}</p>
@@ -282,6 +273,7 @@ function AboutSection() {
 }
 
 function SignatureDishes() {
+  const { t } = useTranslation();
   const [dishes, setDishes] = useState<MenuDish[]>([]);
   useEffect(() => {
     fetch("/api/menu").then(r => r.json()).then(d => {
@@ -292,7 +284,7 @@ function SignatureDishes() {
     <section id="menu" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#F8F4EE]">
       <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
-          <SectionTitle label="Signature Dishes" title="Our Specialties" subtitle="Handcrafted with premium Ethiopian ingredients and generations of tradition" />
+          <SectionTitle label={t("landing.signatureDishes")} title={t("landing.ourSpecialties")} subtitle={t("landing.specialtiesSubtitle")} />
         </AnimatedSection>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {dishes.map((dish, i) => (
@@ -308,7 +300,7 @@ function SignatureDishes() {
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-[#C89B3C] text-white text-xs font-bold shadow-lg">
-                    Bestseller
+                    {t("landing.bestseller")}
                   </div>
                 </div>
                 <div className="p-6">
@@ -328,12 +320,13 @@ function SignatureDishes() {
 }
 
 function LiveKitchenSection() {
+  const { t } = useTranslation();
   const steps = [
-    { step: "01", title: "Select Meat", desc: "Premium Ethiopian beef hand-selected daily" },
-    { step: "02", title: "Fresh Preparation", desc: "Traditional cleaning and preparation" },
-    { step: "03", title: "Traditional Seasoning", desc: "Mitmita, niter kibbeh, and secret spices" },
-    { step: "04", title: "Expert Cutting", desc: "Masterful cutting by our experienced chefs" },
-    { step: "05", title: "Serve Fresh", desc: "Presented with traditional injera and sides" },
+    { step: "01", title: t("landing.selectMeat"), desc: t("landing.selectMeatDesc") },
+    { step: "02", title: t("landing.freshPrep"), desc: t("landing.freshPrepDesc") },
+    { step: "03", title: t("landing.seasoning"), desc: t("landing.seasoningDesc") },
+    { step: "04", title: t("landing.expertCutting"), desc: t("landing.expertCuttingDesc") },
+    { step: "05", title: t("landing.serveFresh"), desc: t("landing.serveFreshDesc") },
   ];
 
   return (
@@ -344,9 +337,9 @@ function LiveKitchenSection() {
       <div className="max-w-[1600px] mx-auto relative z-10">
         <AnimatedSection>
           <div className="text-center mb-16">
-            <span className="text-sm tracking-[0.3em] uppercase text-[#C89B3C] font-medium">Live Kitchen</span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-3 text-white">The Art of Preparation</h2>
-            <p className="text-lg text-white/60 mt-4 max-w-2xl mx-auto">Watch our master chefs transform premium ingredients into unforgettable dishes</p>
+            <span className="text-sm tracking-[0.3em] uppercase text-[#C89B3C] font-medium">{t("landing.liveKitchen")}</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-3 text-white">{t("landing.prepTitle")}</h2>
+            <p className="text-lg text-white/60 mt-4 max-w-2xl mx-auto">{t("landing.prepSubtitle")}</p>
             <div className="w-20 h-1 bg-[#C89B3C] mx-auto mt-6 rounded-full" />
           </div>
         </AnimatedSection>
@@ -374,11 +367,13 @@ function LiveKitchenSection() {
 }
 
 function WhyChooseUs() {
+  const { t } = useTranslation();
+  const whyChooseUs = [t("landing.whyItem1"), t("landing.whyItem2"), t("landing.whyItem3"), t("landing.whyItem4"), t("landing.whyItem5"), t("landing.whyItem6"), t("landing.whyItem7"), t("landing.whyItem8")];
   return (
     <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-white">
       <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
-          <SectionTitle label="Why Choose Us" title="Excellence in Every Detail" />
+          <SectionTitle label={t("landing.whyChooseUs")} title={t("landing.excellence")} />
         </AnimatedSection>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 lg:gap-4">
           {whyChooseUs.map((item, i) => (
@@ -398,12 +393,13 @@ function WhyChooseUs() {
 }
 
 function GallerySection() {
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<number | null>(null);
   return (
     <section id="gallery" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#F8F4EE]">
       <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
-          <SectionTitle label="Gallery" title="Our World" subtitle="Step inside the Kurt Bet experience" />
+          <SectionTitle label={t("landing.gallery")} title={t("landing.ourWorld")} subtitle={t("landing.ourWorldDesc")} />
         </AnimatedSection>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-3 lg:gap-4">
           {galleryImages.map((img, i) => (
@@ -440,6 +436,13 @@ function GallerySection() {
 }
 
 function TestimonialsSection() {
+  const { t } = useTranslation();
+  const testimonials = [
+    { name: t("landing.testimonial1Name"), text: t("landing.testimonial1Text"), rating: 5 },
+    { name: t("landing.testimonial2Name"), text: t("landing.testimonial2Text"), rating: 5 },
+    { name: t("landing.testimonial3Name"), text: t("landing.testimonial3Text"), rating: 5 },
+    { name: t("landing.testimonial4Name"), text: t("landing.testimonial4Text"), rating: 5 },
+  ];
   const [idx, setIdx] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setIdx(i => (i + 1) % testimonials.length), 4000);
@@ -453,8 +456,8 @@ function TestimonialsSection() {
       <div className="max-w-4xl lg:max-w-5xl mx-auto relative z-10">
         <AnimatedSection>
           <div className="text-center mb-12">
-            <span className="text-sm tracking-[0.3em] uppercase text-[#C89B3C] font-medium">Testimonials</span>
-            <h2 className="text-4xl md:text-5xl font-bold mt-3 text-white">What Our Guests Say</h2>
+            <span className="text-sm tracking-[0.3em] uppercase text-[#C89B3C] font-medium">{t("landing.testimonials")}</span>
+            <h2 className="text-4xl md:text-5xl font-bold mt-3 text-white">{t("landing.testimonialTitle")}</h2>
             <div className="w-20 h-1 bg-[#C89B3C] mx-auto mt-6 rounded-full" />
           </div>
         </AnimatedSection>
@@ -487,19 +490,21 @@ function TestimonialsSection() {
 }
 
 function CultureSection() {
+  const { t } = useTranslation();
+  const cultureCards = [
+    { title: t("landing.historyKurt"), desc: t("landing.historyKurtDesc") },
+    { title: t("landing.tereSegaTradition"), desc: t("landing.tereSegaTraditionDesc") },
+    { title: t("landing.hospitality"), desc: t("landing.hospitalityDesc") },
+    { title: t("landing.coffeeCeremony"), desc: t("landing.coffeeCeremonyDesc") },
+  ];
   return (
     <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#F8F4EE]">
       <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
-          <SectionTitle label="Our Heritage" title="Ethiopian Culinary Tradition" subtitle="Centuries of culture, hospitality, and flavor" />
+          <SectionTitle label={t("landing.ourHeritage")} title={t("landing.traditionTitle")} subtitle={t("landing.traditionSubtitle")} />
         </AnimatedSection>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {[
-            { title: "History of Kurt", desc: "Kurt (or Kitfo) has been a cornerstone of Ethiopian cuisine for centuries, originating in the highlands where fresh raw beef was celebrated as a symbol of prosperity and tradition." },
-            { title: "Tere Sega Tradition", desc: "Tere Sega — literally 'fresh meat' — represents the pinnacle of Ethiopian culinary art, prepared with precision and served with respect for ancient customs." },
-            { title: "Ethiopian Hospitality", desc: "In Ethiopian culture, sharing a meal is the highest form of friendship. Our restaurant embodies 'Dejenna' — the spirit of warm, generous hospitality." },
-            { title: "Coffee Ceremony", desc: "No Ethiopian meal is complete without the traditional coffee ceremony — a ritual of roasting, brewing, and sharing that symbolizes community and connection." },
-          ].map((c, i) => (
+          {cultureCards.map((c, i) => (
             <AnimatedSection key={c.title} delay={i * 0.1}>
               <div className="p-8 rounded-2xl bg-white shadow-lg hover:shadow-xl transition-all duration-300 border-l-4 border-[#C89B3C]">
                 <h3 className="text-xl font-bold text-[#3E2723] mb-3">{c.title}</h3>
@@ -514,6 +519,12 @@ function CultureSection() {
 }
 
 function SpecialOffers() {
+  const { t } = useTranslation();
+  const specialOffers = [
+    { title: t("landing.offer1Title"), desc: t("landing.offer1Desc"), badge: t("landing.offer1Badge") },
+    { title: t("landing.offer2Title"), desc: t("landing.offer2Desc"), badge: t("landing.offer2Badge") },
+    { title: t("landing.offer3Title"), desc: t("landing.offer3Desc"), badge: t("landing.offer3Badge") },
+  ];
   return (
     <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-gradient-to-br from-[#3E2723] to-[#1B1B1B] relative overflow-hidden">
       <div className="absolute inset-0 opacity-10" style={{
@@ -522,8 +533,8 @@ function SpecialOffers() {
       <div className="max-w-[1600px] mx-auto relative z-10">
         <AnimatedSection>
           <div className="text-center mb-16">
-            <span className="text-sm tracking-[0.3em] uppercase text-[#C89B3C] font-medium">Special Offers</span>
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-3 text-white">Exclusive Deals</h2>
+            <span className="text-sm tracking-[0.3em] uppercase text-[#C89B3C] font-medium">{t("landing.specialOffers")}</span>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mt-3 text-white">{t("landing.exclusiveDeals")}</h2>
             <div className="w-20 h-1 bg-[#C89B3C] mx-auto mt-6 rounded-full" />
           </div>
         </AnimatedSection>
@@ -535,7 +546,7 @@ function SpecialOffers() {
                 <h3 className="text-2xl font-bold text-white mb-2">{offer.title}</h3>
                 <p className="text-white/60 mb-6">{offer.desc}</p>
                 <a href="/menu" className="inline-flex items-center gap-2 text-[#C89B3C] font-semibold group-hover:gap-3 transition-all">
-                  Claim Offer <ArrowRight className="w-4 h-4" />
+                  {t("landing.claimOffer")} <ArrowRight className="w-4 h-4" />
                 </a>
               </motion.div>
             </AnimatedSection>
@@ -547,11 +558,17 @@ function SpecialOffers() {
 }
 
 function LocationSection() {
+  const { t } = useTranslation();
+  const locationItems = [
+    { icon: MapPin, label: t("landing.addressLabel"), value: t("landing.address") },
+    { icon: Clock, label: t("landing.openingHours"), value: t("landing.hours") },
+    { icon: Phone, label: t("landing.phoneLabel"), value: t("landing.phone") },
+  ];
   return (
-    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#F8F4EE]">
+    <section id="contact" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#F8F4EE]">
       <div className="max-w-[1600px] mx-auto">
         <AnimatedSection>
-          <SectionTitle label="Visit Us" title="Find Kurt Bet" />
+          <SectionTitle label={t("landing.visitUs")} title={t("landing.findUs")} />
         </AnimatedSection>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           <AnimatedSection>
@@ -561,11 +578,7 @@ function LocationSection() {
           </AnimatedSection>
           <AnimatedSection delay={0.2}>
             <div className="space-y-6">
-              {[
-                { icon: MapPin, label: "Address", value: "123 Ethiopian Avenue, Addis Ababa" },
-                { icon: Clock, label: "Opening Hours", value: "Mon-Sun: 11:00 AM - 11:00 PM" },
-                { icon: Phone, label: "Reservations", value: "+251 911 234 567" },
-              ].map(item => (
+              {locationItems.map(item => (
                 <div key={item.label} className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#C89B3C]/20 to-[#A12222]/20 flex items-center justify-center flex-shrink-0">
                     <item.icon className="w-6 h-6 text-[#A12222]" />
@@ -577,7 +590,7 @@ function LocationSection() {
                 </div>
               ))}
               <a href="/menu" className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white font-semibold hover:shadow-xl hover:shadow-[#C89B3C]/30 transition-all duration-300">
-                <MapPin className="w-5 h-5" /> Get Directions
+                <MapPin className="w-5 h-5" /> {t("landing.getDirections")}
               </a>
             </div>
           </AnimatedSection>
@@ -587,7 +600,149 @@ function LocationSection() {
   );
 }
 
+function QRCodeSection() {
+  const { t } = useTranslation();
+
+  const features = [
+    t("landing.qrFeature1"),
+    t("landing.qrFeature2"),
+    t("landing.qrFeature3"),
+    t("landing.qrFeature4"),
+    t("landing.qrFeature5"),
+    t("landing.qrFeature6"),
+    t("landing.qrFeature7"),
+    t("landing.qrFeature8"),
+    t("landing.qrFeature9"),
+  ];
+
+  return (
+    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-gradient-to-br from-[#3E2723] via-[#1B1B1B] to-[#A12222] relative overflow-hidden">
+      {/* Decorative Background Elements */}
+      <div className="absolute inset-0 opacity-10">
+        <div className="absolute top-10 left-10 w-72 h-72 bg-[#C89B3C] rounded-full blur-[120px]" />
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-[#C89B3C]/40 rounded-full blur-[150px]" />
+      </div>
+      {/* Ethiopian Pattern Overlay */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: `repeating-linear-gradient(45deg, #C89B3C 0px, #C89B3C 2px, transparent 2px, transparent 8px)`,
+      }} />
+
+      <div className="max-w-[1600px] mx-auto relative z-10">
+        <AnimatedSection>
+          <div className="text-center mb-12 lg:mb-16">
+            <motion.div
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 3, repeat: Infinity }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-[#C89B3C]/30 mb-6"
+            >
+              <Smartphone className="w-4 h-4 text-[#C89B3C]" />
+              <span className="text-xs tracking-[0.2em] uppercase text-[#C89B3C] font-medium">QR Code</span>
+            </motion.div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4">
+              {t("landing.qrTitle")}
+            </h2>
+            <div className="w-20 h-1 bg-gradient-to-r from-[#C89B3C] to-[#A12222] mx-auto rounded-full mb-6" />
+            <p className="text-white/70 text-sm sm:text-base lg:text-lg max-w-3xl mx-auto leading-relaxed">
+              {t("landing.qrSubtitle")}
+            </p>
+          </div>
+        </AnimatedSection>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 xl:gap-16 items-center">
+          {/* QR Code */}
+          <AnimatedSection>
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+              className="flex justify-center"
+            >
+              <div className="relative group">
+                {/* Glow Effect */}
+                <div className="absolute -inset-6 bg-[#C89B3C]/20 rounded-3xl blur-2xl group-hover:bg-[#C89B3C]/30 transition-all duration-500" />
+                {/* Glass Card */}
+                <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-2xl border-2 border-[#C89B3C]/40 group-hover:border-[#C89B3C]/70 transition-all duration-500">
+                  {/* Decorative Corners */}
+                  <div className="absolute -top-0.5 -left-0.5 w-8 h-8 border-t-4 border-l-4 border-[#C89B3C] rounded-tl-xl" />
+                  <div className="absolute -top-0.5 -right-0.5 w-8 h-8 border-t-4 border-r-4 border-[#C89B3C] rounded-tr-xl" />
+                  <div className="absolute -bottom-0.5 -left-0.5 w-8 h-8 border-b-4 border-l-4 border-[#C89B3C] rounded-bl-xl" />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-8 h-8 border-b-4 border-r-4 border-[#C89B3C] rounded-br-xl" />
+
+                  <div className="p-2 sm:p-3 bg-white rounded-2xl">
+                    <QRCodeSVG
+                      value="https://kurt-bet.vercel.app/menu"
+                      size={280}
+                      level="H"
+                      includeMargin
+                      className="w-full h-auto max-w-[280px] mx-auto"
+                    />
+                  </div>
+
+                  <p className="text-center text-xs text-[#3E2723]/60 mt-4 font-medium tracking-wider uppercase">
+                    {t("app.name")}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          </AnimatedSection>
+
+          {/* Features & CTA */}
+          <AnimatedSection delay={0.2}>
+            <div className="space-y-6 lg:space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {features.map((feat: string, i: number) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: i * 0.05 }}
+                    className="flex items-center gap-3 p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-[#C89B3C]/30 hover:bg-white/10 transition-all duration-300"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-[#C89B3C]/20 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3.5 h-3.5 text-[#C89B3C]" />
+                    </div>
+                    <span className="text-sm text-white/80">{feat}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <motion.a
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  href="/menu"
+                  className="flex-1 px-8 py-4 rounded-full bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white font-semibold text-center shadow-lg hover:shadow-xl hover:shadow-[#C89B3C]/30 transition-all duration-300"
+                >
+                  <span className="flex items-center justify-center gap-2">
+                    {t("landing.qrOpenMenu")}
+                    <ArrowRight className="w-4 h-4" />
+                  </span>
+                </motion.a>
+                <motion.a
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  href="/menu?category=specials"
+                  className="flex-1 px-8 py-4 rounded-full border-2 border-[#C89B3C]/50 text-[#C89B3C] font-semibold text-center hover:bg-[#C89B3C]/10 transition-all duration-300"
+                >
+                  {t("landing.qrTodaySpecials")}
+                </motion.a>
+              </div>
+            </div>
+          </AnimatedSection>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Footer() {
+  const { t } = useTranslation();
+  const footerLinks = [
+    { href: "#home", label: t("landing.home") },
+    { href: "#about", label: t("landing.about") },
+    { href: "#menu", label: t("nav.menu") },
+    { href: "#gallery", label: t("landing.gallery") },
+    { href: "#contact", label: t("landing.contact") },
+  ];
   return (
     <footer className="py-12 lg:py-16 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-[#1B1B1B] text-white/60">
       <div className="max-w-[1600px] mx-auto">
@@ -597,29 +752,29 @@ function Footer() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#A12222] to-[#C89B3C] flex items-center justify-center">
                 <UtensilsCrossed className="w-5 h-5 text-white" />
               </div>
-              <span className="font-bold text-lg text-white">Kurt Bet</span>
+              <span className="font-bold text-lg text-white">{t("app.name")}</span>
             </div>
-            <p className="text-sm leading-relaxed">Experience the authentic taste of Ethiopian Tere Sega, crafted with tradition and served with love.</p>
+            <p className="text-sm leading-relaxed">{t("landing.footerDesc")}</p>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4">Quick Links</h4>
+            <h4 className="font-semibold text-white mb-4">{t("landing.quickLinks")}</h4>
             <div className="space-y-2 text-sm">
-              {["Home", "About", "Menu", "Gallery", "Contact"].map(l => (
-                <a key={l} href={`#${l.toLowerCase()}`} className="block hover:text-[#C89B3C] transition-colors">{l}</a>
+              {footerLinks.map(l => (
+                <a key={l.href} href={l.href} className="block hover:text-[#C89B3C] transition-colors">{l.label}</a>
               ))}
             </div>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4">Opening Hours</h4>
+            <h4 className="font-semibold text-white mb-4">{t("landing.openingHours")}</h4>
             <div className="space-y-2 text-sm">
-              <p>Monday - Sunday</p>
-              <p className="text-white font-semibold">11:00 AM - 11:00 PM</p>
-              <p className="mt-4">Coffee Ceremony</p>
-              <p className="text-white font-semibold">3:00 PM - 6:00 PM</p>
+              <p>{t("common.mondaySunday")}</p>
+              <p className="text-white font-semibold">{t("landing.hours")}</p>
+              <p className="mt-4">{t("landing.coffeeCeremony")}</p>
+              <p className="text-white font-semibold">{t("landing.coffeeCeremonyTime")}</p>
             </div>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4">Follow Us</h4>
+            <h4 className="font-semibold text-white mb-4">{t("landing.followUs")}</h4>
             <div className="flex gap-3 mb-6">
               {[Instagram, Facebook].map((Icon, i) => (
                 <a key={i} href="#" className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-[#C89B3C]/20 hover:text-[#C89B3C] transition-all">
@@ -627,9 +782,9 @@ function Footer() {
                 </a>
               ))}
             </div>
-            <h4 className="font-semibold text-white mb-3">Newsletter</h4>
+            <h4 className="font-semibold text-white mb-3">{t("landing.newsletter")}</h4>
             <div className="flex">
-              <input type="email" placeholder="Your email" className="flex-1 px-4 py-2.5 rounded-l-xl bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#C89B3C]" />
+              <input type="email" placeholder={t("landing.newsletterPlaceholder")} className="flex-1 px-4 py-2.5 rounded-l-xl bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/30 focus:outline-none focus:border-[#C89B3C]" />
               <button className="px-4 py-2.5 rounded-r-xl bg-gradient-to-r from-[#C89B3C] to-[#A12222] text-white text-sm font-semibold">
                 <ArrowRight className="w-4 h-4" />
               </button>
@@ -637,7 +792,7 @@ function Footer() {
           </div>
         </div>
         <div className="border-t border-white/10 pt-8 text-center text-sm">
-          <p>&copy; 2024 Kurt Bet. All rights reserved. Proudly Ethiopian.</p>
+          <p>{t("landing.copyright")}</p>
         </div>
       </div>
     </footer>
@@ -667,6 +822,7 @@ export default function HomePage() {
       <CultureSection />
       <SpecialOffers />
       <LocationSection />
+      <QRCodeSection />
       <Footer />
     </div>
   );

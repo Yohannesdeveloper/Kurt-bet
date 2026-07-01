@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ClipboardList, Users, CreditCard, Clock, Plus, Table, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/lib/i18n";
 
 const stats = [
   { label: "My Tables", value: "0", icon: Table, color: "from-[#C89B3C] to-[#3E2723]", bgColor: "bg-[#C89B3C]/10", iconColor: "text-[#C89B3C]" },
@@ -13,6 +14,7 @@ const stats = [
 ];
 
 export default function WaiterDashboard() {
+  const { t } = useTranslation();
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -69,13 +71,13 @@ export default function WaiterDashboard() {
                 <Button className="w-full justify-start gap-2" variant="default" asChild>
                   <a href="/orders">
                     <Plus className="h-4 w-4" />
-                    Create New Order
+                    {t("orders.newOrder")}
                   </a>
                 </Button>
                 <Button className="w-full justify-start gap-2" variant="outline" asChild>
                   <a href="/tables">
                     <Table className="h-4 w-4" />
-                    View Tables
+                    {t("nav.tables")}
                   </a>
                 </Button>
                 <Button className="w-full justify-start gap-2" variant="outline" asChild>

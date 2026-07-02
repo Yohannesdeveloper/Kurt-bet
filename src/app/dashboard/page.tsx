@@ -109,12 +109,12 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
             <motion.div whileHover={{ scale: 1.02 }} className="hidden sm:flex items-center gap-3 pl-3 border-l border-ethiopian-gold/20 cursor-pointer">
               <div className="relative">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-ethiopian-gold to-ethiopian-clay flex items-center justify-center text-white font-semibold text-sm shadow-lg">
-                  {session?.user?.name?.charAt(0) || "J"}
+                  {(session?.user?.email || "J").charAt(0).toUpperCase()}
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-ethiopian-cream" />
               </div>
               <span className="text-sm font-medium text-ethiopian-coffee hidden lg:block">
-                {session?.user?.name || "John Doe"}
+                {session?.user?.email || "user@email.com"}
               </span>
             </motion.div>
           </div>
@@ -136,6 +136,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role || "CLIENT";
   const isClient = userRole === "CLIENT";
+  const isWaiter = userRole === "WAITER";
 
   const allNavItems = [
     { icon: Home, label: t("nav.dashboard"), href: "/dashboard", key: "dashboard" },
@@ -150,7 +151,12 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
   ];
 
   const hiddenForClient = new Set(["inventory", "employees", "reports"]);
-  const navItems = allNavItems.filter((item) => !(isClient && hiddenForClient.has(item.key)));
+  const hiddenForWaiter = new Set(["inventory", "employees", "reports"]);
+  const navItems = allNavItems.filter((item) => {
+    if (isClient && hiddenForClient.has(item.key)) return false;
+    if (isWaiter && hiddenForWaiter.has(item.key)) return false;
+    return true;
+  });
 
   return (
     <>

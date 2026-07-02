@@ -89,7 +89,7 @@ export default function OrdersPage() {
   const userRole = (session?.user as { role?: string })?.role || "CLIENT";
   const isAdmin = userRole === "ADMIN";
   const canApprove = userRole === "ADMIN" || userRole === "WAITER";
-  const canCreateOrder = userRole === "ADMIN" || userRole === "WAITER";
+  const canCreateOrder = userRole === "ADMIN" || userRole === "WAITER" || userRole === "CLIENT";
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);

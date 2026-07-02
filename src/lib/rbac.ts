@@ -27,7 +27,7 @@ export const routeAccess: Record<string, RouteAccess> = {
     redirectTo: "/dashboard",
   },
   "/orders": {
-    roles: ["ADMIN", "WAITER"],
+    roles: ["ADMIN", "WAITER", "CLIENT"],
     redirectTo: "/dashboard",
   },
   "/kds": {

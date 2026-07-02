@@ -118,7 +118,6 @@ export async function POST(req: NextRequest) {
     body = await req.json();
     const restaurantId = (session.user as { restaurantId?: string }).restaurantId;
     if (!restaurantId) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-    if (!requireOwner(session)) return NextResponse.json({ success: false, error: "Admin access required" }, { status: 403 });
     const userId = (session.user as { id?: string }).id;
 
     const order = await prisma.order.create({

@@ -135,17 +135,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
   const { t } = useTranslation();
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role || "CLIENT";
-
-  const routePermissions: Record<string, string[]> = {
-    "/menu": ["ADMIN", "CLIENT"],
-    "/tables": ["ADMIN", "WAITER"],
-    "/orders": ["ADMIN", "WAITER"],
-    "/kds": ["ADMIN", "KITCHEN"],
-    "/inventory": ["ADMIN"],
-    "/employees": ["ADMIN"],
-    "/reports": ["ADMIN"],
-    "/dashboard/butcher-shop": ["ADMIN", "CLIENT"],
-  };
+  const isClient = userRole === "CLIENT";
 
   const allNavItems = [
     { icon: Home, label: t("nav.dashboard"), href: "/dashboard", key: "dashboard" },
@@ -159,10 +149,8 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
     { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher-shop", key: "butcher-shop" },
   ];
 
-  const navItems = allNavItems.filter((item) => {
-    const allowed = routePermissions[item.href];
-    return !allowed || allowed.includes(userRole);
-  });
+  const hiddenForClient = new Set(["inventory", "employees"]);
+  const navItems = allNavItems.filter((item) => !(isClient && hiddenForClient.has(item.key)));
 
   return (
     <>

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
+  ArrowLeft,
   Download,
   FileText,
   TrendingUp,
@@ -12,6 +13,7 @@ import {
   Inbox,
   BarChart3,
 } from "lucide-react";
+import Link from "next/link";
 import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 
@@ -30,6 +32,12 @@ export default function ReportsPage() {
         className="flex items-center justify-between"
       >
         <div className="flex items-center gap-4">
+          <Link
+            href="/dashboard"
+            className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 shadow-lg hover:from-ethiopian-gold/30 hover:to-ethiopian-clay/30 transition-all duration-200"
+          >
+            <ArrowLeft className="h-6 w-6 text-ethiopian-gold" />
+          </Link>
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-emerald-500/20 shadow-lg">
             <BarChart3 className="h-6 w-6 text-primary" />
           </div>

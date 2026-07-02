@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Save, Palette, Bell, Shield, Printer, Globe, Settings } from "lucide-react";
+import { ArrowLeft, Save, Palette, Bell, Shield, Printer, Globe, Settings } from "lucide-react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 export default function SettingsPage() {
@@ -17,6 +18,12 @@ export default function SettingsPage() {
         animate={{ opacity: 1, y: 0 }}
         className="flex items-center gap-4"
       >
+        <Link
+          href="/dashboard"
+          className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 shadow-lg hover:from-ethiopian-gold/30 hover:to-ethiopian-clay/30 transition-all duration-200"
+        >
+          <ArrowLeft className="h-6 w-6 text-ethiopian-gold" />
+        </Link>
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-emerald-500/20 shadow-lg">
           <Settings className="h-6 w-6 text-primary" />
         </div>

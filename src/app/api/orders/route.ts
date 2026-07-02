@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
       waiterId: null,
       customerId: null,
       userId: sessionUserId || null,
-      approved: false,
+      approved: true,
       status: "NEW",
       type: body?.type || "DINE_IN",
       subtotal: body?.subtotal || 0,

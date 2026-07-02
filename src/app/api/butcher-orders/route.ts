@@ -32,10 +32,6 @@ function getNextNumber(orders: ButcherOrder[]): number {
 }
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
   const { searchParams } = req.nextUrl;
   const status = searchParams.get("status");
 
@@ -48,10 +44,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
-  }
+  let session: any = null;
+  try { session = await getServerSession(authOptions); } catch {}
+  const userId = (session?.user as { id?: string })?.id || "anonymous";
+  const userName = (session?.user as { name?: string })?.name || "Unknown";
 
   const body = await req.json();
   const { meatType, portionSize, quantity, notes } = body;
@@ -64,8 +60,8 @@ export async function POST(req: NextRequest) {
   const newOrder: ButcherOrder = {
     id: generateId(),
     orderNumber: getNextNumber(orders),
-    customerName: (session.user as { name?: string }).name || "Unknown",
-    customerId: (session.user as { id?: string }).id || "",
+    customerName: userName,
+    customerId: userId,
     meatType,
     portionSize,
     quantity,

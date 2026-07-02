@@ -133,7 +133,21 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
 
 function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean; onClose: () => void; currentView: string; onNavigate: (view: string) => void }) {
   const { t } = useTranslation();
-  const navItems = [
+  const { data: session } = useSession();
+  const userRole = (session?.user as { role?: string })?.role || "CLIENT";
+
+  const routePermissions: Record<string, string[]> = {
+    "/menu": ["ADMIN", "CLIENT"],
+    "/tables": ["ADMIN", "WAITER"],
+    "/orders": ["ADMIN", "WAITER"],
+    "/kds": ["ADMIN", "KITCHEN"],
+    "/inventory": ["ADMIN"],
+    "/employees": ["ADMIN"],
+    "/reports": ["ADMIN"],
+    "/dashboard/butcher-shop": ["ADMIN", "CLIENT"],
+  };
+
+  const allNavItems = [
     { icon: Home, label: t("nav.dashboard"), href: "/dashboard", key: "dashboard" },
     { icon: UtensilsCrossed, label: t("nav.menu"), href: "/menu", key: "menu" },
     { icon: Store, label: t("nav.tables"), href: "/tables", key: "tables" },
@@ -144,6 +158,11 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
     { icon: Percent, label: t("nav.reports"), href: "/reports", key: "reports" },
     { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher-shop", key: "butcher-shop" },
   ];
+
+  const navItems = allNavItems.filter((item) => {
+    const allowed = routePermissions[item.href];
+    return !allowed || allowed.includes(userRole);
+  });
 
   return (
     <>

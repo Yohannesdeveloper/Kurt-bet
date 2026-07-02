@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback, memo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat, Beef, CheckCircle, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeft, CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat, Beef, CheckCircle, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
@@ -239,6 +240,12 @@ export default function KDSPage() {
         className="flex items-center justify-between px-6 py-4 border-b border-ethiopian-gold/10 bg-ethiopian-cream/95 backdrop-blur-sm"
       >
         <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 hover:from-ethiopian-gold/30 hover:to-ethiopian-clay/30 transition-all duration-200"
+          >
+            <ArrowLeft className="h-5 w-5 text-ethiopian-gold" />
+          </Link>
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20">
             <CookingPot className="h-5 w-5 text-ethiopian-gold" />
           </div>

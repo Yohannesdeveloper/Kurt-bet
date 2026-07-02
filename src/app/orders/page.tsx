@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -22,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Plus, Filter, Inbox, Minus, X, Loader2, ShoppingCart, Check, Clock, UtensilsCrossed, ChefHat, MapPin, Users, FileText, Trash2 } from "lucide-react";
+import { ArrowLeft, Search, Plus, Filter, Inbox, Minus, X, Loader2, ShoppingCart, Check, Clock, UtensilsCrossed, ChefHat, MapPin, Users, FileText, Trash2 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
@@ -142,9 +143,17 @@ export default function OrdersPage() {
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
       >
-        <div>
-          <h1 className="text-xl lg:text-2xl font-bold tracking-tight font-serif text-ethiopian-coffee">{t("orders.title")}</h1>
-          <p className="text-sm text-ethiopian-coffee/60">{t("orders.subtitle")}</p>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/dashboard"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 shadow-lg hover:from-ethiopian-gold/30 hover:to-ethiopian-clay/30 transition-all duration-200"
+          >
+            <ArrowLeft className="h-5 w-5 text-ethiopian-gold" />
+          </Link>
+          <div>
+            <h1 className="text-xl lg:text-2xl font-bold tracking-tight font-serif text-ethiopian-coffee">{t("orders.title")}</h1>
+            <p className="text-sm text-ethiopian-coffee/60">{t("orders.subtitle")}</p>
+          </div>
         </div>
         <div className="flex items-center gap-2 lg:gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">

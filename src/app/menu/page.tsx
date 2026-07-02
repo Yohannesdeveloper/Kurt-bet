@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Plus, UtensilsCrossed, Loader2, Clock, Edit, Trash2, ShoppingCart, Minus, X, Check, Send, ArrowRight } from "lucide-react";
+import { ArrowLeft, Search, Plus, UtensilsCrossed, Loader2, Clock, Edit, Trash2, ShoppingCart, Minus, X, Check, Send, ArrowRight } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
@@ -130,6 +131,12 @@ export default function MenuPage() {
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
       >
         <div className="flex items-center gap-3 lg:gap-4">
+          <Link
+            href="/dashboard"
+            className="flex h-10 w-10 lg:h-12 lg:w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 shadow-lg hover:from-ethiopian-gold/30 hover:to-ethiopian-clay/30 transition-all duration-200"
+          >
+            <ArrowLeft className="h-5 w-5 lg:h-6 lg:w-6 text-ethiopian-gold" />
+          </Link>
           <div className="flex h-10 w-10 lg:h-12 lg:w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-emerald-500/20 shadow-lg">
             <UtensilsCrossed className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
           </div>

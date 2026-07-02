@@ -149,7 +149,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
     { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher-shop", key: "butcher-shop" },
   ];
 
-  const hiddenForClient = new Set(["inventory", "employees"]);
+  const hiddenForClient = new Set(["inventory", "employees", "reports"]);
   const navItems = allNavItems.filter((item) => !(isClient && hiddenForClient.has(item.key)));
 
   return (

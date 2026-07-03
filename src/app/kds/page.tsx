@@ -229,19 +229,39 @@ export default function KDSPage() {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
   };
 
-  const handleButcherReceived = async (id: string) => {
+  const handleButcherReceived = async (bo: ButcherOrder) => {
     try {
-      const res = await fetch("/api/butcher-orders", {
-        method: "PATCH",
+      const res = await fetch("/api/orders", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, kitchenStatus: "RECEIVED" }),
+        body: JSON.stringify({
+          type: "DINE_IN",
+          tableId: null,
+          tableNumber: bo.tableNumber || null,
+          guestCount: 1,
+          subtotal: 0,
+          total: 0,
+          items: [{
+            menuItemId: "butcher-item",
+            name: bo.menuItemName,
+            quantity: bo.quantity,
+            unitPrice: 0,
+            totalPrice: 0,
+          }],
+        }),
       });
-      const d = await res.json();
-      if (d.success) {
-        toast.success(`Butcher order #${d.data.orderNumber} received`);
+      const orderData = await res.json();
+      if (orderData.success) {
+        toast.success(`#${bo.orderNumber} moved to New Orders`);
+        await fetch(`/api/butcher-orders?id=${encodeURIComponent(bo.id)}`, { method: "DELETE" });
+        fetchOrders();
         fetchButcherOrders();
+      } else {
+        toast.error(orderData.error || "Failed");
       }
-    } catch {}
+    } catch {
+      toast.error("Failed to receive order");
+    }
   };
 
   const colLabel: Record<string, string> = {
@@ -258,7 +278,8 @@ export default function KDSPage() {
     orders: orders.filter(o => o.status === status),
   }));
 
-  const hasOrders = orders.length > 0 || butcherOrders.length > 0;
+  const waitingButcherOrders = butcherOrders.filter(b => b.kitchenStatus === "WAITING");
+  const hasOrders = orders.length > 0 || waitingButcherOrders.length > 0;
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-ethiopian-cream texture-linen">
@@ -279,7 +300,7 @@ export default function KDSPage() {
           </div>
           <div>
             <h1 className="text-lg font-bold tracking-tight text-ethiopian-coffee font-serif">{t("kds.title")}</h1>
-            <p className="text-xs text-ethiopian-coffee/50">{orders.length + butcherOrders.length} orders active</p>
+            <p className="text-xs text-ethiopian-coffee/50">{orders.length + waitingButcherOrders.length} orders active</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -336,11 +357,11 @@ export default function KDSPage() {
               <div className="flex items-center gap-2 mb-3 px-1">
                 <span className="h-2.5 w-2.5 rounded-full bg-ethiopian-clay" />
                 <h2 className="text-sm font-semibold text-ethiopian-coffee/70 uppercase tracking-wider">{t("kds.butcher")}</h2>
-                <Badge variant="secondary" className="text-xs ml-auto">{butcherOrders.length}</Badge>
+                <Badge variant="secondary" className="text-xs ml-auto">{butcherOrders.filter(b => b.kitchenStatus === "WAITING").length}</Badge>
               </div>
               <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pr-1">
                 <AnimatePresence mode="popLayout">
-                  {butcherOrders.map((bo) => (
+                  {butcherOrders.filter(bo => bo.kitchenStatus === "WAITING").map((bo) => (
                     <motion.div key={bo.id} layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }}>
                       <Card className="border-l-4 border-ethiopian-clay/30 bg-clay-50 shadow-sm hover:shadow-md transition-shadow">
                         <CardContent className="p-4">
@@ -373,7 +394,7 @@ export default function KDSPage() {
                           </div>
                           <div className="flex items-center gap-2 pt-2 border-t border-ethiopian-gold/10">
                             {bo.kitchenStatus === "WAITING" && (
-                              <Button size="sm" variant="premium" onClick={() => handleButcherReceived(bo.id)} className="h-8 text-xs gap-1">
+                              <Button size="sm" variant="premium" onClick={() => handleButcherReceived(bo)} className="h-8 text-xs gap-1">
                                 <CheckCircle className="h-3 w-3" /> {t("kds.received")}
                               </Button>
                             )}
@@ -401,7 +422,7 @@ export default function KDSPage() {
                     </motion.div>
                   ))}
                 </AnimatePresence>
-                {butcherOrders.length === 0 && (
+                {butcherOrders.filter(b => b.kitchenStatus === "WAITING").length === 0 && (
                   <div className="flex items-center justify-center h-20 text-xs text-ethiopian-coffee/50 border border-dashed border-ethiopian-gold/20 rounded-xl">
                     {t("orders.noOrders")}
                   </div>

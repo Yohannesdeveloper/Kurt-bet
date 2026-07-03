@@ -466,6 +466,7 @@ function ButcherOrderForm() {
           quantity,
           tableNumber: tableNumber || null,
           notes: notes || "",
+          status: "APPROVED",
         }),
       });
       const data = await res.json();

@@ -156,12 +156,12 @@ export default function KitchenDashboard() {
         </motion.div>
       </div>
 
-      {/* Butcher Orders Section */}
-      {butcherOrders.length > 0 && (
+      {/* Butcher Orders - Awaiting Receipt */}
+      {waitingOrders.length > 0 && (
         <div className="space-y-6">
           <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee">Butcher Orders</h2>
           <div className="grid gap-4">
-            {butcherOrders.map((order) => (
+            {waitingOrders.map((order) => (
               <motion.div
                 key={order.id}
                 initial={{ opacity: 0, y: 10 }}
@@ -174,12 +174,8 @@ export default function KitchenDashboard() {
                     {order.tableNumber && (
                       <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
                     )}
-                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
-                      order.kitchenStatus === "WAITING"
-                        ? "bg-amber-100 text-amber-800 border-amber-300"
-                        : "bg-emerald-100 text-emerald-800 border-emerald-300"
-                    }`}>
-                      {order.kitchenStatus === "WAITING" ? "Waiting" : "Received"}
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-amber-100 text-amber-800 border-amber-300">
+                      Waiting
                     </span>
                     <span className="text-sm text-ethiopian-coffee/60 flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" />
@@ -212,18 +208,74 @@ export default function KitchenDashboard() {
                     )}
                   </div>
 
-                  {order.kitchenStatus === "WAITING" && (
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => markAsReceived(order.id)}
-                        disabled={actionLoading === order.id}
-                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-all disabled:opacity-50"
-                      >
-                        <Check className="w-4 h-4" />
-                        {actionLoading === order.id ? "Marking..." : "Mark as Received"}
-                      </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => markAsReceived(order.id)}
+                      disabled={actionLoading === order.id}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-all disabled:opacity-50"
+                    >
+                      <Check className="w-4 h-4" />
+                      {actionLoading === order.id ? "Marking..." : "Mark as Received"}
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* New Orders - Received Butcher Orders */}
+      {receivedOrders.length > 0 && (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee">New Orders</h2>
+          <div className="grid gap-4">
+            {receivedOrders.map((order) => (
+              <motion.div
+                key={order.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-2xl shadow-md border border-ethiopian-gold/10 hover:shadow-xl hover:border-ethiopian-gold/20 transition-all duration-300 p-5"
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
+                    {order.tableNumber && (
+                      <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                    )}
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-emerald-100 text-emerald-800 border-emerald-300">
+                      Received
+                    </span>
+                    <span className="text-sm text-ethiopian-coffee/60 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      {order.approvedAt ? new Date(order.approvedAt).toLocaleString() : ""}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20">
+                    <div>
+                      <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
+                      <p className="text-sm font-bold text-ethiopian-burgundy">{order.meatType}</p>
                     </div>
-                  )}
+                    <div>
+                      <p className="text-xs text-ethiopian-coffee/40">Dish</p>
+                      <p className="text-sm font-semibold text-ethiopian-coffee">{order.menuItemName}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-ethiopian-coffee/40">Weight</p>
+                      <p className="text-sm font-bold text-ethiopian-gold">{order.weight} kg</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
+                      <p className="text-sm font-semibold text-ethiopian-coffee">x{order.quantity}</p>
+                    </div>
+                    {order.notes && (
+                      <div className="col-span-2 sm:col-span-4">
+                        <p className="text-xs text-ethiopian-coffee/40">Notes</p>
+                        <p className="text-sm italic text-ethiopian-coffee/70">{order.notes}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             ))}

@@ -41,11 +41,11 @@ const unitOptions = ["kg", "g", "L", "mL", "pcs", "dozen", "sack", "bottle"];
 
 export default function InventoryPage() {
   const { t } = useTranslation();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   useEffect(() => {
-    if (session && (session.user as any)?.role !== "ADMIN") router.replace("/dashboard");
-  }, [session, router]);
+    if (status !== "loading" && (!session || (session.user as any)?.role !== "ADMIN")) router.replace("/dashboard");
+  }, [session, status, router]);
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -96,6 +96,7 @@ export default function InventoryPage() {
     toast.success(t("inventory.removed"));
   };
 
+  if (status !== "loading" && (!session || (session.user as any)?.role !== "ADMIN")) return null;
   const filtered = items.filter(
     (i) =>
       i.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

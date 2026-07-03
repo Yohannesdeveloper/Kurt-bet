@@ -50,11 +50,11 @@ const positionOptions = [
 
 export default function EmployeesPage() {
   const { t } = useTranslation();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   useEffect(() => {
-    if (session && (session.user as any)?.role !== "ADMIN") router.replace("/dashboard");
-  }, [session, router]);
+    if (status !== "loading" && (!session || (session.user as any)?.role !== "ADMIN")) router.replace("/dashboard");
+  }, [session, status, router]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -99,6 +99,7 @@ export default function EmployeesPage() {
     toast.success(t("employees.removed"));
   };
 
+  if (status !== "loading" && (!session || (session.user as any)?.role !== "ADMIN")) return null;
   const filtered = employees.filter(
     (e) =>
       e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

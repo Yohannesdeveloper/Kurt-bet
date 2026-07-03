@@ -21,11 +21,12 @@ import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 export default function ReportsPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   useEffect(() => {
-    if (session && (session.user as any)?.role !== "ADMIN") router.replace("/dashboard");
-  }, [session, router]);
+    if (status !== "loading" && (!session || (session.user as any)?.role !== "ADMIN")) router.replace("/dashboard");
+  }, [session, status, router]);
+  if (status !== "loading" && (!session || (session.user as any)?.role !== "ADMIN")) return null;
   const stats = [
     { label: "Total Revenue", value: formatCurrency(0), icon: TrendingUp, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
     { label: "Total Expenses", value: formatCurrency(0), icon: TrendingDown, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },

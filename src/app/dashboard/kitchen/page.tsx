@@ -52,16 +52,6 @@ const statsConfig = {
   BUTCHER:   { label: "Butcher Orders",  value: "0", icon: Beef,        color: "from-ethiopian-burgundy to-ethiopian-gold",  bgColor: "bg-red-500/10",   iconColor: "text-ethiopian-burgundy" },
 };
 
-const statusColors: Record<string, string> = {
-  SENT_TO_KITCHEN: "bg-cyan-100 text-cyan-800 border-cyan-300",
-  KITCHEN_RECEIVED: "bg-emerald-100 text-emerald-800 border-emerald-300",
-};
-
-const statusLabel: Record<string, string> = {
-  SENT_TO_KITCHEN: "Sent to Kitchen",
-  KITCHEN_RECEIVED: "Kitchen Received",
-};
-
 export default function KitchenDashboard() {
   const { t } = useTranslation();
   const statusLabels: Record<string, string> = {

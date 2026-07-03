@@ -51,7 +51,7 @@ const navItemsByRole: Record<string, NavItemType[]> = {
   ],
   BUTCHER: [
     { href: "/dashboard/butcher", label: "Dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },
-    { href: "/dashboard/butcher-shop", label: "Butcher Shop", tKey: "nav.butcherShop", icon: Beef },
+    { href: "/dashboard/butcher", label: "Butcher Shop", tKey: "nav.butcherShop", icon: Beef },
     { href: "/dashboard/butcher?status=PENDING", label: "Pending Orders", tKey: "butcher.pending", icon: Beef },
     { href: "/kds", label: "Kitchen Display", tKey: "kds.title", icon: CookingPot },
     { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },

@@ -147,7 +147,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
     { icon: ClipboardList, label: t("nav.inventory"), href: "/inventory", key: "inventory" },
     { icon: Users, label: t("nav.employees"), href: "/employees", key: "employees" },
     { icon: Percent, label: t("nav.reports"), href: "/reports", key: "reports" },
-    { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher-shop", key: "butcher-shop" },
+    { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher", key: "butcher" },
   ];
 
   const hiddenForClient = new Set(["inventory", "employees", "reports"]);
@@ -201,9 +201,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
               <button
                 key={item.key}
                 onClick={() => {
-                  if (item.key === "butcher-shop") {
-                    window.location.href = item.href;
-                  } else if (item.href.startsWith("/dashboard")) {
+                  if (item.href.startsWith("/dashboard")) {
                     onNavigate(item.href.replace("/dashboard/", "").replace("/dashboard", "home") || "home");
                   } else {
                     window.location.href = item.href;

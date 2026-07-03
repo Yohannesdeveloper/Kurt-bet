@@ -50,16 +50,16 @@ const navItemsByRole: Record<string, NavItemType[]> = {
     { href: "/reservations", label: "Reservations", tKey: "nav.reservations", icon: Store },
   ],
   BUTCHER: [
-    { href: "/dashboard/butcher", label: "Dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },
-    { href: "/dashboard/butcher?shop=1", label: "Butcher Shop", tKey: "nav.butcherShop", icon: Beef },
-    { href: "/dashboard/butcher?status=PENDING", label: "Pending Orders", tKey: "butcher.pending", icon: Beef },
-    { href: "/kds", label: "Kitchen Display", tKey: "kds.title", icon: CookingPot },
-    { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },
+    { href: "/tables", label: "Tables", tKey: "nav.tables", icon: Store },
+    { href: "/orders", label: "Orders", tKey: "nav.orders", icon: ClipboardList },
+    { href: "/kds", label: "Kitchen", tKey: "nav.kitchen", icon: CookingPot },
+    { href: "/dashboard/butcher-shop", label: "Butcher Shop", tKey: "nav.butcherShop", icon: Beef },
   ],
   KITCHEN: [
-    { href: "/dashboard/kitchen", label: "Dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },
-    { href: "/kds", label: "Kitchen Display", tKey: "kds.title", icon: CookingPot },
     { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },
+    { href: "/tables", label: "Tables", tKey: "nav.tables", icon: Store },
+    { href: "/orders", label: "Orders", tKey: "nav.orders", icon: ClipboardList },
+    { href: "/dashboard/butcher-shop", label: "Butcher Shop", tKey: "nav.butcherShop", icon: Beef },
   ],
   WAITER: [
     { href: "/dashboard/waiter", label: "Dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },

@@ -36,6 +36,7 @@ const statsConfig = {
 };
 
 export default function KitchenDashboard() {
+  console.log("KITCHEN DASHBOARD MOUNTED - v3");
   const { t } = useTranslation();
   const statusLabels: Record<string, string> = {
     NEW: t("orders.pending"),
@@ -244,7 +245,7 @@ export default function KitchenDashboard() {
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => markAsReceived(order.id)}
+                      onClick={() => { console.log("BUTTON CLICKED", order.id); markAsReceived(order.id); }}
                       disabled={actionLoading === order.id}
                       className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-all disabled:opacity-50"
                     >

@@ -73,18 +73,34 @@ export default function KitchenDashboard() {
   }, [doFetch]);
 
   const markAsReceived = async (id: string) => {
+    console.log("markAsReceived called with id:", id);
+    console.log("butcherOrders before:", butcherOrders);
+    console.log("localReceivedOrders before:", localReceivedOrders);
     setActionLoading(id);
     const order = butcherOrders.find(o => o.id === id);
+    console.log("found order:", order);
     if (order) {
-      setLocalReceivedOrders(prev => [...prev, { ...order, kitchenStatus: "RECEIVED" as const }]);
+      const receivedOrder = { ...order, kitchenStatus: "RECEIVED" as const };
+      console.log("adding to localReceivedOrders:", receivedOrder);
+      setLocalReceivedOrders(prev => {
+        const next = [...prev, receivedOrder];
+        console.log("localReceivedOrders after update:", next);
+        return next;
+      });
     }
     try {
-      await fetch("/api/butcher-orders", {
+      const res = await fetch("/api/butcher-orders", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, kitchenStatus: "RECEIVED" }),
       });
-      toast.success(`Butcher order marked as received`);
+      const data = await res.json();
+      console.log("PATCH response:", data);
+      if (data.success) {
+        toast.success(`Butcher order marked as received`);
+      } else {
+        toast.error(data.error || "Action failed");
+      }
     } catch {
       toast.error("Action failed");
     } finally {
@@ -99,6 +115,13 @@ export default function KitchenDashboard() {
   ];
   const total = Object.values(counts).reduce((a, b) => a + b, 0) + butcherOrders.length;
   const newTotal = counts.NEW + receivedOrders.length;
+
+  console.log("RENDER - butcherOrders:", butcherOrders);
+  console.log("RENDER - localReceivedOrders:", localReceivedOrders);
+  console.log("RENDER - waitingOrders:", waitingOrders);
+  console.log("RENDER - receivedOrders:", receivedOrders);
+  console.log("RENDER - total:", total);
+  console.log("RENDER - newTotal:", newTotal);
 
   return (
     <div className="space-y-8">

@@ -47,6 +47,7 @@ export default function KitchenDashboard() {
   const [counts, setCounts] = useState<Record<string, number>>({ NEW: 0, PREPARING: 0, READY: 0, SERVED: 0 });
   const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [receivedIds, setReceivedIds] = useState<Set<string>>(new Set());
 
   const doFetch = useCallback(() => {
     fetch("/api/orders?status=NEW,PREPARING,READY,SERVED")
@@ -73,20 +74,14 @@ export default function KitchenDashboard() {
 
   const markAsReceived = async (id: string) => {
     setActionLoading(id);
-    setButcherOrders(prev => prev.map(o => o.id === id ? { ...o, kitchenStatus: "RECEIVED" as const } : o));
+    setReceivedIds(prev => new Set(prev).add(id));
     try {
-      const res = await fetch("/api/butcher-orders", {
+      await fetch("/api/butcher-orders", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, kitchenStatus: "RECEIVED" }),
       });
-      const data = await res.json();
-      if (data.success) {
-        doFetch();
-        toast.success(`Butcher order marked as received`);
-      } else {
-        toast.error(data.error || "Action failed");
-      }
+      toast.success(`Butcher order marked as received`);
     } catch {
       toast.error("Action failed");
     } finally {
@@ -94,8 +89,8 @@ export default function KitchenDashboard() {
     }
   };
 
-  const waitingOrders = butcherOrders.filter(o => o.kitchenStatus === "WAITING");
-  const receivedOrders = butcherOrders.filter(o => o.kitchenStatus === "RECEIVED");
+  const waitingOrders = butcherOrders.filter(o => o.kitchenStatus === "WAITING" && !receivedIds.has(o.id));
+  const receivedOrders = butcherOrders.filter(o => o.kitchenStatus === "RECEIVED" || receivedIds.has(o.id));
   const total = Object.values(counts).reduce((a, b) => a + b, 0) + butcherOrders.length;
   const newTotal = counts.NEW + receivedOrders.length;
 

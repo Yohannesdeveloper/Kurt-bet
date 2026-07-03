@@ -48,7 +48,7 @@ export default function KitchenDashboard() {
   const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const fetchData = useCallback(() => {
+  const doFetch = useCallback(() => {
     fetch("/api/orders?status=NEW,PREPARING,READY,SERVED")
       .then(r => r.json())
       .then(d => {
@@ -66,23 +66,23 @@ export default function KitchenDashboard() {
   }, []);
 
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 5000);
+    doFetch();
+    const interval = setInterval(doFetch, 5000);
     return () => clearInterval(interval);
-  }, [fetchData]);
+  }, [doFetch]);
 
-  const markAsReceived = async (order: ButcherOrder) => {
-    setActionLoading(order.id);
+  const markAsReceived = async (id: string) => {
+    setActionLoading(id);
     try {
       const res = await fetch("/api/butcher-orders", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: order.id, kitchenStatus: "RECEIVED" }),
+        body: JSON.stringify({ id, kitchenStatus: "RECEIVED" }),
       });
       const data = await res.json();
       if (data.success) {
-        setButcherOrders(prev => prev.map(o => o.id === order.id ? { ...o, kitchenStatus: "RECEIVED" as const } : o));
-        toast.success(`Butcher order #${order.orderNumber} received`);
+        doFetch();
+        toast.success(`Butcher order marked as received`);
       } else {
         toast.error(data.error || "Action failed");
       }
@@ -211,7 +211,7 @@ export default function KitchenDashboard() {
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => markAsReceived(order)}
+                      onClick={() => markAsReceived(order.id)}
                       disabled={actionLoading === order.id}
                       className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-all disabled:opacity-50"
                     >

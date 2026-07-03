@@ -91,6 +91,7 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
 
   const handleStatus = async (newStatus: string) => {
     setUpdating(true);
+    onStatusUpdate(order.id, newStatus);
     try {
       const res = await fetch(`/api/orders/${order.id}`, {
         method: "PATCH",
@@ -99,10 +100,13 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
       });
       const d = await res.json();
       if (d.success) {
-        onStatusUpdate(order.id, newStatus);
         toast.success(`Order #${order.orderNumber} → ${STATUS_FLOW[newStatus]?.label || newStatus}`);
+      } else {
+        toast.error(d.error || "Status update failed");
       }
-    } catch {} finally {
+    } catch {
+      toast.error("Status update failed (network)");
+    } finally {
       setUpdating(false);
     }
   };
@@ -254,8 +258,8 @@ export default function KDSPage() {
       const orderData = await res.json();
       if (orderData.success) {
         toast.success(`#${bo.orderNumber} moved to New Orders`);
+        setOrders(prev => [orderData.data, ...prev]);
         await fetch(`/api/butcher-orders?id=${encodeURIComponent(bo.id)}`, { method: "DELETE" });
-        fetchOrders();
         fetchButcherOrders();
       } else {
         toast.error(orderData.error || "Failed");

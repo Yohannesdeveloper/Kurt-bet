@@ -147,7 +147,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
     { icon: ClipboardList, label: t("nav.inventory"), href: "/inventory", key: "inventory" },
     { icon: Users, label: t("nav.employees"), href: "/employees", key: "employees" },
     { icon: Percent, label: t("nav.reports"), href: "/reports", key: "reports" },
-    { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher?shop=1", key: "butcher" },
+    { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher-shop", key: "butcher-shop" },
   ];
 
   const hiddenForClient = new Set(["inventory", "employees", "reports"]);
@@ -203,6 +203,8 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
                 onClick={() => {
                   if (item.href === "/dashboard") {
                     onNavigate("home");
+                  } else if (item.key === "butcher-shop") {
+                    onNavigate("butcher-shop");
                   } else if (item.href.startsWith("/dashboard")) {
                     window.location.href = item.href;
                   } else {
@@ -211,7 +213,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
                   onClose();
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group border border-transparent ${
-                  currentView === (item.href === "/dashboard" ? "home" : undefined)
+                  currentView === (item.key === "butcher-shop" ? "butcher-shop" : item.href === "/dashboard" ? "home" : undefined)
                     ? "bg-gradient-to-r from-ethiopian-gold/10 to-ethiopian-clay/10 text-ethiopian-gold border-ethiopian-gold/20"
                     : "text-ethiopian-coffee/70 hover:bg-gradient-to-r hover:from-ethiopian-gold/10 hover:to-ethiopian-clay/10 hover:text-ethiopian-gold hover:border-ethiopian-gold/20"
                 }`}
@@ -434,6 +436,164 @@ function PopularRestaurants() {
   );
 }
 
+function ButcherOrderForm() {
+  const { data: session } = useSession();
+  const [meatType, setMeatType] = useState("Beef");
+  const [menuItemName, setMenuItemName] = useState("Tibs");
+  const [weight, setWeight] = useState("1");
+  const [customWeight, setCustomWeight] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [tableNumber, setTableNumber] = useState("");
+  const [notes, setNotes] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
+  const weightPresets = [0.5, 1, 2, 3, 5];
+  const dishOptions = ["Tibs", "Kurt", "Dulet", "Tere Sega", "Gored Gored"];
+
+  const handleSubmit = async () => {
+    const w = parseFloat(weight);
+    if (!w || w <= 0) { toast.error("Select a weight"); return; }
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/butcher-orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          meatType,
+          menuItemName,
+          weight: w,
+          quantity,
+          tableNumber: tableNumber || null,
+          notes: notes || "",
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Butcher order #${data.data.orderNumber} placed!`);
+        setMeatType("Beef");
+        setMenuItemName("Tibs");
+        setWeight("1");
+        setQuantity(1);
+        setTableNumber("");
+        setNotes("");
+      } else {
+        toast.error(data.error || "Failed to place order");
+      }
+    } catch { toast.error("Failed to place order"); }
+    finally { setSubmitting(false); }
+  };
+
+  return (
+    <section className="py-4">
+      <div className="flex items-center gap-3 mb-6">
+        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="p-2.5 rounded-xl bg-gradient-to-br from-ethiopian-clay to-ethiopian-gold text-white shadow-lg">
+          <Beef className="w-6 h-6" />
+        </motion.div>
+        <div>
+          <h2 className="text-2xl font-serif font-bold text-ethiopian-coffee">Butcher Shop</h2>
+          <p className="text-xs text-ethiopian-coffee/60">Order raw meat for your dishes</p>
+        </div>
+      </div>
+
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-ethiopian-gold/10">
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Meat Type</label>
+            <div className="flex flex-wrap gap-2">
+              {meatTypes.map((type) => (
+                <button key={type} onClick={() => setMeatType(type)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    meatType === type
+                      ? "bg-ethiopian-burgundy text-white shadow-md"
+                      : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
+                  }`}
+                >{type}</button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Dish</label>
+            <div className="flex flex-wrap gap-2">
+              {dishOptions.map((dish) => (
+                <button key={dish} onClick={() => setMenuItemName(dish)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    menuItemName === dish
+                      ? "bg-ethiopian-gold text-white shadow-md"
+                      : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
+                  }`}
+                >{dish}</button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Weight (kg)</label>
+            <div className="flex flex-wrap gap-2">
+              {weightPresets.map((w) => (
+                <button key={w} onClick={() => { setWeight(w.toString()); setCustomWeight(false); }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    weight === w.toString() && !customWeight
+                      ? "bg-ethiopian-burgundy text-white shadow-md"
+                      : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
+                  }`}
+                >{w} kg</button>
+              ))}
+              <button onClick={() => setCustomWeight(true)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  customWeight
+                    ? "bg-ethiopian-gold text-white shadow-md"
+                    : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
+                }`}
+              >Custom</button>
+            </div>
+            {customWeight && (
+              <input type="number" step="0.1" min="0.1" placeholder="Enter weight in kg"
+                value={weight} onChange={(e) => setWeight(e.target.value)}
+                className="mt-2 w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none"
+              />
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Quantity</label>
+            <div className="flex items-center gap-4">
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
+                <Minus className="w-5 h-5" />
+              </button>
+              <span className="text-3xl font-bold text-ethiopian-gold min-w-[3rem] text-center">{quantity}</span>
+              <button onClick={() => setQuantity(Math.min(20, quantity + 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
+                <Plus className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-2">Table Number (optional)</label>
+            <input type="text" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)}
+              placeholder="e.g., 5"
+              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-2">Notes (optional)</label>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
+              placeholder="Any special instructions..." rows={2}
+              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none"
+            />
+          </div>
+
+          <GoldButton onClick={handleSubmit} disabled={submitting}>
+            {submitting ? "Placing..." : "Place Order"}
+          </GoldButton>
+        </div>
+      </motion.div>
+    </section>
+  );
+}
+
 function MobileNav() {
   const { t } = useTranslation();
   const mobileNavItems = [
@@ -560,6 +720,8 @@ export default function DashboardPage() {
                 <CategoriesSection />
                 <PopularRestaurants />
               </>
+            ) : currentView === "butcher-shop" ? (
+              <ButcherOrderForm />
             ) : null}
           </div>
         </div>

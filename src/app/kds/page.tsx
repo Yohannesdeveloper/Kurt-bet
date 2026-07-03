@@ -5,10 +5,34 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { ArrowLeft, CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat, Beef, CheckCircle } from "lucide-react";
+import { ArrowLeft, CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat, Beef, CheckCircle, Trash2, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
+
+const dishImages: Record<string, string> = {
+  Tibs: "/images/tibs.jpg", Kurt: "/images/kurt.jpg", Kitfo: "/images/kifo.jpg",
+  Dulet: "/images/kurt.jpg", "Tere Sega": "/images/gored gored.jpg", "Gored Gored": "/images/gored gored.jpg",
+};
+const dishColors: Record<string, string> = {
+  Tibs: "bg-red-600", Kurt: "bg-amber-700", Kitfo: "bg-orange-600",
+  Dulet: "bg-emerald-700", "Tere Sega": "bg-rose-700", "Gored Gored": "bg-purple-700",
+};
+function DishThumb({ name, size = "md" }: { name: string; size?: "sm" | "md" }) {
+  const [err, setErr] = useState(false);
+  const dim = size === "sm" ? "w-9 h-9" : "w-11 h-11";
+  const iconDim = size === "sm" ? "text-base" : "text-lg";
+  const color = dishColors[name] || "bg-gray-600";
+  const src = dishImages[name] || "/images/kurt.jpg";
+  return (
+    <div className={`${dim} rounded-lg overflow-hidden flex-shrink-0 border border-ethiopian-gold/10 shadow-sm relative`}>
+      {!err && <img src={src} alt={name} className="w-full h-full object-cover absolute inset-0" onError={() => setErr(true)} />}
+      <div className={`w-full h-full ${err ? "flex" : "hidden"} items-center justify-center ${color} text-white font-bold ${iconDim}`}>
+        {name.charAt(0)}
+      </div>
+    </div>
+  );
+}
 
 interface OrderItem {
   id: string;
@@ -321,15 +345,17 @@ export default function KDSPage() {
                       <Card className="border-l-4 border-ethiopian-clay/30 bg-clay-50 shadow-sm hover:shadow-md transition-shadow">
                         <CardContent className="p-4">
                           <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <div className="flex items-center gap-2 mb-1">
-                                <Beef className="h-4 w-4 text-ethiopian-clay" />
-                                <span className="font-bold text-base text-ethiopian-coffee">#{bo.orderNumber}</span>
-                                <Badge variant="outline" className="text-xs text-ethiopian-clay border-ethiopian-clay/30">{t("kds.butcher")}</Badge>
-                              </div>
-                              <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60">
-                                <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(bo.createdAt)}</span>
-                                {bo.tableNumber && <span>Table {bo.tableNumber}</span>}
+                            <div className="flex items-center gap-3">
+                              <DishThumb name={bo.menuItemName} size="sm" />
+                              <div>
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-bold text-base text-ethiopian-coffee">#{bo.orderNumber}</span>
+                                  <Badge variant="outline" className="text-xs text-ethiopian-clay border-ethiopian-clay/30">{t("kds.butcher")}</Badge>
+                                </div>
+                                <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60">
+                                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(bo.createdAt)}</span>
+                                  {bo.tableNumber && <span>Table {bo.tableNumber}</span>}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -354,6 +380,21 @@ export default function KDSPage() {
                             {bo.kitchenStatus === "RECEIVED" && (
                               <Badge variant="secondary" className="text-xs">Received</Badge>
                             )}
+                            <button
+                              onClick={async () => {
+                                if (!confirm("Delete this butcher order?")) return;
+                                try {
+                                  const res = await fetch(`/api/butcher-orders?id=${encodeURIComponent(bo.id)}`, { method: "DELETE" });
+                                  const d = await res.json();
+                                  if (d.success) { toast.success("Deleted"); fetchButcherOrders(); }
+                                  else { toast.error(d.error || "Failed"); }
+                                } catch { toast.error("Failed"); }
+                              }}
+                              className="ml-auto flex items-center gap-1 px-2 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors text-xs font-medium"
+                              title="Delete order"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" /> Delete
+                            </button>
                           </div>
                         </CardContent>
                       </Card>

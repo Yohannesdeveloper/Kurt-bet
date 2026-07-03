@@ -47,7 +47,7 @@ export default function KitchenDashboard() {
   const [counts, setCounts] = useState<Record<string, number>>({ NEW: 0, PREPARING: 0, READY: 0, SERVED: 0 });
   const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [receivedIds, setReceivedIds] = useState<string[]>([]);
+  const [localReceivedOrders, setLocalReceivedOrders] = useState<ButcherOrder[]>([]);
 
   const doFetch = useCallback(() => {
     fetch("/api/orders?status=NEW,PREPARING,READY,SERVED")
@@ -74,8 +74,10 @@ export default function KitchenDashboard() {
 
   const markAsReceived = async (id: string) => {
     setActionLoading(id);
-    setButcherOrders(prev => prev.map(o => o.id === id ? { ...o, kitchenStatus: "RECEIVED" as const } : o));
-    setReceivedIds(prev => [...prev, id]);
+    const order = butcherOrders.find(o => o.id === id);
+    if (order) {
+      setLocalReceivedOrders(prev => [...prev, { ...order, kitchenStatus: "RECEIVED" as const }]);
+    }
     try {
       await fetch("/api/butcher-orders", {
         method: "PATCH",
@@ -90,8 +92,11 @@ export default function KitchenDashboard() {
     }
   };
 
-  const waitingOrders = butcherOrders.filter(o => o.kitchenStatus === "WAITING" && !receivedIds.includes(o.id));
-  const receivedOrders = butcherOrders.filter(o => o.kitchenStatus === "RECEIVED" || receivedIds.includes(o.id));
+  const waitingOrders = butcherOrders.filter(o => o.kitchenStatus === "WAITING" && !localReceivedOrders.some(r => r.id === o.id));
+  const receivedOrders = [
+    ...localReceivedOrders,
+    ...butcherOrders.filter(o => o.kitchenStatus === "RECEIVED" && !localReceivedOrders.some(r => r.id === o.id)),
+  ];
   const total = Object.values(counts).reduce((a, b) => a + b, 0) + butcherOrders.length;
   const newTotal = counts.NEW + receivedOrders.length;
 
@@ -158,7 +163,7 @@ export default function KitchenDashboard() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee">Butcher Orders</h2>
-          <span className="text-xs text-ethiopian-coffee/40">Received: {receivedIds.length}</span>
+          <span className="text-xs text-ethiopian-coffee/40">In New Orders: {localReceivedOrders.length}</span>
         </div>
         {waitingOrders.length === 0 ? (
           <div className="text-center py-6 text-ethiopian-coffee/60 bg-white rounded-2xl shadow-md border border-ethiopian-gold/10">

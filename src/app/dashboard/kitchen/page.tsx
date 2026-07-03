@@ -96,6 +96,7 @@ export default function KitchenDashboard() {
   const waitingOrders = butcherOrders.filter(o => o.kitchenStatus === "WAITING");
   const receivedOrders = butcherOrders.filter(o => o.kitchenStatus === "RECEIVED");
   const total = Object.values(counts).reduce((a, b) => a + b, 0) + butcherOrders.length;
+  const newTotal = counts.NEW + receivedOrders.length;
 
   return (
     <div className="space-y-8">
@@ -225,64 +226,6 @@ export default function KitchenDashboard() {
         </div>
       )}
 
-      {/* New Orders - Received Butcher Orders */}
-      {receivedOrders.length > 0 && (
-        <div className="space-y-6">
-          <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee">New Orders</h2>
-          <div className="grid gap-4">
-            {receivedOrders.map((order) => (
-              <motion.div
-                key={order.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl shadow-md border border-ethiopian-gold/10 hover:shadow-xl hover:border-ethiopian-gold/20 transition-all duration-300 p-5"
-              >
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
-                    {order.tableNumber && (
-                      <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
-                    )}
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-emerald-100 text-emerald-800 border-emerald-300">
-                      Received
-                    </span>
-                    <span className="text-sm text-ethiopian-coffee/60 flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" />
-                      {order.approvedAt ? new Date(order.approvedAt).toLocaleString() : ""}
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20">
-                    <div>
-                      <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
-                      <p className="text-sm font-bold text-ethiopian-burgundy">{order.meatType}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-ethiopian-coffee/40">Dish</p>
-                      <p className="text-sm font-semibold text-ethiopian-coffee">{order.menuItemName}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-ethiopian-coffee/40">Weight</p>
-                      <p className="text-sm font-bold text-ethiopian-gold">{order.weight} kg</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
-                      <p className="text-sm font-semibold text-ethiopian-coffee">x{order.quantity}</p>
-                    </div>
-                    {order.notes && (
-                      <div className="col-span-2 sm:col-span-4">
-                        <p className="text-xs text-ethiopian-coffee/40">Notes</p>
-                        <p className="text-sm italic text-ethiopian-coffee/70">{order.notes}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      )}
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -300,10 +243,11 @@ export default function KitchenDashboard() {
               {STATUS_ORDER.map((status) => {
                 const colors: Record<string, string> = { NEW: "bg-amber-500", PREPARING: "bg-blue-500", READY: "bg-orange-500", SERVED: "bg-green-500" };
                 const labels: Record<string, string> = { NEW: t("orders.pending"), PREPARING: t("orders.preparing"), READY: t("orders.ready"), SERVED: t("orders.delivered") };
+                const count = status === "NEW" ? newTotal : counts[status];
                 return (
                   <div key={status} className="text-center">
                     <div className={`h-12 w-12 rounded-full ${colors[status]} flex items-center justify-center mx-auto mb-2 shadow-lg`}>
-                      <span className="text-white font-bold text-lg">{counts[status]}</span>
+                      <span className="text-white font-bold text-lg">{count}</span>
                     </div>
                     <p className="text-sm font-medium text-ethiopian-coffee">{labels[status]}</p>
                   </div>
@@ -317,16 +261,31 @@ export default function KitchenDashboard() {
                 <p className="text-sm text-ethiopian-coffee/60">New orders will appear here</p>
               </div>
             ) : (
-              <div className="space-y-2">
-                {STATUS_ORDER.flatMap(status =>
-                  Array.from({ length: Math.min(counts[status], 3) }).map((_, i) => (
-                    <div key={`${status}-${i}`} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                      <div className={`h-2 w-2 rounded-full ${statsConfig[status as keyof typeof statsConfig].bgColor}`} />
-                      <span className="text-sm font-medium text-ethiopian-coffee">{statusLabels[status]}</span>
-                      <span className="text-xs text-ethiopian-coffee/60 ml-auto">In queue</span>
-                    </div>
-                  ))
+              <div className="space-y-3">
+                {receivedOrders.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-ethiopian-coffee/60 uppercase tracking-wider">New Orders</p>
+                    {receivedOrders.map((order) => (
+                      <div key={order.id} className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
+                        <Beef className="w-4 h-4 text-ethiopian-burgundy flex-shrink-0" />
+                        <span className="text-sm font-semibold text-ethiopian-coffee">#{order.orderNumber} {order.menuItemName}</span>
+                        <span className="text-xs text-ethiopian-coffee/60">{order.meatType} · {order.weight}kg · x{order.quantity}</span>
+                        {order.tableNumber && <span className="text-xs font-medium text-ethiopian-gold ml-auto">Table {order.tableNumber}</span>}
+                      </div>
+                    ))}
+                  </div>
                 )}
+                <div className="space-y-2">
+                  {STATUS_ORDER.flatMap(status =>
+                    Array.from({ length: Math.min(counts[status], 3) }).map((_, i) => (
+                      <div key={`${status}-${i}`} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                        <div className={`h-2 w-2 rounded-full ${statsConfig[status as keyof typeof statsConfig].bgColor}`} />
+                        <span className="text-sm font-medium text-ethiopian-coffee">{statusLabels[status]}</span>
+                        <span className="text-xs text-ethiopian-coffee/60 ml-auto">In queue</span>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             )}
             <Button className="w-full mt-4" variant="premium" asChild>

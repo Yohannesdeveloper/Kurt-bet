@@ -1,0 +1,327 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChefHat, Clock, CheckCircle, AlertCircle, Flame, Timer, CookingPot, Beef, Check } from "lucide-react";
+import { motion } from "framer-motion";
+import { useTranslation } from "@/lib/i18n";
+import Link from "next/link";
+import toast from "react-hot-toast";
+
+type ButcherOrderItem = {
+  meatType: string;
+  portionSize: string;
+  quantity: number;
+  dish: string;
+};
+
+type ButcherOrder = {
+  id: string;
+  orderNumber: number;
+  customerName: string;
+  items: ButcherOrderItem[];
+  notes: string;
+  status: "PENDING" | "WAITER_APPROVED" | "BUTCHER_PREPARING" | "BUTCHER_APPROVED" | "SENT_TO_KITCHEN" | "KITCHEN_RECEIVED" | "REJECTED";
+  createdAt: string;
+  waiterApprovedAt?: string;
+  butcherPreparingAt?: string;
+  butcherApprovedAt?: string;
+  sentToKitchenAt?: string;
+  receivedAt?: string;
+  rejectedAt?: string;
+};
+
+const statusColors: Record<string, string> = {
+  SENT_TO_KITCHEN: "bg-cyan-100 text-cyan-800 border-cyan-300",
+  KITCHEN_RECEIVED: "bg-emerald-100 text-emerald-800 border-emerald-300",
+};
+
+const statusLabel: Record<string, string> = {
+  SENT_TO_KITCHEN: "Sent to Kitchen",
+  KITCHEN_RECEIVED: "Kitchen Received",
+};
+
+const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
+
+const statsConfig = {
+  NEW:       { label: "Pending Orders",   value: "0", icon: Clock,       color: "from-amber-500 to-orange-600",    bgColor: "bg-amber-500/10",  iconColor: "text-amber-600" },
+  PREPARING: { label: "In Progress",      value: "0", icon: Flame,       color: "from-orange-500 to-red-600",     bgColor: "bg-orange-500/10",  iconColor: "text-orange-600" },
+  READY:     { label: "Ready to Serve",   value: "0", icon: CheckCircle, color: "from-ethiopian-gold to-ethiopian-coffee",  bgColor: "bg-ethiopian-gold/10", iconColor: "text-ethiopian-gold" },
+  SERVED:    { label: "Served Today",     value: "0", icon: Timer,       color: "from-blue-500 to-cyan-600",     bgColor: "bg-blue-500/10",   iconColor: "text-blue-600" },
+  BUTCHER:   { label: "Butcher Orders",  value: "0", icon: Beef,        color: "from-ethiopian-burgundy to-ethiopian-gold",  bgColor: "bg-red-500/10",   iconColor: "text-ethiopian-burgundy" },
+};
+
+const statusColors: Record<string, string> = {
+  SENT_TO_KITCHEN: "bg-cyan-100 text-cyan-800 border-cyan-300",
+  KITCHEN_RECEIVED: "bg-emerald-100 text-emerald-800 border-emerald-300",
+};
+
+const statusLabel: Record<string, string> = {
+  SENT_TO_KITCHEN: "Sent to Kitchen",
+  KITCHEN_RECEIVED: "Kitchen Received",
+};
+
+export default function KitchenDashboard() {
+  const { t } = useTranslation();
+  const statusLabels: Record<string, string> = {
+    NEW: t("orders.pending"),
+    PREPARING: t("orders.preparing"),
+    READY: t("orders.ready"),
+    SERVED: t("orders.delivered"),
+    BUTCHER: t("dashboard.butcherOrders"),
+  };
+  const [counts, setCounts] = useState<Record<string, number>>({ NEW: 0, PREPARING: 0, READY: 0, SERVED: 0 });
+  const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const fetchData = useCallback(() => {
+    fetch("/api/orders?status=NEW,PREPARING,READY,SERVED")
+      .then(r => r.json())
+      .then(d => {
+        if (d.success) {
+          const c: Record<string, number> = { NEW: 0, PREPARING: 0, READY: 0, SERVED: 0 };
+          d.data.forEach((o: any) => { if (c[o.status] !== undefined) c[o.status]++; });
+          setCounts(c);
+        }
+      })
+      .catch(() => {});
+    fetch("/api/butcher-orders?status=SENT_TO_KITCHEN,KITCHEN_RECEIVED")
+      .then(r => r.json())
+      .then(d => { if (d.success) setButcherOrders(d.data); })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
+  }, [fetchData]);
+
+  const updateStatus = async (id: string, status: string) => {
+    setActionLoading(id);
+    try {
+      const res = await fetch("/api/butcher-orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Order #${data.data.orderNumber} marked as received`);
+        fetchData();
+      } else {
+        toast.error(data.error || "Action failed");
+      }
+    } catch {
+      toast.error("Action failed");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const total = Object.values(counts).reduce((a, b) => a + b, 0) + butcherOrders.length;
+  const butcherCount = butcherOrders.filter(o => o.status === "SENT_TO_KITCHEN").length;
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight font-serif text-ethiopian-coffee">
+            {t("nav.kitchen")} Dashboard
+          </h1>
+          <p className="text-ethiopian-coffee/60 mt-1">Manage incoming orders and kitchen queue</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-2 w-2 rounded-full bg-ethiopian-gold animate-pulse" />
+          <ChefHat className="h-5 w-5 text-ethiopian-gold" />
+          <span className="text-sm font-medium text-ethiopian-coffee">{total} active</span>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 lg:gap-6">
+        {STATUS_ORDER.map((status, index) => {
+          const s = statsConfig[status as keyof typeof statsConfig];
+          return (
+            <motion.div
+              key={status}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+            >
+              <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-ethiopian-gold/10 hover:border-ethiopian-gold/20">
+                <CardContent className="p-4 lg:p-6">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`h-10 w-10 lg:h-12 lg:w-12 rounded-xl ${s.bgColor} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+                      <s.icon className={`h-5 w-5 lg:h-6 lg:w-6 ${s.iconColor}`} />
+                    </div>
+                  </div>
+                  <p className="text-xs lg:text-sm text-ethiopian-coffee/60 font-medium mb-1">{statusLabels[status]}</p>
+                  <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee">{counts[status]}</p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          );
+        })}
+        {/* Butcher stat */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.5 }}
+        >
+          <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-ethiopian-gold/10 hover:border-ethiopian-burgundy/30">
+            <CardContent className="p-4 lg:p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="h-10 w-10 lg:h-12 lg:w-12 rounded-xl bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <Beef className="h-5 w-5 lg:h-6 lg:w-6 text-ethiopian-burgundy" />
+                </div>
+              </div>
+              <p className="text-xs lg:text-sm text-ethiopian-coffee/60 font-medium mb-1">{t("dashboard.butcherOrders")}</p>
+              <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee">{butcherCount}</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Butcher Orders Section */}
+      {butcherOrders.length > 0 && (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee">Butcher Orders</h2>
+          <div className="grid gap-4">
+            {butcherOrders.map((order) => (
+              <motion.div
+                key={order.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white rounded-2xl shadow-md border border-ethiopian-gold/10 hover:shadow-xl hover:border-ethiopian-gold/20 transition-all duration-300 p-5"
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
+                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusColors[order.status]}`}>
+                          {statusLabel[order.status]}
+                        </span>
+                        <span className="text-sm text-ethiopian-coffee/60 flex items-center gap-1">
+                          <Clock className="w-3.5 h-3.5" />
+                          {new Date(order.createdAt).toLocaleString()}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-ethiopian-coffee/40">Customer</p>
+                        <p className="text-sm font-semibold text-ethiopian-coffee">{order.customerName}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Items List */}
+                  <div className="space-y-3">
+                    {(order.items || []).map((item, index) => (
+                      <div key={index} className="p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                          <div>
+                            <p className="text-xs text-ethiopian-coffee/40">Dish</p>
+                            <p className="text-sm font-semibold text-ethiopian-gold">{item.dish}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
+                            <p className="text-sm font-semibold text-ethiopian-burgundy">{item.meatType}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-ethiopian-coffee/40">Portion</p>
+                            <p className="text-sm font-semibold text-ethiopian-gold">{item.portionSize}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
+                            <p className="text-sm font-semibold text-ethiopian-coffee">x{item.quantity}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {order.notes && (
+                    <p className="text-sm text-ethiopian-coffee/70 italic">
+                      "{order.notes}"
+                    </p>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {order.status === "SENT_TO_KITCHEN" && (
+                      <button
+                        onClick={() => updateStatus(order.id, "KITCHEN_RECEIVED")}
+                        disabled={actionLoading === order.id}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-all disabled:opacity-50"
+                      >
+                        <Check className="w-4 h-4" />
+                        Mark as Received
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.4 }}
+      >
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-serif text-ethiopian-coffee">
+              <AlertCircle className="h-5 w-5 text-ethiopian-gold" />
+              Order Queue
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+              {STATUS_ORDER.map((status) => {
+                const colors: Record<string, string> = { NEW: "bg-amber-500", PREPARING: "bg-blue-500", READY: "bg-orange-500", SERVED: "bg-green-500" };
+                const labels: Record<string, string> = { NEW: t("orders.pending"), PREPARING: t("orders.preparing"), READY: t("orders.ready"), SERVED: t("orders.delivered") };
+                return (
+                  <div key={status} className="text-center">
+                    <div className={`h-12 w-12 rounded-full ${colors[status]} flex items-center justify-center mx-auto mb-2 shadow-lg`}>
+                      <span className="text-white font-bold text-lg">{counts[status]}</span>
+                    </div>
+                    <p className="text-sm font-medium text-ethiopian-coffee">{labels[status]}</p>
+                  </div>
+                );
+              })}
+            </div>
+            {total === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-ethiopian-coffee/60">
+                <ChefHat className="h-16 w-16 mb-4 opacity-30 text-ethiopian-coffee" />
+                <p className="font-medium mb-1 text-ethiopian-coffee">No orders in queue</p>
+                <p className="text-sm text-ethiopian-coffee/60">New orders will appear here</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {STATUS_ORDER.flatMap(status =>
+                  Array.from({ length: Math.min(counts[status], 3) }).map((_, i) => (
+                    <div key={`${status}-${i}`} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div className={`h-2 w-2 rounded-full ${statsConfig[status as keyof typeof statsConfig].bgColor}`} />
+                      <span className="text-sm font-medium text-ethiopian-coffee">{statusLabels[status]}</span>
+                      <span className="text-xs text-ethiopian-coffee/60 ml-auto">In queue</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+            <Button className="w-full mt-4" variant="premium" asChild>
+              <Link href="/kds">
+                <CookingPot className="h-4 w-4 mr-2" />
+                Open Kitchen Display System
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
+    </div>
+  );
+}

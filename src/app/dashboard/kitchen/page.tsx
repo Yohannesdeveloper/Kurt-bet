@@ -71,18 +71,18 @@ export default function KitchenDashboard() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  const markAsReceived = async (id: string) => {
-    setActionLoading(id);
+  const markAsReceived = async (order: ButcherOrder) => {
+    setActionLoading(order.id);
     try {
       const res = await fetch("/api/butcher-orders", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, kitchenStatus: "RECEIVED" }),
+        body: JSON.stringify({ id: order.id, kitchenStatus: "RECEIVED" }),
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Butcher order marked as received`);
-        fetchData();
+        setButcherOrders(prev => prev.map(o => o.id === order.id ? { ...o, kitchenStatus: "RECEIVED" as const } : o));
+        toast.success(`Butcher order #${order.orderNumber} received`);
       } else {
         toast.error(data.error || "Action failed");
       }
@@ -211,7 +211,7 @@ export default function KitchenDashboard() {
 
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => markAsReceived(order.id)}
+                      onClick={() => markAsReceived(order)}
                       disabled={actionLoading === order.id}
                       className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-all disabled:opacity-50"
                     >

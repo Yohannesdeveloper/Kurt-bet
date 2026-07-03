@@ -573,11 +573,9 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 orderId: order.id,
-                orderNumber: order.orderNumber,
-                tableNumber: table?.number?.toString() || null,
                 menuItemName: cartItem.name,
                 quantity: cartItem.quantity,
-                orderTime: order.createdAt || new Date().toISOString(),
+                tableNumber: table?.number?.toString() || null,
               }),
             });
           }

@@ -11,17 +11,18 @@ import toast from "react-hot-toast";
 
 type ButcherOrder = {
   id: string;
-  orderId: string;
   orderNumber: number;
-  tableNumber: string | null;
+  orderId?: string;
+  meatType: string;
   menuItemName: string;
+  weight: number;
   quantity: number;
-  status: "PENDING" | "APPROVED";
-  orderTime: string;
-  meatWeightKg: number | null;
-  preparationNotes: string;
-  approvedAt: string | null;
+  tableNumber: string | null;
+  notes: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
   kitchenStatus: "WAITING" | "RECEIVED";
+  createdAt: string;
+  approvedAt: string | null;
 };
 
 const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
@@ -188,21 +189,25 @@ export default function KitchenDashboard() {
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20">
                     <div>
-                      <p className="text-xs text-ethiopian-coffee/40">Menu Item</p>
+                      <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
+                      <p className="text-sm font-bold text-ethiopian-burgundy">{order.meatType}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-ethiopian-coffee/40">Dish</p>
                       <p className="text-sm font-semibold text-ethiopian-coffee">{order.menuItemName}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-ethiopian-coffee/40">Weight</p>
+                      <p className="text-sm font-bold text-ethiopian-gold">{order.weight} kg</p>
                     </div>
                     <div>
                       <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
                       <p className="text-sm font-semibold text-ethiopian-coffee">x{order.quantity}</p>
                     </div>
-                    <div>
-                      <p className="text-xs text-ethiopian-coffee/40">Meat Weight</p>
-                      <p className="text-sm font-semibold text-ethiopian-burgundy">{order.meatWeightKg} kg</p>
-                    </div>
-                    {order.preparationNotes && (
-                      <div>
+                    {order.notes && (
+                      <div className="col-span-2 sm:col-span-4">
                         <p className="text-xs text-ethiopian-coffee/40">Notes</p>
-                        <p className="text-sm font-semibold text-ethiopian-coffee">{order.preparationNotes}</p>
+                        <p className="text-sm italic text-ethiopian-coffee/70">{order.notes}</p>
                       </div>
                     )}
                   </div>

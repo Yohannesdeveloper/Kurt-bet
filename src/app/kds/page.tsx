@@ -152,15 +152,17 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
 type ButcherOrder = {
   id: string;
   orderNumber: number;
+  orderId?: string;
+  meatType: string;
   menuItemName: string;
+  weight: number;
   quantity: number;
-  meatWeightKg: number | null;
-  preparationNotes: string;
   tableNumber: string | null;
-  status: "PENDING" | "APPROVED";
-  approvedAt: string | null;
-  orderTime: string;
+  notes: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
   kitchenStatus: "WAITING" | "RECEIVED";
+  createdAt: string;
+  approvedAt: string | null;
 };
 
 export default function KDSPage() {
@@ -326,7 +328,7 @@ export default function KDSPage() {
                                 <Badge variant="outline" className="text-xs text-ethiopian-clay border-ethiopian-clay/30">{t("kds.butcher")}</Badge>
                               </div>
                               <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60">
-                                <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(bo.orderTime)}</span>
+                                <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(bo.createdAt)}</span>
                                 {bo.tableNumber && <span>Table {bo.tableNumber}</span>}
                               </div>
                             </div>
@@ -335,9 +337,13 @@ export default function KDSPage() {
                             <div className="flex items-center gap-2 text-sm">
                               <span className="font-medium text-ethiopian-clay">{bo.menuItemName}</span>
                               <span className="font-semibold text-ethiopian-coffee">×{bo.quantity}</span>
-                              {bo.meatWeightKg && <span className="text-ethiopian-coffee/50">· {bo.meatWeightKg} kg</span>}
                             </div>
-                            {bo.preparationNotes && <p className="text-xs text-ethiopian-coffee/50 italic">"{bo.preparationNotes}"</p>}
+                            <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60">
+                              <span className="text-ethiopian-burgundy font-medium">{bo.meatType}</span>
+                              <span>·</span>
+                              <span>{bo.weight} kg</span>
+                            </div>
+                            {bo.notes && <p className="text-xs text-ethiopian-coffee/50 italic">"{bo.notes}"</p>}
                           </div>
                           <div className="flex items-center gap-2 pt-2 border-t border-ethiopian-gold/10">
                             {bo.kitchenStatus === "WAITING" && (

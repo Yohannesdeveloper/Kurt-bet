@@ -5,29 +5,23 @@ import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
 
 const DEMO_FILE = ".demo-butcher-orders.json";
 
-type ButcherOrderItem = {
-  menuItemId: string;
-  menuItemName: string;
-  quantity: number;
-  dish: string;
-};
-
 type ButcherOrder = {
   id: string;
   orderNumber: number;
   orderId?: string;
-  tableNumber?: string;
   customerName: string;
   customerId: string;
-  items: ButcherOrderItem[];
-  preparationNotes: string;
-  meatWeightKg?: number;
-  status: "PENDING" | "SENT_TO_KITCHEN" | "KITCHEN_RECEIVED" | "REJECTED";
+  meatType: string;
+  menuItemName: string;
+  weight: number;
+  quantity: number;
+  tableNumber: string | null;
+  notes: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  kitchenStatus: "WAITING" | "RECEIVED";
   createdAt: string;
-  approvedAt?: string;
-  sentToKitchenAt?: string;
-  receivedAt?: string;
-  rejectedAt?: string;
+  approvedAt: string | null;
+  rejectedAt: string | null;
 };
 
 function generateId(): string {
@@ -59,16 +53,10 @@ export async function POST(req: NextRequest) {
   const userName = (session?.user as { name?: string })?.name || "Unknown";
 
   const body = await req.json();
-  const { items, preparationNotes, orderId, tableNumber } = body;
+  const { meatType, menuItemName, weight, quantity, notes, tableNumber, orderId } = body;
 
-  if (!items || !Array.isArray(items) || items.length === 0) {
-    return NextResponse.json({ success: false, error: "At least one item is required" }, { status: 400 });
-  }
-
-  for (const item of items) {
-    if (!item.menuItemId || !item.menuItemName || !item.quantity) {
-      return NextResponse.json({ success: false, error: "Each item requires menuItemId, menuItemName, and quantity" }, { status: 400 });
-    }
+  if (!menuItemName || !quantity || quantity < 1) {
+    return NextResponse.json({ success: false, error: "menuItemName and quantity (>=1) are required" }, { status: 400 });
   }
 
   const orders = await readDemoJSON<ButcherOrder>(DEMO_FILE);
@@ -76,18 +64,19 @@ export async function POST(req: NextRequest) {
     id: generateId(),
     orderNumber: getNextNumber(orders),
     orderId: orderId || undefined,
-    tableNumber: tableNumber || undefined,
     customerName: userName,
     customerId: userId,
-    items: items.map((item: any) => ({
-      menuItemId: item.menuItemId,
-      menuItemName: item.menuItemName,
-      quantity: item.quantity,
-      dish: item.dish || "",
-    })),
-    preparationNotes: preparationNotes || "",
+    meatType: meatType || "Beef",
+    menuItemName,
+    weight: parseFloat(weight) || 1,
+    quantity: parseInt(quantity) || 1,
+    tableNumber: tableNumber || null,
+    notes: notes || "",
     status: "PENDING",
+    kitchenStatus: "WAITING",
     createdAt: new Date().toISOString(),
+    approvedAt: null,
+    rejectedAt: null,
   };
 
   orders.push(newOrder);
@@ -103,14 +92,13 @@ export async function PATCH(req: NextRequest) {
 
   const role = (session.user as { role?: string }).role;
   const body = await req.json();
-  const { id, status, preparationNotes, meatWeightKg } = body;
+  const { id, status, kitchenStatus } = body;
 
-  if (!id || !status) {
-    return NextResponse.json({ success: false, error: "id and status are required" }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ success: false, error: "id is required" }, { status: 400 });
   }
 
-  const validStatuses = ["PENDING", "SENT_TO_KITCHEN", "KITCHEN_RECEIVED", "REJECTED"];
-  if (!validStatuses.includes(status)) {
+  if (status && !["PENDING", "APPROVED", "REJECTED"].includes(status)) {
     return NextResponse.json({ success: false, error: "Invalid status" }, { status: 400 });
   }
 
@@ -123,31 +111,28 @@ export async function PATCH(req: NextRequest) {
   const order = orders[index];
   const now = new Date().toISOString();
 
-  if (role === "BUTCHER" || role === "ADMIN") {
-    if (order.status === "PENDING" && status === "SENT_TO_KITCHEN") {
-      order.status = status;
-      order.sentToKitchenAt = now;
-      order.approvedAt = now;
-      if (meatWeightKg !== undefined) order.meatWeightKg = meatWeightKg;
-      if (preparationNotes !== undefined) order.preparationNotes = preparationNotes;
-    } else if (order.status === "PENDING" && status === "REJECTED") {
-      order.status = status;
-      order.rejectedAt = now;
-    } else {
-      return NextResponse.json({ success: false, error: "Invalid status transition" }, { status: 400 });
+  if (kitchenStatus && (role === "KITCHEN" || role === "ADMIN")) {
+    if (order.status !== "APPROVED") {
+      return NextResponse.json({ success: false, error: "Only approved orders can be received by kitchen" }, { status: 400 });
     }
-  } else if (role === "KITCHEN" || role === "ADMIN") {
-    if (order.status === "SENT_TO_KITCHEN" && status === "KITCHEN_RECEIVED") {
-      order.status = status;
-      order.receivedAt = now;
-    } else {
-      return NextResponse.json({ success: false, error: "Invalid status transition for kitchen" }, { status: 400 });
+    if (!["WAITING", "RECEIVED"].includes(kitchenStatus)) {
+      return NextResponse.json({ success: false, error: "Invalid kitchenStatus" }, { status: 400 });
     }
-  } else if (role === "WAITER" && order.status === "PENDING" && status === "REJECTED") {
-    order.status = status;
+    order.kitchenStatus = kitchenStatus;
+  } else if (order.status === "PENDING" && status === "APPROVED") {
+    if (role !== "BUTCHER" && role !== "ADMIN") {
+      return NextResponse.json({ success: false, error: "Only butchers can approve" }, { status: 403 });
+    }
+    order.status = "APPROVED";
+    order.approvedAt = now;
+  } else if (order.status === "PENDING" && status === "REJECTED") {
+    if (role !== "BUTCHER" && role !== "ADMIN") {
+      return NextResponse.json({ success: false, error: "Only butchers can reject" }, { status: 403 });
+    }
+    order.status = "REJECTED";
     order.rejectedAt = now;
   } else {
-    return NextResponse.json({ success: false, error: "Unauthorized role or invalid transition" }, { status: 403 });
+    return NextResponse.json({ success: false, error: "Invalid status transition" }, { status: 400 });
   }
 
   await writeDemoJSON(DEMO_FILE, orders);

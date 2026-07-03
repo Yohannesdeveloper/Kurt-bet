@@ -33,16 +33,18 @@ export default function ButcherShopPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orderId: `order-${Date.now()}`,
-          orderNumber: 0,
-          tableNumber: tableNumber || null,
+          meatType,
           menuItemName,
+          weight: w,
           quantity,
-          orderTime: new Date().toISOString(),
+          notes: notes || "",
+          tableNumber: tableNumber || null,
         }),
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Butcher order placed!`);
+        toast.success(`Butcher order #${data.data.orderNumber} placed!`);
+        setMeatType("Beef");
         setMenuItemName("Tibs");
         setWeight("1");
         setQuantity(1);

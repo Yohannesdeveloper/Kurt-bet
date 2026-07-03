@@ -470,7 +470,14 @@ function ButcherOrderForm() {
 
   const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
   const weightPresets = [0.5, 1, 2, 3, 5];
-  const dishOptions = ["Tibs", "Kurt", "Dulet", "Tere Sega", "Gored Gored"];
+  const dishOptions = [
+    { name: "Tibs", image: "/images/tibs.jpg", description: "Sautéed meat with onions, peppers & spices" },
+    { name: "Kurt", image: "/images/kurt.jpg", description: "Ethiopian-style steak tartare" },
+    { name: "Kitfo", image: "/images/kifo.jpg", description: "Minced raw beef mitmita & niter kibbeh" },
+    { name: "Dulet", image: "/images/kurt.jpg", description: "Minced tripe, liver & lean beef" },
+    { name: "Tere Sega", image: "/images/gored gored.jpg", description: "Raw beef strips with gored-gored spices" },
+    { name: "Gored Gored", image: "/images/gored gored.jpg", description: "Cubed raw beef with awaze & spices" },
+  ];
 
   const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
   const [statusLoading, setStatusLoading] = useState(true);
@@ -594,15 +601,38 @@ function ButcherOrderForm() {
 
           <div>
             <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Dish</label>
-            <div className="flex flex-wrap gap-2">
-              {dishOptions.map((dish) => (
-                <button key={dish} onClick={() => setMenuItemName(dish)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    menuItemName === dish
-                      ? "bg-ethiopian-gold text-white shadow-md"
-                      : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+              {dishOptions.map((dish, i) => (
+                <motion.button
+                  key={dish.name}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  onClick={() => setMenuItemName(dish.name)}
+                  className={`group relative overflow-hidden rounded-xl border-2 transition-all duration-200 ${
+                    menuItemName === dish.name
+                      ? "border-ethiopian-gold ring-2 ring-ethiopian-gold/30 shadow-lg"
+                      : "border-ethiopian-gold/10 hover:border-ethiopian-gold/40 hover:shadow-md"
                   }`}
-                >{dish}</button>
+                >
+                  <div className="aspect-[4/3] overflow-hidden bg-muted">
+                    <img
+                      src={dish.image}
+                      alt={dish.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-2.5 text-left">
+                      <p className="text-white font-bold text-sm drop-shadow-sm">{dish.name}</p>
+                      <p className="text-white/70 text-[10px] leading-tight line-clamp-1">{dish.description}</p>
+                    </div>
+                  </div>
+                  {menuItemName === dish.name && (
+                    <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-ethiopian-gold rounded-full flex items-center justify-center shadow">
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                    </div>
+                  )}
+                </motion.button>
               ))}
             </div>
           </div>

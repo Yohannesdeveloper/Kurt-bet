@@ -44,10 +44,10 @@ const navItemsByRole: Record<string, NavItemType[]> = {
     { href: "/settings", label: "Settings", tKey: "nav.settings", icon: Settings },
   ],
   CLIENT: [
-    { href: "/dashboard/client", label: "Dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },
     { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },
-    { href: "/orders", label: "My Orders", tKey: "nav.myOrders", icon: ClipboardList },
-    { href: "/reservations", label: "Reservations", tKey: "nav.reservations", icon: Store },
+    { href: "/tables", label: "Tables", tKey: "nav.tables", icon: Store },
+    { href: "/kds", label: "Kitchen", tKey: "nav.kitchen", icon: CookingPot },
+    { href: "/dashboard/butcher-shop", label: "Butcher Shop", tKey: "nav.butcherShop", icon: Beef },
   ],
   BUTCHER: [
     { href: "/tables", label: "Tables", tKey: "nav.tables", icon: Store },

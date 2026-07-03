@@ -53,14 +53,11 @@ export async function POST(req: NextRequest) {
   const userName = (session?.user as { name?: string })?.name || "Unknown";
 
   const body = await req.json();
-  const { meatType, menuItemName, weight, quantity, notes, tableNumber, orderId, status } = body;
+  const { meatType, menuItemName, weight, quantity, notes, tableNumber, orderId } = body;
 
   if (!menuItemName || !quantity || quantity < 1) {
     return NextResponse.json({ success: false, error: "menuItemName and quantity (>=1) are required" }, { status: 400 });
   }
-
-  const now = new Date().toISOString();
-  const isApproved = status === "APPROVED";
 
   const orders = await readDemoJSON<ButcherOrder>(DEMO_FILE);
   const newOrder: ButcherOrder = {
@@ -75,10 +72,10 @@ export async function POST(req: NextRequest) {
     quantity: parseInt(quantity) || 1,
     tableNumber: tableNumber || null,
     notes: notes || "",
-    status: isApproved ? "APPROVED" : "PENDING",
+    status: "PENDING",
     kitchenStatus: "WAITING",
-    createdAt: now,
-    approvedAt: isApproved ? now : null,
+    createdAt: new Date().toISOString(),
+    approvedAt: null,
     rejectedAt: null,
   };
 

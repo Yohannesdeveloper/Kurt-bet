@@ -39,7 +39,6 @@ export default function ButcherShopPage() {
           quantity,
           notes: notes || "",
           tableNumber: tableNumber || null,
-          status: "APPROVED",
         }),
       });
       const data = await res.json();

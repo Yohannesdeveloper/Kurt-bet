@@ -391,7 +391,7 @@ export default function ButcherDashboardPage() {
                   </div>
                 )}
 
-                {activeTab === "status" && order.status === "PENDING" && (
+                {activeTab === "pending" && order.status === "PENDING" && (
                   <div className="flex items-center gap-2 pt-2 border-t border-ethiopian-gold/10">
                     <button
                       onClick={() => approveOrder(order)}

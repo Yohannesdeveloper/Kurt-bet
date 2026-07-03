@@ -432,22 +432,32 @@ function PopularRestaurants() {
   );
 }
 
+const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
+const weightPresets = [0.5, 1, 2, 3, 5];
+const dishOptions = ["Tibs", "Kurt", "Dulet", "Tere Sega", "Gored Gored"];
+
 function ButcherOrderForm() {
   const { data: session } = useSession();
-  const { t } = useTranslation();
+  const [meatType, setMeatType] = useState("Beef");
   const [menuItemName, setMenuItemName] = useState("Tibs");
+  const [weight, setWeight] = useState("1");
+  const [customWeight, setCustomWeight] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [tableNumber, setTableNumber] = useState("");
+  const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const butcherItems = ["Tibs", "Kurt", "Dulet", "Tere Sega", "Gored Gored"];
-
   const handleSubmit = async () => {
+    const w = parseFloat(weight);
+    if (!w || w <= 0) { toast.error("Select a weight"); return; }
     setSubmitting(true);
     try {
       const res = await fetch("/api/butcher-orders", {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orderId: `order-${Date.now()}`,
+          orderNumber: 0,
+          tableNumber: tableNumber || null,
           menuItemName,
           quantity,
           orderTime: new Date().toISOString(),
@@ -455,9 +465,12 @@ function ButcherOrderForm() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Butcher order #${data.data.orderNumber} placed!`);
+        toast.success(`Butcher order placed!`);
         setMenuItemName("Tibs");
+        setWeight("1");
         setQuantity(1);
+        setTableNumber("");
+        setNotes("");
       } else {
         toast.error(data.error || "Failed to place order");
       }
@@ -472,33 +485,81 @@ function ButcherOrderForm() {
           <Beef className="w-6 h-6" />
         </motion.div>
         <div>
-          <h2 className="text-2xl font-serif font-bold text-ethiopian-coffee">{t("butcher.title")}</h2>
-          <p className="text-xs text-ethiopian-coffee/60">{t("butcher.subtitle")}</p>
+          <h2 className="text-2xl font-serif font-bold text-ethiopian-coffee">Butcher Shop</h2>
+          <p className="text-xs text-ethiopian-coffee/60">Order raw meat for your dishes</p>
         </div>
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-ethiopian-gold/10 relative overflow-hidden">
-        <div className="absolute inset-0 pattern-overlay pointer-events-none" />
-        <div className="relative z-10">
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Menu Item</label>
+        <div className="relative z-10 space-y-6">
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Meat Type</label>
             <div className="flex flex-wrap gap-2">
-              {butcherItems.map((item) => (
-                <button key={item} onClick={() => setMenuItemName(item)}
-                  className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                    menuItemName === item
-                      ? "bg-ethiopian-clay text-white shadow-md scale-105"
-                      : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
+              {meatTypes.map((type) => (
+                <button key={type} onClick={() => setMeatType(type)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    meatType === type
+                      ? "bg-ethiopian-burgundy text-white shadow-md"
+                      : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
                   }`}
                 >
-                  {item}
+                  {type}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("butcher.quantity")}</label>
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Dish</label>
+            <div className="flex flex-wrap gap-2">
+              {dishOptions.map((dish) => (
+                <button key={dish} onClick={() => setMenuItemName(dish)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    menuItemName === dish
+                      ? "bg-ethiopian-gold text-white shadow-md"
+                      : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
+                  }`}
+                >
+                  {dish}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Weight (kg)</label>
+            <div className="flex flex-wrap gap-2">
+              {weightPresets.map((w) => (
+                <button key={w} onClick={() => { setWeight(w.toString()); setCustomWeight(false); }}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    weight === w.toString() && !customWeight
+                      ? "bg-ethiopian-burgundy text-white shadow-md"
+                      : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
+                  }`}
+                >
+                  {w} kg
+                </button>
+              ))}
+              <button onClick={() => setCustomWeight(true)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  customWeight
+                    ? "bg-ethiopian-gold text-white shadow-md"
+                    : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
+                }`}
+              >
+                Custom
+              </button>
+            </div>
+            {customWeight && (
+              <input type="number" step="0.1" min="0.1" placeholder="Enter weight in kg"
+                value={weight} onChange={(e) => setWeight(e.target.value)}
+                className="mt-2 w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none"
+              />
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Quantity</label>
             <div className="flex items-center gap-4">
               <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
                 <Minus className="w-5 h-5" />
@@ -510,8 +571,24 @@ function ButcherOrderForm() {
             </div>
           </div>
 
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-2">Table Number (optional)</label>
+            <input type="text" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)}
+              placeholder="e.g., 5"
+              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-2">Notes (optional)</label>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
+              placeholder="Any special instructions..." rows={2}
+              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none"
+            />
+          </div>
+
           <GoldButton onClick={handleSubmit} disabled={submitting}>
-            {submitting ? t("butcher.placingOrder") : `Place Order - ${quantity} x ${menuItemName}`}
+            {submitting ? "Placing..." : "Place Order"}
           </GoldButton>
         </div>
       </motion.div>

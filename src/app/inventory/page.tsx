@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -39,6 +41,11 @@ const unitOptions = ["kg", "g", "L", "mL", "pcs", "dozen", "sack", "bottle"];
 
 export default function InventoryPage() {
   const { t } = useTranslation();
+  const { data: session } = useSession();
+  const router = useRouter();
+  useEffect(() => {
+    if (session && (session.user as any)?.role !== "ADMIN") router.replace("/dashboard");
+  }, [session, router]);
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);

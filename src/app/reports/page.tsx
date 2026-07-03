@@ -1,5 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -18,6 +21,11 @@ import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 
 export default function ReportsPage() {
+  const { data: session } = useSession();
+  const router = useRouter();
+  useEffect(() => {
+    if (session && (session.user as any)?.role !== "ADMIN") router.replace("/dashboard");
+  }, [session, router]);
   const stats = [
     { label: "Total Revenue", value: formatCurrency(0), icon: TrendingUp, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
     { label: "Total Expenses", value: formatCurrency(0), icon: TrendingDown, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },

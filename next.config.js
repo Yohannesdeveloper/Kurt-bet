@@ -21,11 +21,6 @@ const nextConfig = {
   // Production optimizations
   productionBrowserSourceMaps: false,
   
-  // Compiler optimizations
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
-
   // Experimental features for performance
   experimental: {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],

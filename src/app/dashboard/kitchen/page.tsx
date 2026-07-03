@@ -13,6 +13,25 @@ const dishImages: Record<string, string> = {
   Tibs: "/images/tibs.jpg", Kurt: "/images/kurt.jpg", Kitfo: "/images/kifo.jpg",
   Dulet: "/images/kurt.jpg", "Tere Sega": "/images/gored gored.jpg", "Gored Gored": "/images/gored gored.jpg",
 };
+const dishColors: Record<string, string> = {
+  Tibs: "bg-red-600", Kurt: "bg-amber-700", Kitfo: "bg-orange-600",
+  Dulet: "bg-emerald-700", "Tere Sega": "bg-rose-700", "Gored Gored": "bg-purple-700",
+};
+function DishThumb({ name, size = "md" }: { name: string; size?: "sm" | "md" }) {
+  const dim = size === "sm" ? "w-10 h-10" : "w-12 h-12";
+  const iconDim = size === "sm" ? "text-lg" : "text-xl";
+  const color = dishColors[name] || "bg-gray-600";
+  const src = dishImages[name] || "/images/kurt.jpg";
+  const [err, setErr] = useState(false);
+  return (
+    <div className={`${dim} rounded-xl overflow-hidden flex-shrink-0 border border-ethiopian-gold/10 shadow-sm relative`}>
+      {!err && <img src={src} alt={name} className="w-full h-full object-cover absolute inset-0" onError={() => setErr(true)} />}
+      <div className={`w-full h-full ${err ? "flex" : "hidden"} items-center justify-center ${color} text-white font-bold ${iconDim}`}>
+        {name.charAt(0)}
+      </div>
+    </div>
+  );
+}
 
 type ButcherOrder = {
   id: string;
@@ -159,6 +178,7 @@ export default function KitchenDashboard() {
           <p className="text-ethiopian-coffee/60 mt-1">Manage incoming orders and kitchen queue</p>
         </div>
         <div className="flex items-center gap-2">
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-300">v3</span>
           <div className="h-2 w-2 rounded-full bg-ethiopian-gold animate-pulse" />
           <ChefHat className="h-5 w-5 text-ethiopian-gold" />
           <span className="text-sm font-medium text-ethiopian-coffee">{total} active</span>
@@ -230,13 +250,7 @@ export default function KitchenDashboard() {
               >
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-3 flex-wrap">
-                    <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-ethiopian-gold/10 shadow-sm">
-                      <img
-                        src={dishImages[order.menuItemName] || "/images/kurt.jpg"}
-                        alt={order.menuItemName}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+                    <DishThumb name={order.menuItemName} />
                     <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
                     {order.tableNumber && (
                       <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
@@ -287,10 +301,11 @@ export default function KitchenDashboard() {
                     <button
                       onClick={() => deleteButcherOrder(order.id)}
                       disabled={actionLoading === order.id}
-                      className="p-2 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 transition-all disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 transition-all disabled:opacity-50 text-sm font-medium"
                       title="Delete order"
                     >
                       {actionLoading === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                      Delete
                     </button>
                   </div>
                 </div>
@@ -341,9 +356,7 @@ export default function KitchenDashboard() {
                     <p className="text-xs font-semibold text-ethiopian-coffee/60 uppercase tracking-wider">New Orders</p>
                     {receivedOrders.map((order) => (
                       <div key={order.id} className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
-                        <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 border border-amber-200">
-                          <img src={dishImages[order.menuItemName] || "/images/kurt.jpg"} alt={order.menuItemName} className="w-full h-full object-cover" />
-                        </div>
+                        <DishThumb name={order.menuItemName} size="sm" />
                         <Beef className="w-4 h-4 text-ethiopian-burgundy flex-shrink-0" />
                         <span className="text-sm font-semibold text-ethiopian-coffee">#{order.orderNumber} {order.menuItemName}</span>
                         <span className="text-xs text-ethiopian-coffee/60">{order.meatType} · {order.weight}kg · x{order.quantity}</span>
@@ -351,10 +364,11 @@ export default function KitchenDashboard() {
                         <button
                           onClick={() => deleteButcherOrder(order.id)}
                           disabled={actionLoading === order.id}
-                          className="p-1.5 rounded-lg hover:bg-red-100 hover:text-red-500 transition-colors text-gray-400 disabled:opacity-50"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors disabled:opacity-50 text-xs font-medium"
                           title="Delete"
                         >
                           {actionLoading === order.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                          Delete
                         </button>
                       </div>
                     ))}

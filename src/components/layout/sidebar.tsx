@@ -39,6 +39,7 @@ const navItemsByRole: Record<string, NavItemType[]> = {
     { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },
     { href: "/payments", label: "Payments", tKey: "nav.payments", icon: CreditCard },
     { href: "/dashboard/butcher", label: "Butcher", tKey: "nav.butcher", icon: Beef },
+    { href: "/dashboard/butcher-shop", label: "Butcher Shop", tKey: "nav.butcherShop", icon: Beef },
     { href: "/customers", label: "Customers", tKey: "nav.customers", icon: Users },
     { href: "/reports", label: "Reports", tKey: "nav.reports", icon: BarChart3 },
     { href: "/settings", label: "Settings", tKey: "nav.settings", icon: Settings },
@@ -52,6 +53,7 @@ const navItemsByRole: Record<string, NavItemType[]> = {
   ],
   BUTCHER: [
     { href: "/dashboard/butcher", label: "Dashboard", tKey: "nav.dashboard", icon: LayoutDashboard },
+    { href: "/dashboard/butcher-shop", label: "Butcher Shop", tKey: "nav.butcherShop", icon: Beef },
     { href: "/dashboard/butcher?status=PENDING", label: "Pending Orders", tKey: "butcher.pending", icon: Beef },
     { href: "/kds", label: "Kitchen Display", tKey: "kds.title", icon: CookingPot },
     { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },

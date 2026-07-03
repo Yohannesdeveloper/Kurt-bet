@@ -288,7 +288,7 @@ export default function KitchenDashboard() {
                 );
               })}
             </div>
-            {total === 0 ? (
+            {total === 0 && receivedOrders.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-ethiopian-coffee/60">
                 <ChefHat className="h-16 w-16 mb-4 opacity-30 text-ethiopian-coffee" />
                 <p className="font-medium mb-1 text-ethiopian-coffee">No orders in queue</p>

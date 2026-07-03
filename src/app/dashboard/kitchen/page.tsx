@@ -8,7 +8,6 @@ import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
 import Link from "next/link";
 import toast from "react-hot-toast";
-import { useSession } from "next-auth/react";
 
 const dishImages: Record<string, string> = {
   Tibs: "/images/tibs.jpg", Kurt: "/images/kurt.jpg", Kitfo: "/images/kifo.jpg",
@@ -44,9 +43,6 @@ const statsConfig = {
 export default function KitchenDashboard() {
   console.log("KITCHEN DASHBOARD MOUNTED - v3");
   const { t } = useTranslation();
-  const { data: session } = useSession();
-  const userRole = (session?.user as { role?: string })?.role || "";
-  const canDelete = userRole === "ADMIN" || userRole === "KITCHEN";
   const statusLabels: Record<string, string> = {
     NEW: t("orders.pending"),
     PREPARING: t("orders.preparing"),
@@ -288,16 +284,14 @@ export default function KitchenDashboard() {
                       <Check className="w-4 h-4" />
                       {actionLoading === order.id ? "Marking..." : "Mark as Received"}
                     </button>
-                    {canDelete && (
-                      <button
-                        onClick={() => deleteButcherOrder(order.id)}
-                        disabled={actionLoading === order.id}
-                        className="p-2 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 transition-all disabled:opacity-50"
-                        title="Delete order"
-                      >
-                        {actionLoading === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                      </button>
-                    )}
+                    <button
+                      onClick={() => deleteButcherOrder(order.id)}
+                      disabled={actionLoading === order.id}
+                      className="p-2 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 transition-all disabled:opacity-50"
+                      title="Delete order"
+                    >
+                      {actionLoading === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -354,16 +348,14 @@ export default function KitchenDashboard() {
                         <span className="text-sm font-semibold text-ethiopian-coffee">#{order.orderNumber} {order.menuItemName}</span>
                         <span className="text-xs text-ethiopian-coffee/60">{order.meatType} · {order.weight}kg · x{order.quantity}</span>
                         {order.tableNumber && <span className="text-xs font-medium text-ethiopian-gold ml-auto">Table {order.tableNumber}</span>}
-                        {canDelete && (
-                          <button
-                            onClick={() => deleteButcherOrder(order.id)}
-                            disabled={actionLoading === order.id}
-                            className="p-1.5 rounded-lg hover:bg-red-100 hover:text-red-500 transition-colors text-gray-400 disabled:opacity-50"
-                            title="Delete"
-                          >
-                            {actionLoading === order.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                          </button>
-                        )}
+                        <button
+                          onClick={() => deleteButcherOrder(order.id)}
+                          disabled={actionLoading === order.id}
+                          className="p-1.5 rounded-lg hover:bg-red-100 hover:text-red-500 transition-colors text-gray-400 disabled:opacity-50"
+                          title="Delete"
+                        >
+                          {actionLoading === order.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                        </button>
                       </div>
                     ))}
                   </div>

@@ -9,6 +9,11 @@ import { useTranslation } from "@/lib/i18n";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
+const dishImages: Record<string, string> = {
+  Tibs: "/images/tibs.jpg", Kurt: "/images/kurt.jpg", Kitfo: "/images/kifo.jpg",
+  Dulet: "/images/kurt.jpg", "Tere Sega": "/images/gored gored.jpg", "Gored Gored": "/images/gored gored.jpg",
+};
+
 type ButcherOrder = {
   id: string;
   orderNumber: number;
@@ -205,6 +210,13 @@ export default function KitchenDashboard() {
               >
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-3 flex-wrap">
+                    <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-ethiopian-gold/10 shadow-sm">
+                      <img
+                        src={dishImages[order.menuItemName] || "/images/kurt.jpg"}
+                        alt={order.menuItemName}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
                     {order.tableNumber && (
                       <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
@@ -301,6 +313,9 @@ export default function KitchenDashboard() {
                     <p className="text-xs font-semibold text-ethiopian-coffee/60 uppercase tracking-wider">New Orders</p>
                     {receivedOrders.map((order) => (
                       <div key={order.id} className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
+                        <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 border border-amber-200">
+                          <img src={dishImages[order.menuItemName] || "/images/kurt.jpg"} alt={order.menuItemName} className="w-full h-full object-cover" />
+                        </div>
                         <Beef className="w-4 h-4 text-ethiopian-burgundy flex-shrink-0" />
                         <span className="text-sm font-semibold text-ethiopian-coffee">#{order.orderNumber} {order.menuItemName}</span>
                         <span className="text-xs text-ethiopian-coffee/60">{order.meatType} · {order.weight}kg · x{order.quantity}</span>

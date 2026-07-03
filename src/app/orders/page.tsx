@@ -228,6 +228,7 @@ export default function OrdersPage() {
                       isAdmin={isAdmin}
                       canApprove={canApprove}
                       onApprove={handleApprove}
+                      onDelete={(id) => setOrders(prev => prev.filter(o => o.id !== id))}
                     />
                   ))}
                 </div>
@@ -244,15 +245,37 @@ export default function OrdersPage() {
   );
 }
 
-function OrderCard({ order, index, isAdmin, canApprove, onApprove }: {
+function OrderCard({ order, index, isAdmin, canApprove, onApprove, onDelete }: {
   order: Order;
   index: number;
   isAdmin: boolean;
   canApprove: boolean;
   onApprove: (id: string, approve: boolean) => void;
+  onDelete: (id: string) => void;
 }) {
   const { t } = useTranslation();
   const [detailOpen, setDetailOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDelete = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm("Are you sure you want to delete this order?")) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/orders/${order.id}`, { method: "DELETE" });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Order deleted");
+        onDelete(order.id);
+      } else {
+        toast.error(data.error || "Failed to delete order");
+      }
+    } catch {
+      toast.error("Failed to delete order");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   return (
     <>
@@ -318,15 +341,25 @@ function OrderCard({ order, index, isAdmin, canApprove, onApprove }: {
           </div>
 
           {canApprove && (
-            <div className="px-4 pb-4 pt-0">
+            <div className="px-4 pb-4 pt-0 flex gap-2">
               <Button
                 variant={order.approved ? "outline" : "default"}
                 size="sm"
                 onClick={(e) => { e.stopPropagation(); onApprove(order.id, !order.approved); }}
-                className={`w-full h-8 text-xs ${order.approved ? "" : "bg-emerald-600 hover:bg-emerald-700 text-white"}`}
+                className={`flex-1 h-8 text-xs ${order.approved ? "" : "bg-emerald-600 hover:bg-emerald-700 text-white"}`}
               >
                 {order.approved ? t("orders.unapprove") : t("orders.approve")}
               </Button>
+              {isAdmin && (
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="p-1.5 rounded-full hover:bg-red-100 hover:text-red-500 transition-colors text-gray-400 disabled:opacity-50"
+                  title="Delete order"
+                >
+                  {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                </button>
+              )}
             </div>
           )}
         </Card>

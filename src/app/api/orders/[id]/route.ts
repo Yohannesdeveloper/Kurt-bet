@@ -59,6 +59,26 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions).catch(() => null);
+  const role = (session?.user as { role?: string })?.role;
+  if (!session?.user || role !== "ADMIN") {
+    return NextResponse.json({ success: false, error: "Only admins can delete orders" }, { status: 403 });
+  }
+
+  try {
+    await prisma.order.delete({ where: { id: params.id } });
+    return NextResponse.json({ success: true });
+  } catch {
+    const demoOrders = await readDemoJSON<any>(DEMO_FILE);
+    const idx = demoOrders.findIndex((o: any) => o.id === params.id);
+    if (idx === -1) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
+    demoOrders.splice(idx, 1);
+    await writeDemoJSON(DEMO_FILE, demoOrders);
+    return NextResponse.json({ success: true });
+  }
+}
+
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   let body: any;
   try {

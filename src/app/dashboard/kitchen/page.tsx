@@ -73,6 +73,7 @@ export default function KitchenDashboard() {
 
   const markAsReceived = async (id: string) => {
     setActionLoading(id);
+    setButcherOrders(prev => prev.map(o => o.id === id ? { ...o, kitchenStatus: "RECEIVED" as const } : o));
     try {
       const res = await fetch("/api/butcher-orders", {
         method: "PATCH",

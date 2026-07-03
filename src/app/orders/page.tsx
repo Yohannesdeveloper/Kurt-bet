@@ -739,6 +739,30 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
               <p className="text-sm text-muted-foreground">{t("orders.itemsCount", { count: cart.reduce((s, c) => s + c.quantity, 0) })}</p>
               <p className="font-semibold">{formatCurrency(subtotal)}</p>
             </div>
+
+            {cart.length > 0 && (
+              <div className="border rounded-lg p-3 space-y-2 bg-muted/30">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cart</p>
+                {cart.map(item => (
+                  <div key={item.menuItemId} className="flex items-center justify-between gap-2">
+                    <span className="text-sm truncate flex-1">{item.name}</span>
+                    <div className="flex items-center gap-1">
+                      <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQty(item.menuItemId, -1)}>
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <span className="w-5 text-center text-xs font-medium">{item.quantity}</span>
+                      <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQty(item.menuItemId, 1)}>
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                      <span className="text-xs font-medium w-14 text-right">{formatCurrency(item.totalPrice)}</span>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => updateQty(item.menuItemId, -item.quantity)} title="Remove">
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -765,12 +789,24 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
               <p className="text-sm font-medium mb-2">{t("orders.items", { count: cart.reduce((s, c) => s + c.quantity, 0) })}</p>
               <div className="space-y-2">
                 {cart.map(item => (
-                  <div key={item.menuItemId} className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-2">
-                      {item.image && <img src={item.image} alt="" className="h-7 w-7 rounded object-cover" />}
-                      {item.name} x{item.quantity}
+                  <div key={item.menuItemId} className="flex items-center justify-between text-sm gap-2">
+                    <span className="flex items-center gap-2 flex-1 min-w-0">
+                      {item.image && <img src={item.image} alt="" className="h-7 w-7 rounded object-cover flex-shrink-0" />}
+                      <span className="truncate">{item.name}</span>
                     </span>
-                    <span>{formatCurrency(item.totalPrice)}</span>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQty(item.menuItemId, -1)}>
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <span className="w-5 text-center text-xs font-medium">{item.quantity}</span>
+                      <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQty(item.menuItemId, 1)}>
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                      <span className="text-xs font-medium w-14 text-right">{formatCurrency(item.totalPrice)}</span>
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => updateQty(item.menuItemId, -item.quantity)} title="Remove">
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>

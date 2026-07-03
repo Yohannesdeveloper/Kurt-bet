@@ -435,39 +435,33 @@ function PopularRestaurants() {
 function ButcherOrderForm() {
   const { data: session } = useSession();
   const { t } = useTranslation();
-  const [meatType, setMeatType] = useState("Beef");
-  const [portionSize, setPortionSize] = useState("1/2 kg");
+  const [menuItemName, setMenuItemName] = useState("Tibs");
   const [quantity, setQuantity] = useState(1);
-  const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
-  const portionOptions = ["1/3 kg", "1/2 kg", "1 kg", "2 kg", "3 kg", "5 kg"];
-  const meatPrices: Record<string, Record<string, number>> = {
-    Beef: { "1/3 kg": 250, "1/2 kg": 350, "1 kg": 650, "2 kg": 1200, "3 kg": 1700, "5 kg": 2500 },
-    Lamb: { "1/3 kg": 280, "1/2 kg": 400, "1 kg": 750, "2 kg": 1400, "3 kg": 2000, "5 kg": 3000 },
-    Goat: { "1/3 kg": 300, "1/2 kg": 420, "1 kg": 800, "2 kg": 1500, "3 kg": 2200, "5 kg": 3500 },
-    Chicken: { "1/3 kg": 180, "1/2 kg": 250, "1 kg": 450, "2 kg": 850, "3 kg": 1200, "5 kg": 1800 },
-  };
-
-  const unitPrice = meatPrices[meatType]?.[portionSize] || 0;
-  const total = unitPrice * quantity;
+  const butcherItems = ["Tibs", "Kurt", "Dulet", "Tere Sega", "Gored Gored"];
 
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
       const res = await fetch("/api/butcher-orders", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ meatType, portionSize, quantity, notes }),
+        body: JSON.stringify({
+          orderId: `order-${Date.now()}`,
+          menuItemName,
+          quantity,
+          orderTime: new Date().toISOString(),
+        }),
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(t("butcher.orderPlaced", { orderNumber: data.data.orderNumber }));
-        setMeatType("Beef"); setPortionSize("1/2 kg"); setQuantity(1); setNotes("");
+        toast.success(`Butcher order #${data.data.orderNumber} placed!`);
+        setMenuItemName("Tibs");
+        setQuantity(1);
       } else {
-        toast.error(data.error || t("butcher.failedToPlace"));
+        toast.error(data.error || "Failed to place order");
       }
-    } catch { toast.error(t("butcher.failedToPlace")); }
+    } catch { toast.error("Failed to place order"); }
     finally { setSubmitting(false); }
   };
 
@@ -487,76 +481,37 @@ function ButcherOrderForm() {
         <div className="absolute inset-0 pattern-overlay pointer-events-none" />
         <div className="relative z-10">
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("butcher.selectMeatType")}</label>
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Menu Item</label>
             <div className="flex flex-wrap gap-2">
-              {meatTypes.map((type) => (
-                <button key={type} onClick={() => { setMeatType(type); setPortionSize("1/2 kg"); }}
+              {butcherItems.map((item) => (
+                <button key={item} onClick={() => setMenuItemName(item)}
                   className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                    meatType === type
+                    menuItemName === item
                       ? "bg-ethiopian-clay text-white shadow-md scale-105"
                       : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
                   }`}
                 >
-                  {t(`butcher.meat${type}`)}
+                  {item}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("butcher.portionSize")}</label>
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-              {portionOptions.map((size) => {
-                const price = meatPrices[meatType]?.[size] || 0;
-                return (
-                  <button key={size} onClick={() => setPortionSize(size)}
-                    className={`flex flex-col items-center px-3 py-3 rounded-xl text-sm font-medium transition-all ${
-                      portionSize === size
-                        ? "bg-ethiopian-gold text-white shadow-md scale-105 border-2 border-ethiopian-gold"
-                        : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border-2 border-transparent"
-                    }`}
-                  >
-                    <span>{size}</span>
-                    <span className={`text-xs mt-1 ${portionSize === size ? "text-white/80" : "text-ethiopian-gold"}`}>ETB {price}</span>
-                  </button>
-                );
-              })}
+            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("butcher.quantity")}</label>
+            <div className="flex items-center gap-4">
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
+                <Minus className="w-5 h-5" />
+              </button>
+              <span className="text-3xl font-bold text-ethiopian-gold min-w-[3rem] text-center">{quantity}</span>
+              <button onClick={() => setQuantity(Math.min(20, quantity + 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
+                <Plus className="w-5 h-5" />
+              </button>
             </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-            <div>
-              <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("butcher.quantity")}</label>
-              <div className="flex items-center gap-4">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
-                  <Minus className="w-5 h-5" />
-                </button>
-                <span className="text-3xl font-bold text-ethiopian-gold min-w-[3rem] text-center">{quantity}</span>
-                <button onClick={() => setQuantity(Math.min(20, quantity + 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
-                  <Plus className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("butcher.total")}</label>
-              <div className="p-4 rounded-xl bg-gradient-to-r from-ethiopian-coffee to-ethiopian-charcoal text-white">
-                <p className="text-xs opacity-80">{quantity} x {portionSize} {t(`butcher.meat${meatType}`)}</p>
-                <p className="text-2xl font-bold font-serif">ETB {total.toLocaleString()}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">{t("butcher.specialInstructions")}</label>
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
-              placeholder={t("butcher.instructionsPlaceholder")}
-              className="w-full px-4 py-3 rounded-xl bg-ethiopian-cream text-ethiopian-coffee placeholder:text-ethiopian-coffee/40 text-sm border border-transparent focus:border-ethiopian-gold focus:outline-none transition-all resize-none"
-              rows={3}
-            />
           </div>
 
           <GoldButton onClick={handleSubmit} disabled={submitting}>
-            {submitting ? t("butcher.placingOrder") : t("butcher.placeOrderWithTotal", { total: total.toLocaleString() })}
+            {submitting ? t("butcher.placingOrder") : `Place Order - ${quantity} x ${menuItemName}`}
           </GoldButton>
         </div>
       </motion.div>

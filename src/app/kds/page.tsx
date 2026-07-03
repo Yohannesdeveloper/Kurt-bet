@@ -5,11 +5,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { ArrowLeft, CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat, Beef, CheckCircle, Sparkles } from "lucide-react";
+import { ArrowLeft, CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, ChefHat, Beef, CheckCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
-import { EthiopianCornerSet } from "@/components/shared/ethiopian-patterns";
 
 interface OrderItem {
   id: string;
@@ -150,16 +149,19 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
   );
 });
 
-interface ButcherOrder {
+type ButcherOrder = {
   id: string;
   orderNumber: number;
-  customerName: string;
-  meatType: string;
-  portionSize: string;
+  menuItemName: string;
   quantity: number;
-  notes: string;
-  status: string;
-}
+  meatWeightKg: number | null;
+  preparationNotes: string;
+  tableNumber: string | null;
+  status: "PENDING" | "APPROVED";
+  approvedAt: string | null;
+  orderTime: string;
+  kitchenStatus: "WAITING" | "RECEIVED";
+};
 
 export default function KDSPage() {
   const { t } = useTranslation();
@@ -177,7 +179,7 @@ export default function KDSPage() {
   }, []);
 
   const fetchButcherOrders = useCallback(() => {
-    fetch("/api/butcher-orders?status=SENT_TO_KITCHEN")
+    fetch("/api/butcher-orders?status=APPROVED")
       .then(r => r.json())
       .then(d => {
         if (d.success) setButcherOrders(d.data);
@@ -201,16 +203,16 @@ export default function KDSPage() {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
   };
 
-  const handleButcherStatus = async (id: string, newStatus: string) => {
+  const handleButcherReceived = async (id: string) => {
     try {
       const res = await fetch("/api/butcher-orders", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status: newStatus }),
+        body: JSON.stringify({ id, kitchenStatus: "RECEIVED" }),
       });
       const d = await res.json();
       if (d.success) {
-        toast.success(`Butcher order #${d.data.orderNumber} updated`);
+        toast.success(`Butcher order #${d.data.orderNumber} received`);
         fetchButcherOrders();
       }
     } catch {}
@@ -324,23 +326,28 @@ export default function KDSPage() {
                                 <Badge variant="outline" className="text-xs text-ethiopian-clay border-ethiopian-clay/30">{t("kds.butcher")}</Badge>
                               </div>
                               <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60">
-                                <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{t("butcher.sentToKitchen")}</span>
-                                <span>{bo.customerName}</span>
+                                <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(bo.orderTime)}</span>
+                                {bo.tableNumber && <span>Table {bo.tableNumber}</span>}
                               </div>
                             </div>
                           </div>
                           <div className="space-y-1 mb-3">
                             <div className="flex items-center gap-2 text-sm">
-                              <span className="font-medium text-ethiopian-clay">{bo.meatType}</span>
-                              <span className="text-ethiopian-coffee/50">· {bo.portionSize}</span>
+                              <span className="font-medium text-ethiopian-clay">{bo.menuItemName}</span>
                               <span className="font-semibold text-ethiopian-coffee">×{bo.quantity}</span>
+                              {bo.meatWeightKg && <span className="text-ethiopian-coffee/50">· {bo.meatWeightKg} kg</span>}
                             </div>
-                            {bo.notes && <p className="text-xs text-ethiopian-coffee/50 italic">"{bo.notes}"</p>}
+                            {bo.preparationNotes && <p className="text-xs text-ethiopian-coffee/50 italic">"{bo.preparationNotes}"</p>}
                           </div>
                           <div className="flex items-center gap-2 pt-2 border-t border-ethiopian-gold/10">
-                            <Button size="sm" variant="premium" onClick={() => handleButcherStatus(bo.id, "KITCHEN_RECEIVED")} className="h-8 text-xs gap-1">
-                              <CheckCircle className="h-3 w-3" /> {t("kds.received")}
-                            </Button>
+                            {bo.kitchenStatus === "WAITING" && (
+                              <Button size="sm" variant="premium" onClick={() => handleButcherReceived(bo.id)} className="h-8 text-xs gap-1">
+                                <CheckCircle className="h-3 w-3" /> {t("kds.received")}
+                              </Button>
+                            )}
+                            {bo.kitchenStatus === "RECEIVED" && (
+                              <Badge variant="secondary" className="text-xs">Received</Badge>
+                            )}
                           </div>
                         </CardContent>
                       </Card>

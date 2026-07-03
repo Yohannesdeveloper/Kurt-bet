@@ -6,24 +6,25 @@ import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
 const DEMO_FILE = ".demo-butcher-orders.json";
 
 type ButcherOrderItem = {
-  meatType: string;
-  portionSize: string;
+  menuItemId: string;
+  menuItemName: string;
   quantity: number;
-  dish: string; // Purpose of the meat (e.g., "kitfo", "tibs")
+  dish: string;
 };
 
 type ButcherOrder = {
   id: string;
   orderNumber: number;
+  orderId?: string;
+  tableNumber?: string;
   customerName: string;
   customerId: string;
-  items: ButcherOrderItem[]; // Array of items instead of single fields
-  notes: string;
-  status: "PENDING" | "WAITER_APPROVED" | "BUTCHER_PREPARING" | "BUTCHER_APPROVED" | "SENT_TO_KITCHEN" | "KITCHEN_RECEIVED" | "REJECTED";
+  items: ButcherOrderItem[];
+  preparationNotes: string;
+  meatWeightKg?: number;
+  status: "PENDING" | "SENT_TO_KITCHEN" | "KITCHEN_RECEIVED" | "REJECTED";
   createdAt: string;
-  waiterApprovedAt?: string;
-  butcherPreparingAt?: string;
-  butcherApprovedAt?: string;
+  approvedAt?: string;
   sentToKitchenAt?: string;
   receivedAt?: string;
   rejectedAt?: string;
@@ -44,7 +45,8 @@ export async function GET(req: NextRequest) {
 
   let orders = await readDemoJSON<ButcherOrder>(DEMO_FILE);
   if (status && status !== "all") {
-    orders = orders.filter((o) => o.status === status);
+    const statuses = status.split(",");
+    orders = orders.filter((o) => statuses.includes(o.status));
   }
   orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   return NextResponse.json({ success: true, data: orders });
@@ -57,16 +59,15 @@ export async function POST(req: NextRequest) {
   const userName = (session?.user as { name?: string })?.name || "Unknown";
 
   const body = await req.json();
-  const { items, notes } = body;
+  const { items, preparationNotes, orderId, tableNumber } = body;
 
   if (!items || !Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ success: false, error: "At least one item is required" }, { status: 400 });
   }
 
-  // Validate each item
   for (const item of items) {
-    if (!item.meatType || !item.portionSize || !item.quantity || !item.dish) {
-      return NextResponse.json({ success: false, error: "Each item requires meatType, portionSize, quantity, and dish" }, { status: 400 });
+    if (!item.menuItemId || !item.menuItemName || !item.quantity) {
+      return NextResponse.json({ success: false, error: "Each item requires menuItemId, menuItemName, and quantity" }, { status: 400 });
     }
   }
 
@@ -74,10 +75,17 @@ export async function POST(req: NextRequest) {
   const newOrder: ButcherOrder = {
     id: generateId(),
     orderNumber: getNextNumber(orders),
+    orderId: orderId || undefined,
+    tableNumber: tableNumber || undefined,
     customerName: userName,
     customerId: userId,
-    items,
-    notes: notes || "",
+    items: items.map((item: any) => ({
+      menuItemId: item.menuItemId,
+      menuItemName: item.menuItemName,
+      quantity: item.quantity,
+      dish: item.dish || "",
+    })),
+    preparationNotes: preparationNotes || "",
     status: "PENDING",
     createdAt: new Date().toISOString(),
   };
@@ -94,15 +102,14 @@ export async function PATCH(req: NextRequest) {
   }
 
   const role = (session.user as { role?: string }).role;
-
   const body = await req.json();
-  const { id, status } = body;
+  const { id, status, preparationNotes, meatWeightKg } = body;
 
   if (!id || !status) {
     return NextResponse.json({ success: false, error: "id and status are required" }, { status: 400 });
   }
 
-  const validStatuses = ["PENDING", "WAITER_APPROVED", "BUTCHER_PREPARING", "BUTCHER_APPROVED", "SENT_TO_KITCHEN", "KITCHEN_RECEIVED", "REJECTED"];
+  const validStatuses = ["PENDING", "SENT_TO_KITCHEN", "KITCHEN_RECEIVED", "REJECTED"];
   if (!validStatuses.includes(status)) {
     return NextResponse.json({ success: false, error: "Invalid status" }, { status: 400 });
   }
@@ -116,45 +123,31 @@ export async function PATCH(req: NextRequest) {
   const order = orders[index];
   const now = new Date().toISOString();
 
-  // Role-based status transition checks
-  if (role === "WAITER" || role === "ADMIN") {
-    // Waiter can only approve pending orders
-    if (order.status === "PENDING" && status === "WAITER_APPROVED") {
+  if (role === "BUTCHER" || role === "ADMIN") {
+    if (order.status === "PENDING" && status === "SENT_TO_KITCHEN") {
       order.status = status;
-      order.waiterApprovedAt = now;
+      order.sentToKitchenAt = now;
+      order.approvedAt = now;
+      if (meatWeightKg !== undefined) order.meatWeightKg = meatWeightKg;
+      if (preparationNotes !== undefined) order.preparationNotes = preparationNotes;
     } else if (order.status === "PENDING" && status === "REJECTED") {
       order.status = status;
       order.rejectedAt = now;
     } else {
-      return NextResponse.json({ success: false, error: "Invalid status transition for waiter" }, { status: 400 });
-    }
-  } else if (role === "BUTCHER" || role === "ADMIN") {
-    // Butcher can process orders after waiter approval
-    if (order.status === "WAITER_APPROVED" && status === "BUTCHER_PREPARING") {
-      order.status = status;
-      order.butcherPreparingAt = now;
-    } else if (order.status === "BUTCHER_PREPARING" && status === "BUTCHER_APPROVED") {
-      order.status = status;
-      order.butcherApprovedAt = now;
-    } else if (order.status === "BUTCHER_APPROVED" && status === "SENT_TO_KITCHEN") {
-      order.status = status;
-      order.sentToKitchenAt = now;
-    } else if (order.status === "WAITER_APPROVED" && status === "REJECTED") {
-      order.status = status;
-      order.rejectedAt = now;
-    } else {
-      return NextResponse.json({ success: false, error: "Invalid status transition for butcher" }, { status: 400 });
+      return NextResponse.json({ success: false, error: "Invalid status transition" }, { status: 400 });
     }
   } else if (role === "KITCHEN" || role === "ADMIN") {
-    // Kitchen can receive orders
     if (order.status === "SENT_TO_KITCHEN" && status === "KITCHEN_RECEIVED") {
       order.status = status;
       order.receivedAt = now;
     } else {
       return NextResponse.json({ success: false, error: "Invalid status transition for kitchen" }, { status: 400 });
     }
+  } else if (role === "WAITER" && order.status === "PENDING" && status === "REJECTED") {
+    order.status = status;
+    order.rejectedAt = now;
   } else {
-    return NextResponse.json({ success: false, error: "Unauthorized role" }, { status: 403 });
+    return NextResponse.json({ success: false, error: "Unauthorized role or invalid transition" }, { status: 403 });
   }
 
   await writeDemoJSON(DEMO_FILE, orders);

@@ -5,18 +5,21 @@ export const demoCategories = [
   { id: "yefsig", name: "የፍስግ (Yefsig)", sortOrder: 1, isActive: true },
 ];
 
+// Butcher required menu items (must go to butcher first)
+export const BUTCHER_REQUIRED_ITEMS = ["Tibs", "Kurt", "Dulet", "Tere Sega", "Gored Gored"];
+
 export const demoItems = [
   // YEFSIG items (non-vegetarian)
-  { id: "item-1", name: "Kurt (ቁርጥ)", price: 350, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Fresh raw beef cubes seasoned with mitmita and niter kibbeh — our signature dish", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/kurt.jpg" },
-  { id: "item-2", name: "Kitfo (ክትፎ)", price: 300, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Minced raw beef marinated in mitmita, niter kibbeh and cardamom", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/kifo.jpg" },
-  { id: "item-3", name: "Gored Gored (ጎረድ ጎረድ)", price: 320, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Large cubes of raw beef served with awaze dipping sauce", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/gored gored.jpg" },
-  { id: "item-4", name: "Zelzl Sega (ዝልዝል ሥጋ)", price: 400, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Thinly sliced raw beef strips seasoned with traditional spices", isAvailable: true, preparationTime: 5, variants: [], extras: [], image: "/images/zilzil tibs.jpg" },
-  { id: "item-5", name: "Tibs (ጥብስ)", price: 280, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Sautéed beef with onions, jalapeños, tomatoes and rosemary", isAvailable: true, preparationTime: 18, variants: [], extras: [], image: "/images/tibs.jpg" },
-  { id: "item-6", name: "Awaze Tibs (አዋዜ ጥብስ)", price: 300, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Beef tibs simmered in spicy awaze sauce", isAvailable: true, preparationTime: 20, variants: [], extras: [], image: "/images/Awaze Tibs.jpg" },
-  { id: "item-7", name: "Zilzil Tibs (ዝልዝል ጥብስ)", price: 320, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Thinly sliced beef strips sautéed with garlic and peppers", isAvailable: true, preparationTime: 18, variants: [], extras: [], image: "/images/zilzil tibs.jpg" },
-  { id: "item-8", name: "Shekla Tibs (ሸክላ ጥብስ)", price: 380, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Beef tibs served sizzling in a traditional clay pot", isAvailable: true, preparationTime: 25, variants: [], extras: [] },
-  { id: "item-9", name: "Dulet (ዱለት)", price: 200, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Minced tripe, liver and beef sautéed with onions and mitmita", isAvailable: true, preparationTime: 15, variants: [], extras: [] },
-  { id: "item-10", name: "Lamb Tibs", price: 350, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Tender lamb cubes sautéed with rosemary and garlic", isAvailable: true, preparationTime: 20, variants: [], extras: [] },
+  { id: "item-1", name: "Kurt (ቁርጥ)", price: 350, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Fresh raw beef cubes seasoned with mitmita and niter kibbeh — our signature dish", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/kurt.jpg", requiresButcher: true },
+  { id: "item-2", name: "Kitfo (ክትፎ)", price: 300, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Minced raw beef marinated in mitmita, niter kibbeh and cardamom", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/kifo.jpg", requiresButcher: true },
+  { id: "item-3", name: "Gored Gored (ጎረድ ጎረድ)", price: 320, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Large cubes of raw beef served with awaze dipping sauce", isAvailable: true, preparationTime: 8, variants: [], extras: [], image: "/images/gored gored.jpg", requiresButcher: true },
+  { id: "item-4", name: "Tere Sega (ጠረ ስጋ)", price: 400, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Thinly sliced raw beef strips seasoned with traditional spices", isAvailable: true, preparationTime: 5, variants: [], extras: [], image: "/images/zilzil tibs.jpg", requiresButcher: true },
+  { id: "item-5", name: "Tibs (ጥብስ)", price: 280, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Sautéed beef with onions, jalapeños, tomatoes and rosemary", isAvailable: true, preparationTime: 18, variants: [], extras: [], image: "/images/tibs.jpg", requiresButcher: true },
+  { id: "item-6", name: "Awaze Tibs (አዋዜ ጥብስ)", price: 300, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Beef tibs simmered in spicy awaze sauce", isAvailable: true, preparationTime: 20, variants: [], extras: [], image: "/images/Awaze Tibs.jpg", requiresButcher: true },
+  { id: "item-7", name: "Zilzil Tibs (ዝልዝል ጥብስ)", price: 320, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Thinly sliced beef strips sautéed with garlic and peppers", isAvailable: true, preparationTime: 18, variants: [], extras: [], image: "/images/zilzil tibs.jpg", requiresButcher: true },
+  { id: "item-8", name: "Shekla Tibs (ሸክላ ጥብስ)", price: 380, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Beef tibs served sizzling in a traditional clay pot", isAvailable: true, preparationTime: 25, variants: [], extras: [], requiresButcher: true },
+  { id: "item-9", name: "Dulet (ዱለት)", price: 200, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Minced tripe, liver and beef sautéed with onions and mitmita", isAvailable: true, preparationTime: 15, variants: [], extras: [], requiresButcher: true },
+  { id: "item-10", name: "Lamb Tibs", price: 350, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Tender lamb cubes sautéed with rosemary and garlic", isAvailable: true, preparationTime: 20, variants: [], extras: [], requiresButcher: true },
   { id: "item-11", name: "Asa Tibs (ዓሣ ጥብስ)", price: 280, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Pan-fried tilapia with onions, tomatoes and herbs", isAvailable: true, preparationTime: 18, variants: [], extras: [] },
   { id: "item-48", name: "Yeheb Gorrod (የሀብ ጎረድ)", price: 380, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Grilled lamb ribs seasoned with Ethiopian spices", isAvailable: true, preparationTime: 25, variants: [], extras: [] },
   { id: "item-52", name: "Beyaynetu (በያይነቱ)", price: 500, categoryId: "yefsig", category: { id: "yefsig", name: "የፍስግ (Yefsig)" }, description: "Ethiopian combination platter — sample of tibs, kitfo, doro wat and vegetarian dishes", isAvailable: true, preparationTime: 30, variants: [], extras: [] },
@@ -74,7 +77,7 @@ export async function ensureDemoItemsSeeded() {
   const persistedIds = new Set(persisted.map((pi: any) => pi.id));
   const hasStaleHardcoded = persisted.some((pi: any) => {
     const hc = hcIndex.get(pi.id);
-    return hc && (hc.price !== pi.price || hc.name !== pi.name || hc.image !== pi.image || hc.categoryId !== pi.categoryId);
+    return hc && (hc.price !== pi.price || hc.name !== pi.name || hc.image !== pi.image || hc.categoryId !== pi.categoryId || hc.requiresButcher !== pi.requiresButcher);
   });
   const missingHardcoded = demoItems.some((di: any) => !persistedIds.has(di.id));
 
@@ -85,6 +88,7 @@ export async function ensureDemoItemsSeeded() {
       ...ui,
       categoryId: ui.categoryId || "yefsig",
       category: ui.category || { id: ui.categoryId || "yefsig", name: demoCategories.find(c => c.id === (ui.categoryId || "yefsig"))?.name || "የፍስግ (Yefsig)" },
+      requiresButcher: ui.requiresButcher ?? false,
     }));
     await writeDemoJSON(".demo-menu-items.json", [...demoItems.map((di: any) => ({ ...di })), ...updatedUserItems]);
   }

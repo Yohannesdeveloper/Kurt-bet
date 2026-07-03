@@ -5,6 +5,8 @@ import { authOptions, requireOwner } from "@/lib/auth";
 import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
 
 const DEMO_FILE = ".demo-orders.json";
+const BUTCHER_ORDERS_FILE = ".demo-butcher-orders.json";
+const BUTCHER_ITEM_KEYWORDS = ["tibs", "kurt", "dulet", "tere sega", "tere siga", "gored gored"];
 
 export async function GET(req: NextRequest) {
   let status: string | null = null;
@@ -217,6 +219,36 @@ export async function POST(req: NextRequest) {
     };
     demoOrders.unshift(demoOrder);
     await writeDemoJSON(DEMO_FILE, demoOrders);
+
+    // Auto-create butcher orders for items that need raw meat prep
+    const butcherItems = (body?.items || []).filter((item: any) => {
+      const name = (item.name || "").toLowerCase();
+      return BUTCHER_ITEM_KEYWORDS.some((kw) => name.includes(kw));
+    });
+    if (butcherItems.length > 0) {
+      const butcherOrders = await readDemoJSON<any>(BUTCHER_ORDERS_FILE);
+      const nextButcherNumber = butcherOrders.length > 0 ? Math.max(...butcherOrders.map((o: any) => o.orderNumber)) + 1 : 1001;
+      const tableNumber = body?.tableNumber || undefined;
+      const newButcherOrders = butcherItems.map((item: any, i: number) => ({
+        id: `butcher-${demoOrder.id}-${i}`,
+        orderNumber: nextButcherNumber + i,
+        orderId: demoOrder.id,
+        tableNumber,
+        customerName: (session?.user as { name?: string })?.name || "Unknown",
+        customerId: (session?.user as { id?: string })?.id || "anonymous",
+        items: [{
+          menuItemId: item.menuItemId,
+          menuItemName: item.name,
+          quantity: item.quantity || 1,
+          dish: item.name,
+        }],
+        preparationNotes: item.cookingNotes || item.instructions || "",
+        status: "PENDING",
+        createdAt: new Date().toISOString(),
+      }));
+      await writeDemoJSON(BUTCHER_ORDERS_FILE, [...butcherOrders, ...newButcherOrders]);
+    }
+
     return NextResponse.json({ success: true, data: demoOrder }, { status: 201 });
   }
 }

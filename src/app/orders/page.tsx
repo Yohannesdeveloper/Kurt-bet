@@ -65,6 +65,7 @@ interface MenuItem {
   categoryId: string;
   image?: string;
   isAvailable?: boolean;
+  requiresButcher?: boolean;
 }
 
 interface TableOption {
@@ -561,9 +562,29 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(t("orders.created", { orderNumber: data.data.orderNumber }));
+        const order = data.data;
+        const table = tables.find(t => t.id === tableId);
+        // Create butcher orders for any items that require butcher processing
+        for (const cartItem of cart) {
+          const menuItem = menuItems.find(m => m.id === cartItem.menuItemId);
+          if (menuItem?.requiresButcher) {
+            await fetch("/api/butcher-orders", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                orderId: order.id,
+                orderNumber: order.orderNumber,
+                tableNumber: table?.number?.toString() || null,
+                menuItemName: cartItem.name,
+                quantity: cartItem.quantity,
+                orderTime: order.createdAt || new Date().toISOString(),
+              }),
+            });
+          }
+        }
+        toast.success(t("orders.created", { orderNumber: order.orderNumber }));
         onOpenChange(false);
-        onOrderCreated(data.data);
+        onOrderCreated(order);
       } else {
         toast.error(data.error || t("orders.createFailed"));
       }

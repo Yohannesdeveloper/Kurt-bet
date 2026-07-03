@@ -9,37 +9,19 @@ import { useTranslation } from "@/lib/i18n";
 import Link from "next/link";
 import toast from "react-hot-toast";
 
-type ButcherOrderItem = {
-  meatType: string;
-  portionSize: string;
-  quantity: number;
-  dish: string;
-};
-
 type ButcherOrder = {
   id: string;
+  orderId: string;
   orderNumber: number;
-  customerName: string;
-  items: ButcherOrderItem[];
-  notes: string;
-  status: "PENDING" | "WAITER_APPROVED" | "BUTCHER_PREPARING" | "BUTCHER_APPROVED" | "SENT_TO_KITCHEN" | "KITCHEN_RECEIVED" | "REJECTED";
-  createdAt: string;
-  waiterApprovedAt?: string;
-  butcherPreparingAt?: string;
-  butcherApprovedAt?: string;
-  sentToKitchenAt?: string;
-  receivedAt?: string;
-  rejectedAt?: string;
-};
-
-const statusColors: Record<string, string> = {
-  SENT_TO_KITCHEN: "bg-cyan-100 text-cyan-800 border-cyan-300",
-  KITCHEN_RECEIVED: "bg-emerald-100 text-emerald-800 border-emerald-300",
-};
-
-const statusLabel: Record<string, string> = {
-  SENT_TO_KITCHEN: "Sent to Kitchen",
-  KITCHEN_RECEIVED: "Kitchen Received",
+  tableNumber: string | null;
+  menuItemName: string;
+  quantity: number;
+  status: "PENDING" | "APPROVED";
+  orderTime: string;
+  meatWeightKg: number | null;
+  preparationNotes: string;
+  approvedAt: string | null;
+  kitchenStatus: "WAITING" | "RECEIVED";
 };
 
 const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
@@ -76,7 +58,7 @@ export default function KitchenDashboard() {
         }
       })
       .catch(() => {});
-    fetch("/api/butcher-orders?status=SENT_TO_KITCHEN,KITCHEN_RECEIVED")
+    fetch("/api/butcher-orders?status=APPROVED")
       .then(r => r.json())
       .then(d => { if (d.success) setButcherOrders(d.data); })
       .catch(() => {});
@@ -88,17 +70,17 @@ export default function KitchenDashboard() {
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  const updateStatus = async (id: string, status: string) => {
+  const markAsReceived = async (id: string) => {
     setActionLoading(id);
     try {
       const res = await fetch("/api/butcher-orders", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status }),
+        body: JSON.stringify({ id, kitchenStatus: "RECEIVED" }),
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Order #${data.data.orderNumber} marked as received`);
+        toast.success(`Butcher order marked as received`);
         fetchData();
       } else {
         toast.error(data.error || "Action failed");
@@ -110,8 +92,9 @@ export default function KitchenDashboard() {
     }
   };
 
+  const waitingOrders = butcherOrders.filter(o => o.kitchenStatus === "WAITING");
+  const receivedOrders = butcherOrders.filter(o => o.kitchenStatus === "RECEIVED");
   const total = Object.values(counts).reduce((a, b) => a + b, 0) + butcherOrders.length;
-  const butcherCount = butcherOrders.filter(o => o.status === "SENT_TO_KITCHEN").length;
 
   return (
     <div className="space-y-8">
@@ -153,7 +136,6 @@ export default function KitchenDashboard() {
             </motion.div>
           );
         })}
-        {/* Butcher stat */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -167,7 +149,7 @@ export default function KitchenDashboard() {
                 </div>
               </div>
               <p className="text-xs lg:text-sm text-ethiopian-coffee/60 font-medium mb-1">{t("dashboard.butcherOrders")}</p>
-              <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee">{butcherCount}</p>
+              <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee">{waitingOrders.length}</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -186,70 +168,57 @@ export default function KitchenDashboard() {
                 className="bg-white rounded-2xl shadow-md border border-ethiopian-gold/10 hover:shadow-xl hover:border-ethiopian-gold/20 transition-all duration-300 p-5"
               >
                 <div className="flex flex-col gap-4">
-                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
-                        <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusColors[order.status]}`}>
-                          {statusLabel[order.status]}
-                        </span>
-                        <span className="text-sm text-ethiopian-coffee/60 flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5" />
-                          {new Date(order.createdAt).toLocaleString()}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="text-xs text-ethiopian-coffee/40">Customer</p>
-                        <p className="text-sm font-semibold text-ethiopian-coffee">{order.customerName}</p>
-                      </div>
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
+                    {order.tableNumber && (
+                      <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                    )}
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
+                      order.kitchenStatus === "WAITING"
+                        ? "bg-amber-100 text-amber-800 border-amber-300"
+                        : "bg-emerald-100 text-emerald-800 border-emerald-300"
+                    }`}>
+                      {order.kitchenStatus === "WAITING" ? "Waiting" : "Received"}
+                    </span>
+                    <span className="text-sm text-ethiopian-coffee/60 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      {order.approvedAt ? new Date(order.approvedAt).toLocaleString() : ""}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20">
+                    <div>
+                      <p className="text-xs text-ethiopian-coffee/40">Menu Item</p>
+                      <p className="text-sm font-semibold text-ethiopian-coffee">{order.menuItemName}</p>
                     </div>
-                  </div>
-
-                  {/* Items List */}
-                  <div className="space-y-3">
-                    {(order.items || []).map((item, index) => (
-                      <div key={index} className="p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20">
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                          <div>
-                            <p className="text-xs text-ethiopian-coffee/40">Dish</p>
-                            <p className="text-sm font-semibold text-ethiopian-gold">{item.dish}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
-                            <p className="text-sm font-semibold text-ethiopian-burgundy">{item.meatType}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-ethiopian-coffee/40">Portion</p>
-                            <p className="text-sm font-semibold text-ethiopian-gold">{item.portionSize}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
-                            <p className="text-sm font-semibold text-ethiopian-coffee">x{item.quantity}</p>
-                          </div>
-                        </div>
+                    <div>
+                      <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
+                      <p className="text-sm font-semibold text-ethiopian-coffee">x{order.quantity}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-ethiopian-coffee/40">Meat Weight</p>
+                      <p className="text-sm font-semibold text-ethiopian-burgundy">{order.meatWeightKg} kg</p>
+                    </div>
+                    {order.preparationNotes && (
+                      <div>
+                        <p className="text-xs text-ethiopian-coffee/40">Notes</p>
+                        <p className="text-sm font-semibold text-ethiopian-coffee">{order.preparationNotes}</p>
                       </div>
-                    ))}
+                    )}
                   </div>
 
-                  {order.notes && (
-                    <p className="text-sm text-ethiopian-coffee/70 italic">
-                      "{order.notes}"
-                    </p>
-                  )}
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {order.status === "SENT_TO_KITCHEN" && (
+                  {order.kitchenStatus === "WAITING" && (
+                    <div className="flex items-center gap-2">
                       <button
-                        onClick={() => updateStatus(order.id, "KITCHEN_RECEIVED")}
+                        onClick={() => markAsReceived(order.id)}
                         disabled={actionLoading === order.id}
                         className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-all disabled:opacity-50"
                       >
                         <Check className="w-4 h-4" />
-                        Mark as Received
+                        {actionLoading === order.id ? "Marking..." : "Mark as Received"}
                       </button>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
               </motion.div>
             ))}

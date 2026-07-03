@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, type CSSProperties } from "react";
+import { useState, useEffect, useRef, useCallback, type CSSProperties } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
   Search, ShoppingCart, User, MapPin, Star, Clock,
@@ -8,7 +8,7 @@ import {
   Heart, Percent, Menu, X, ChevronLeft,
   ChevronRight as ChevronRightIcon, Sparkles, Flame,
   Zap, TrendingUp, Store, CookingPot, ClipboardList, Users, LogOut,
-  Beef, Check, XCircle, Send, Minus, Plus, Gem, Award
+  Beef, Check, XCircle, Send, Minus, Plus, Gem, Award, Package
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
@@ -436,8 +436,29 @@ function PopularRestaurants() {
   );
 }
 
+type ButcherOrder = {
+  id: string;
+  orderNumber: number;
+  orderId?: string;
+  customerName: string;
+  customerId: string;
+  meatType: string;
+  menuItemName: string;
+  weight: number;
+  quantity: number;
+  tableNumber: string | null;
+  notes: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  createdAt: string;
+  approvedAt: string | null;
+  rejectedAt: string | null;
+};
+
 function ButcherOrderForm() {
   const { data: session } = useSession();
+  const role = (session?.user as { role?: string })?.role;
+  const isButcher = role === "BUTCHER";
+  const [activeTab, setActiveTab] = useState<"pending" | "status">("pending");
   const [meatType, setMeatType] = useState("Beef");
   const [menuItemName, setMenuItemName] = useState("Tibs");
   const [weight, setWeight] = useState("1");
@@ -450,6 +471,63 @@ function ButcherOrderForm() {
   const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
   const weightPresets = [0.5, 1, 2, 3, 5];
   const dishOptions = ["Tibs", "Kurt", "Dulet", "Tere Sega", "Gored Gored"];
+
+  const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  const fetchButcherOrders = useCallback(async () => {
+    try {
+      const res = await fetch("/api/butcher-orders");
+      const data = await res.json();
+      if (data.success) setButcherOrders(data.data);
+    } catch {} finally { setStatusLoading(false); }
+  }, []);
+
+  useEffect(() => {
+    if (isButcher) {
+      fetchButcherOrders();
+      const interval = setInterval(fetchButcherOrders, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [isButcher, fetchButcherOrders]);
+
+  const approveOrder = async (order: ButcherOrder) => {
+    setActionLoading(order.id);
+    try {
+      const res = await fetch("/api/butcher-orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: order.id, status: "APPROVED" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Order #${order.orderNumber} approved and sent to kitchen`);
+        fetchButcherOrders();
+      } else toast.error(data.error || "Action failed");
+    } catch { toast.error("Action failed"); }
+    finally { setActionLoading(null); }
+  };
+
+  const rejectOrder = async (order: ButcherOrder) => {
+    setActionLoading(order.id);
+    try {
+      const res = await fetch("/api/butcher-orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: order.id, status: "REJECTED" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Order #${order.orderNumber} rejected`);
+        fetchButcherOrders();
+      } else toast.error(data.error || "Action failed");
+    } catch { toast.error("Action failed"); }
+    finally { setActionLoading(null); }
+  };
+
+  const pendingButcherOrders = butcherOrders.filter((o) => o.status === "PENDING");
+  const processedButcherOrders = butcherOrders.filter((o) => o.status !== "PENDING");
 
   const handleSubmit = async () => {
     const w = parseFloat(weight);
@@ -471,6 +549,7 @@ function ButcherOrderForm() {
       const data = await res.json();
       if (data.success) {
         toast.success(`Butcher order #${data.data.orderNumber} placed!`);
+        fetchButcherOrders();
         setMeatType("Beef");
         setMenuItemName("Tibs");
         setWeight("1");
@@ -590,6 +669,126 @@ function ButcherOrderForm() {
           </GoldButton>
         </div>
       </motion.div>
+
+      {isButcher && (
+        <section className="mt-8">
+          <div className="flex items-center gap-3 mb-4">
+            <ClipboardList className="w-5 h-5 text-ethiopian-gold" />
+            <h3 className="text-xl font-serif font-bold text-ethiopian-coffee">Butcher Status</h3>
+            <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream text-ethiopian-coffee/60">
+              {pendingButcherOrders.length} pending
+            </span>
+          </div>
+
+          <div className="flex gap-2 border-b border-gray-200 mb-4">
+            <button
+              onClick={() => setActiveTab("pending")}
+              className={`pb-2 px-3 text-sm font-medium border-b-2 transition-all ${
+                activeTab === "pending"
+                  ? "border-ethiopian-burgundy text-ethiopian-burgundy"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Pending Orders
+              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream">{pendingButcherOrders.length}</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("status")}
+              className={`pb-2 px-3 text-sm font-medium border-b-2 transition-all ${
+                activeTab === "status"
+                  ? "border-ethiopian-burgundy text-ethiopian-burgundy"
+                  : "border-transparent text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              Butcher Status
+              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream">{processedButcherOrders.length}</span>
+            </button>
+          </div>
+
+          {statusLoading ? (
+            <div className="text-center py-8 text-ethiopian-coffee/60">Loading...</div>
+          ) : (activeTab === "pending" ? pendingButcherOrders : processedButcherOrders).length === 0 ? (
+            <div className="text-center py-8">
+              <Package className="w-10 h-10 text-ethiopian-gold mx-auto mb-2" />
+              <p className="text-ethiopian-coffee/60 text-sm">
+                {activeTab === "pending" ? "No orders waiting for approval" : "No processed orders"}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {(activeTab === "pending" ? pendingButcherOrders : processedButcherOrders).map((order) => (
+                <motion.div
+                  key={order.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white rounded-xl shadow-md border border-ethiopian-gold/10 p-4"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
+                      {order.tableNumber && (
+                        <span className="text-xs font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                      )}
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${
+                      order.status === "PENDING" ? "bg-amber-100 text-amber-800 border-amber-300" :
+                      order.status === "APPROVED" ? "bg-emerald-100 text-emerald-800 border-emerald-300" :
+                      "bg-red-100 text-red-800 border-red-300"
+                    }`}>
+                      {order.status === "PENDING" ? "Pending" : order.status === "APPROVED" ? "Approved" : "Rejected"}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20 mb-2 text-xs">
+                    <div><span className="text-ethiopian-coffee/40">Meat:</span> <span className="font-bold text-ethiopian-burgundy">{order.meatType}</span></div>
+                    <div><span className="text-ethiopian-coffee/40">Dish:</span> <span className="font-semibold text-ethiopian-coffee">{order.menuItemName}</span></div>
+                    <div><span className="text-ethiopian-coffee/40">Weight:</span> <span className="font-bold text-ethiopian-gold">{order.weight} kg</span></div>
+                    <div><span className="text-ethiopian-coffee/40">Qty:</span> <span className="font-semibold text-ethiopian-coffee">x{order.quantity}</span></div>
+                  </div>
+
+                  {order.notes && (
+                    <div className="text-xs text-ethiopian-coffee/70 italic border-l-2 border-ethiopian-gold/30 pl-2 mb-2">
+                      "{order.notes}"
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between">
+                    <div className="text-xs text-ethiopian-coffee/60">
+                      {new Date(order.createdAt).toLocaleString()} &middot; {order.customerName}
+                    </div>
+
+                    {activeTab === "pending" && order.status === "PENDING" && (
+                      <div className="flex items-center gap-1.5">
+                        <button onClick={() => approveOrder(order)} disabled={actionLoading === order.id}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-xs font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                        >
+                          {actionLoading === order.id ? "..." : <><Check className="w-3.5 h-3.5" /> Approve</>}
+                        </button>
+                        <button onClick={() => rejectOrder(order)} disabled={actionLoading === order.id}
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition-all disabled:opacity-50"
+                        >
+                          <XCircle className="w-3.5 h-3.5" /> Reject
+                        </button>
+                      </div>
+                    )}
+
+                    {order.status === "APPROVED" && order.approvedAt && (
+                      <div className="text-xs text-emerald-600 font-medium">
+                        Approved: {new Date(order.approvedAt).toLocaleString()}
+                      </div>
+                    )}
+                    {order.status === "REJECTED" && order.rejectedAt && (
+                      <div className="text-xs text-red-600 font-medium">
+                        Rejected: {new Date(order.rejectedAt).toLocaleString()}
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
     </section>
   );
 }

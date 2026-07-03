@@ -3,11 +3,16 @@
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
-import { Beef, Minus, Plus, Clock } from "lucide-react";
+import { Beef, Minus, Plus, Clock, Drumstick, WholeWord } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
 
-const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
+const meatTypes = [
+  { id: "Beef", icon: Beef, color: "from-ethiopian-burgundy to-red-700", bg: "bg-red-50", label: "Beef" },
+  { id: "Lamb", icon: Beef, color: "from-ethiopian-earth to-amber-700", bg: "bg-amber-50", label: "Lamb" },
+  { id: "Goat", icon: Beef, color: "from-ethiopian-coffee to-stone-700", bg: "bg-stone-50", label: "Goat" },
+  { id: "Chicken", icon: Drumstick, color: "from-ethiopian-gold to-yellow-600", bg: "bg-yellow-50", label: "Chicken" },
+];
 const weightPresets = [0.5, 1, 2, 3, 5];
 const dishOptions = [
   { name: "Tibs", image: "/images/tibs.jpg", description: "Sautéed meat with onions, peppers & spices" },
@@ -91,20 +96,36 @@ export default function ButcherShopPage() {
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Meat Type</label>
-            <div className="flex flex-wrap gap-2">
-              {meatTypes.map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setMeatType(type)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    meatType === type
-                      ? "bg-ethiopian-burgundy text-white shadow-md"
-                      : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {meatTypes.map((type, i) => {
+                const Icon = type.icon;
+                return (
+                  <motion.button
+                    key={type.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    onClick={() => setMeatType(type.id)}
+                    className={`group relative overflow-hidden rounded-xl border-2 transition-all duration-200 ${
+                      meatType === type.id
+                        ? "border-ethiopian-gold ring-2 ring-ethiopian-gold/30 shadow-lg"
+                        : "border-ethiopian-gold/10 hover:border-ethiopian-gold/40 hover:shadow-md"
+                    }`}
+                  >
+                    <div className={`aspect-[4/3] flex flex-col items-center justify-center gap-1.5 ${type.bg} p-3`}>
+                      <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300`}>
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <span className="text-sm font-bold text-ethiopian-coffee">{type.label}</span>
+                    </div>
+                    {meatType === type.id && (
+                      <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-ethiopian-gold rounded-full flex items-center justify-center shadow">
+                        <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                      </div>
+                    )}
+                  </motion.button>
+                );
+              })}
             </div>
           </div>
 

@@ -241,6 +241,7 @@ export default function KDSPage() {
           guestCount: 1,
           subtotal: 0,
           total: 0,
+          skipButcherAutoCreate: true,
           items: [{
             menuItemId: "butcher-item",
             name: bo.menuItemName,

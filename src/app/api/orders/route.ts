@@ -221,6 +221,8 @@ export async function POST(req: NextRequest) {
     await writeDemoJSON(DEMO_FILE, demoOrders);
 
     // Auto-create butcher orders for items that need raw meat prep
+    const shouldSkipButcher = body?.skipButcherAutoCreate === true;
+    if (!shouldSkipButcher) {
     const butcherItems = (body?.items || []).filter((item: any) => {
       const name = (item.name || "").toLowerCase();
       return BUTCHER_ITEM_KEYWORDS.some((kw) => name.includes(kw));
@@ -247,6 +249,7 @@ export async function POST(req: NextRequest) {
         createdAt: new Date().toISOString(),
       }));
       await writeDemoJSON(BUTCHER_ORDERS_FILE, [...butcherOrders, ...newButcherOrders]);
+    }
     }
 
     return NextResponse.json({ success: true, data: demoOrder }, { status: 201 });

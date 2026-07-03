@@ -147,7 +147,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
     { icon: ClipboardList, label: t("nav.inventory"), href: "/inventory", key: "inventory" },
     { icon: Users, label: t("nav.employees"), href: "/employees", key: "employees" },
     { icon: Percent, label: t("nav.reports"), href: "/reports", key: "reports" },
-    { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher", key: "butcher" },
+    { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher?shop=1", key: "butcher" },
   ];
 
   const hiddenForClient = new Set(["inventory", "employees", "reports"]);

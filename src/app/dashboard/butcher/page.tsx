@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { motion } from "framer-motion";
-import { Beef, Check, XCircle, Clock, Package, Minus, Plus } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { Beef, Check, XCircle, Clock, Package, Minus, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
 
@@ -56,6 +57,8 @@ export default function ButcherDashboardPage() {
   const [fTable, setFTable] = useState("");
   const [fNotes, setFNotes] = useState("");
   const [fSubmitting, setFSubmitting] = useState(false);
+  const searchParams = useSearchParams();
+  const [showForm, setShowForm] = useState(searchParams.get("shop") === "1");
 
   const role = (session?.user as { role?: string })?.role;
 
@@ -193,92 +196,101 @@ export default function ButcherDashboardPage() {
         </div>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 rounded-2xl shadow-md border border-ethiopian-gold/10">
-        <h2 className="text-lg font-bold font-serif text-ethiopian-coffee mb-4">New Butcher Order</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Meat Type</label>
-            <div className="flex flex-wrap gap-1.5">
-              {meatTypes.map((type) => (
-                <button key={type} onClick={() => setFMeatType(type)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    fMeatType === type ? "bg-ethiopian-burgundy text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
-                  }`}
-                >{type}</button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Dish</label>
-            <div className="flex flex-wrap gap-1.5">
-              {dishOptions.map((dish) => (
-                <button key={dish} onClick={() => setFDish(dish)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    fDish === dish ? "bg-ethiopian-gold text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
-                  }`}
-                >{dish}</button>
-              ))}
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Weight (kg)</label>
-            <div className="flex flex-wrap gap-1.5">
-              {weightPresets.map((w) => (
-                <button key={w} onClick={() => { setFWeight(w.toString()); setFCustomWeight(false); }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    fWeight === w.toString() && !fCustomWeight ? "bg-ethiopian-burgundy text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
-                  }`}
-                >{w} kg</button>
-              ))}
-              <button onClick={() => setFCustomWeight(true)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                  fCustomWeight ? "bg-ethiopian-gold text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
-                }`}
-              >Custom</button>
-            </div>
-            {fCustomWeight && (
-              <input type="number" step="0.1" min="0.1" value={fWeight} onChange={(e) => setFWeight(e.target.value)}
-                className="mt-1.5 w-full px-2 py-1.5 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none text-xs"
-              />
-            )}
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Quantity</label>
-            <div className="flex items-center gap-2">
-              <button onClick={() => setFQuantity(Math.max(1, fQuantity - 1))} className="w-8 h-8 rounded-lg bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 flex items-center justify-center">
-                <Minus className="w-3.5 h-3.5" />
-              </button>
-              <span className="text-lg font-bold text-ethiopian-gold min-w-[1.5rem] text-center">{fQuantity}</span>
-              <button onClick={() => setFQuantity(Math.min(20, fQuantity + 1))} className="w-8 h-8 rounded-lg bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 flex items-center justify-center">
-                <Plus className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-          <div>
-            <label className="block text-xs font-semibold text-ethiopian-coffee mb-1.5">Table (optional)</label>
-            <input type="text" value={fTable} onChange={(e) => setFTable(e.target.value)}
-              placeholder="e.g. 5"
-              className="w-full px-3 py-1.5 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none text-xs"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-ethiopian-coffee mb-1.5">Notes (optional)</label>
-            <input type="text" value={fNotes} onChange={(e) => setFNotes(e.target.value)}
-              placeholder="Special instructions"
-              className="w-full px-3 py-1.5 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none text-xs"
-            />
-          </div>
-          <div className="flex items-end">
-            <button onClick={placeOrder} disabled={fSubmitting}
-              className="w-full px-5 py-2 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
-            >
-              {fSubmitting ? "Placing..." : "Place Order"}
-            </button>
-          </div>
-        </div>
-      </motion.div>
+      <div className="bg-white rounded-2xl shadow-md border border-ethiopian-gold/10 overflow-hidden">
+        <button onClick={() => setShowForm(!showForm)} className="w-full flex items-center justify-between px-6 py-4 hover:bg-ethiopian-cream/30 transition-colors">
+          <h2 className="text-lg font-bold font-serif text-ethiopian-coffee">New Butcher Order</h2>
+          {showForm ? <ChevronUp className="w-5 h-5 text-ethiopian-coffee/60" /> : <ChevronDown className="w-5 h-5 text-ethiopian-coffee/60" />}
+        </button>
+        <AnimatePresence>
+          {showForm && (
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="px-6 pb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                <div>
+                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Meat Type</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {meatTypes.map((type) => (
+                      <button key={type} onClick={() => setFMeatType(type)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          fMeatType === type ? "bg-ethiopian-burgundy text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
+                        }`}
+                      >{type}</button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Dish</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {dishOptions.map((dish) => (
+                      <button key={dish} onClick={() => setFDish(dish)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          fDish === dish ? "bg-ethiopian-gold text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
+                        }`}
+                      >{dish}</button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Weight (kg)</label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {weightPresets.map((w) => (
+                      <button key={w} onClick={() => { setFWeight(w.toString()); setFCustomWeight(false); }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          fWeight === w.toString() && !fCustomWeight ? "bg-ethiopian-burgundy text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
+                        }`}
+                      >{w} kg</button>
+                    ))}
+                    <button onClick={() => setFCustomWeight(true)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        fCustomWeight ? "bg-ethiopian-gold text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
+                      }`}
+                    >Custom</button>
+                  </div>
+                  {fCustomWeight && (
+                    <input type="number" step="0.1" min="0.1" value={fWeight} onChange={(e) => setFWeight(e.target.value)}
+                      className="mt-1.5 w-full px-2 py-1.5 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none text-xs"
+                    />
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Quantity</label>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setFQuantity(Math.max(1, fQuantity - 1))} className="w-8 h-8 rounded-lg bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 flex items-center justify-center">
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <span className="text-lg font-bold text-ethiopian-gold min-w-[1.5rem] text-center">{fQuantity}</span>
+                    <button onClick={() => setFQuantity(Math.min(20, fQuantity + 1))} className="w-8 h-8 rounded-lg bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 flex items-center justify-center">
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
+                <div>
+                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-1.5">Table (optional)</label>
+                  <input type="text" value={fTable} onChange={(e) => setFTable(e.target.value)}
+                    placeholder="e.g. 5"
+                    className="w-full px-3 py-1.5 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-1.5">Notes (optional)</label>
+                  <input type="text" value={fNotes} onChange={(e) => setFNotes(e.target.value)}
+                    placeholder="Special instructions"
+                    className="w-full px-3 py-1.5 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none text-xs"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <button onClick={placeOrder} disabled={fSubmitting}
+                    className="w-full px-5 py-2 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                  >
+                    {fSubmitting ? "Placing..." : "Place Order"}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
       <div className="flex gap-2 border-b border-gray-200">
         <button

@@ -201,15 +201,17 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
               <button
                 key={item.key}
                 onClick={() => {
-                  if (item.href.startsWith("/dashboard")) {
-                    onNavigate(item.href.replace("/dashboard/", "").replace("/dashboard", "home") || "home");
+                  if (item.href === "/dashboard") {
+                    onNavigate("home");
+                  } else if (item.href.startsWith("/dashboard")) {
+                    window.location.href = item.href;
                   } else {
                     window.location.href = item.href;
                   }
                   onClose();
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group border border-transparent ${
-                  currentView === (item.href.replace("/dashboard/", "").replace("/dashboard", "home") || "home")
+                  currentView === (item.href === "/dashboard" ? "home" : undefined)
                     ? "bg-gradient-to-r from-ethiopian-gold/10 to-ethiopian-clay/10 text-ethiopian-gold border-ethiopian-gold/20"
                     : "text-ethiopian-coffee/70 hover:bg-gradient-to-r hover:from-ethiopian-gold/10 hover:to-ethiopian-clay/10 hover:text-ethiopian-gold hover:border-ethiopian-gold/20"
                 }`}

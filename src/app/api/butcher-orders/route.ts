@@ -84,6 +84,34 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({ success: true, data: newOrder }, { status: 201 });
 }
 
+export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session?.user) {
+    return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
+  }
+
+  const role = (session.user as { role?: string }).role;
+  if (role !== "ADMIN" && role !== "KITCHEN") {
+    return NextResponse.json({ success: false, error: "Only admins and kitchen can delete" }, { status: 403 });
+  }
+
+  const { searchParams } = req.nextUrl;
+  const id = searchParams.get("id");
+  if (!id) {
+    return NextResponse.json({ success: false, error: "id is required" }, { status: 400 });
+  }
+
+  const orders = await readDemoJSON<ButcherOrder>(DEMO_FILE);
+  const index = orders.findIndex((o) => o.id === id);
+  if (index === -1) {
+    return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
+  }
+
+  orders.splice(index, 1);
+  await writeDemoJSON(DEMO_FILE, orders);
+  return NextResponse.json({ success: true });
+}
+
 export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session?.user) {

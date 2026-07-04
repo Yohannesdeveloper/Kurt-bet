@@ -421,10 +421,10 @@
     "restaurantCount": "{count} ሬስቶራንቶች"
   },
   "restaurant": {
-    "kurtBetSpecial": "ቁርጥ ቤት ልዩ",
-    "addisKitfoHouse": "አዲስ ክትፎ ቤት",
-    "tibsPalace": "ጥብስ ቤተ መንግሥት",
-    "goredGoredHouse": "ጎረድ ጎረድ ቤት",
+    "kurtBetSpecial": "ቁርጥ",
+    "addisKitfoHouse": "ክትፎ",
+    "tibsPalace": "ጥብስ",
+    "goredGoredHouse": "ጎረድ ጎረድ",
     "traditional": "ባህላዊ",
     "authentic": "እውነተኛ",
     "spicy": "ቅመም",

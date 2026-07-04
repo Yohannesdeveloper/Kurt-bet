@@ -421,10 +421,10 @@
     "restaurantCount": "{count} restaurants"
   },
   "restaurant": {
-    "kurtBetSpecial": "Habesha Kurt Bet Special",
-    "addisKitfoHouse": "Addis Kitfo House",
-    "tibsPalace": "Tibs Palace",
-    "goredGoredHouse": "Gored Gored House",
+    "kurtBetSpecial": "Kurt",
+    "addisKitfoHouse": "Kitfo",
+    "tibsPalace": "Tibs",
+    "goredGoredHouse": "Gored Gored",
     "traditional": "Traditional",
     "authentic": "Authentic",
     "spicy": "Spicy",

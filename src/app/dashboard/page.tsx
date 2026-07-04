@@ -31,10 +31,10 @@ const categoryMeta: Record<string, { count: number; image: string; color: string
 
 const restaurantKeys = ["kurtBetSpecial", "addisKitfoHouse", "tibsPalace", "goredGoredHouse"] as const;
 const restaurantMeta: Record<string, { rating: number; deliveryTime: string; price: string; image: string; color: string; tagKeys: string[]; featured: boolean; discount: string | null }> = {
-  kurtBetSpecial: { rating: 4.9, deliveryTime: "30-45", price: "ETB 500", image: "/images/kurt.jpg", color: "from-ethiopian-burgundy to-ethiopian-charcoal", tagKeys: ["tereSega", "traditional"], featured: true, discount: "20% OFF" },
-  addisKitfoHouse: { rating: 4.8, deliveryTime: "25-40", price: "ETB 450", image: "/images/kifo.jpg", color: "from-ethiopian-gold to-ethiopian-coffee", tagKeys: ["kitfo", "authentic"], featured: true, discount: "15% OFF" },
-  tibsPalace: { rating: 4.7, deliveryTime: "35-50", price: "ETB 380", image: "/images/tibs.jpg", color: "from-ethiopian-earth to-ethiopian-charcoal", tagKeys: ["tibs", "spicy"], featured: false, discount: null },
-  goredGoredHouse: { rating: 4.6, deliveryTime: "20-35", price: "ETB 420", image: "/images/gored gored.jpg", color: "from-ethiopian-coffee to-ethiopian-charcoal", tagKeys: ["goredGored", "fresh"], featured: false, discount: null },
+  kurtBetSpecial: { rating: 4.9, deliveryTime: "30-45", price: "500", image: "/images/kurt.jpg", color: "from-ethiopian-burgundy to-ethiopian-charcoal", tagKeys: ["tereSega", "traditional"], featured: true, discount: "20" },
+  addisKitfoHouse: { rating: 4.8, deliveryTime: "25-40", price: "450", image: "/images/kifo.jpg", color: "from-ethiopian-gold to-ethiopian-coffee", tagKeys: ["kitfo", "authentic"], featured: true, discount: "15" },
+  tibsPalace: { rating: 4.7, deliveryTime: "35-50", price: "380", image: "/images/tibs.jpg", color: "from-ethiopian-earth to-ethiopian-charcoal", tagKeys: ["tibs", "spicy"], featured: false, discount: null },
+  goredGoredHouse: { rating: 4.6, deliveryTime: "20-35", price: "420", image: "/images/gored gored.jpg", color: "from-ethiopian-coffee to-ethiopian-charcoal", tagKeys: ["goredGored", "fresh"], featured: false, discount: null },
 };
 
 function Header({ onCartClick }: { onCartClick: () => void }) {

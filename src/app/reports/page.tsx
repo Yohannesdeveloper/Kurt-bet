@@ -169,7 +169,7 @@ export default function ReportsPage() {
   const butcherSummary = butcherData?.summary ?? { totalRevenue: 0, totalTransactions: 0, totalItems: 0 };
   const bartenderSummary = bartenderData?.summary ?? { totalRevenue: 0, totalTransactions: 0, totalItems: 0 };
 
-  const totalRevenue = (waiterSummary.totalRevenue || 0);
+  const totalRevenue = (waiterSummary.totalRevenue || 0) + (butcherSummary.totalRevenue || 0) + (bartenderSummary.totalRevenue || 0);
   const totalExpenses = 0;
   const netProfit = totalRevenue - totalExpenses;
 

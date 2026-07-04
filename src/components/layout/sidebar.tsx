@@ -50,6 +50,11 @@ const navItemsByRole: Record<string, NavItemType[]> = {
     { href: "/kds", label: "Kitchen", tKey: "nav.kitchen", icon: CookingPot },
     { href: "/dashboard/butcher-shop", label: "Butcher Shop", tKey: "nav.butcherShop", icon: Beef },
   ],
+  BARTENDER: [
+    { href: "/menu", label: "Menu", tKey: "nav.menu", icon: UtensilsCrossed },
+    { href: "/orders", label: "Orders", tKey: "nav.orders", icon: ClipboardList },
+    { href: "/dashboard", label: "Bartender", tKey: "nav.bartender", icon: Coffee },
+  ],
   BUTCHER: [
     { href: "/tables", label: "Tables", tKey: "nav.tables", icon: Store },
     { href: "/orders", label: "Orders", tKey: "nav.orders", icon: ClipboardList },

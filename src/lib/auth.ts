@@ -90,6 +90,7 @@ export const authOptions: NextAuthOptions = {
           "kitchen@restaurant.com": { name: "Bereket Hailu",  role: "KITCHEN", firstName: "Bereket", lastName: "Hailu" },
           "client@restaurant.com":  { name: "Client User",    role: "CLIENT",  firstName: "Client",  lastName: "User" },
           "butcher@restaurant.com": { name: "Butcher User",   role: "BUTCHER", firstName: "Butcher", lastName: "User" },
+          "bartender@restaurant.com": { name: "Bartender User", role: "BARTENDER", firstName: "Bartender", lastName: "User" },
         };
         const demo = DEMO_USERS[credentials.email];
         const passwordOk = credentials.email === "admin@restaurant.com"
@@ -158,9 +159,10 @@ export function hasPermission(role: string, requiredRole: string): boolean {
   const hierarchy: Record<string, number> = {
     CLIENT: 1,
     BUTCHER: 2,
-    KITCHEN: 3,
-    WAITER: 4,
-    ADMIN: 5,
+    BARTENDER: 3,
+    KITCHEN: 4,
+    WAITER: 5,
+    ADMIN: 6,
   };
   return (hierarchy[role] || 0) >= (hierarchy[requiredRole] || 0);
 }
@@ -168,6 +170,7 @@ export function hasPermission(role: string, requiredRole: string): boolean {
 export function getRoleDashboard(role: string): string {
   const dashboards: Record<string, string> = {
     ADMIN: "/dashboard/admin",
+    BARTENDER: "/dashboard",
     BUTCHER: "/dashboard/butcher",
     CLIENT: "/dashboard/client",
     KITCHEN: "/dashboard/kitchen",

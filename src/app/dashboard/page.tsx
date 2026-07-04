@@ -139,6 +139,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
   const userRole = (session?.user as { role?: string })?.role || "CLIENT";
   const isClient = userRole === "CLIENT";
   const isWaiter = userRole === "WAITER";
+  const isBartender = userRole === "BARTENDER";
 
   const allNavItems = [
     { icon: Home, label: t("nav.dashboard"), href: "/dashboard", key: "dashboard" },
@@ -153,9 +154,11 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
     { icon: Coffee, label: t("nav.bartender"), href: "/dashboard/bartender", key: "bartender" },
   ];
 
+  const allowedForBartender = new Set(["menu", "orders", "bartender"]);
   const hiddenForClient = new Set(["inventory", "employees", "reports"]);
   const hiddenForWaiter = new Set(["inventory", "employees", "reports"]);
   const navItems = allNavItems.filter((item) => {
+    if (isBartender && !allowedForBartender.has(item.key)) return false;
     if (isClient && hiddenForClient.has(item.key)) return false;
     if (isWaiter && hiddenForWaiter.has(item.key)) return false;
     return true;

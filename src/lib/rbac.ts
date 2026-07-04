@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "./auth";
 
-export type UserRole = "ADMIN" | "CLIENT" | "KITCHEN" | "WAITER";
+export type UserRole = "ADMIN" | "BARTENDER" | "CLIENT" | "KITCHEN" | "WAITER";
 
 export interface RouteAccess {
   roles: UserRole[];
@@ -27,7 +27,7 @@ export const routeAccess: Record<string, RouteAccess> = {
     redirectTo: "/dashboard",
   },
   "/orders": {
-    roles: ["ADMIN", "WAITER", "CLIENT"],
+    roles: ["ADMIN", "BARTENDER", "WAITER", "CLIENT"],
     redirectTo: "/dashboard",
   },
   "/kds": {
@@ -39,7 +39,7 @@ export const routeAccess: Record<string, RouteAccess> = {
     redirectTo: "/dashboard",
   },
   "/menu": {
-    roles: ["ADMIN", "CLIENT"],
+    roles: ["ADMIN", "BARTENDER", "CLIENT"],
     redirectTo: "/dashboard",
   },
   "/employees": {
@@ -110,6 +110,7 @@ export function checkRouteAccess(path: string, userRole: UserRole): boolean {
 export function getRedirectForRole(role: UserRole): string {
   const redirects: Record<UserRole, string> = {
     ADMIN: "/dashboard/admin",
+    BARTENDER: "/dashboard",
     CLIENT: "/dashboard/client",
     KITCHEN: "/dashboard/kitchen",
     WAITER: "/dashboard/waiter",

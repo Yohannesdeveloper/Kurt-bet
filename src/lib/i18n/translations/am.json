@@ -444,5 +444,26 @@
     "codeFood50": "ኮድ፡ FOOD50",
     "logout": "ዘግተህ ውጣ",
     "endSession": "ክፍለ ጊዜህን አጥፋ"
+  },
+  "bartender": {
+    "title": "መጠጥ ቤት",
+    "drinkOrders": "{count} የመጠጥ ትዕዛዞች",
+    "live": "ቀጥታ",
+    "served": "{count} ደርሷል",
+    "noOrders": "ምንም የመጠጥ ትዕዛዞች የሉም",
+    "noOrdersDesc": "ደንበኞች መጠጥ ሲያዝዙ የመጠጥ ትዕዛዞች እዚህ ይታያሉ",
+    "noOrdersColumn": "ምንም ትዕዛዝ የለም",
+    "tabPending": "በመጠባበቅ ላይ",
+    "tabPreparing": "በዝግጅት ላይ",
+    "tabReady": "ለማቅረብ ዝግጁ",
+    "tabServed": "ደርሷል",
+    "delete": "ሰርዝ",
+    "confirmDelete": "ይህን የመጠጥ ትዕዛዝ ሰርዝ?",
+    "deleted": "ተሰርዟል",
+    "updateFailed": "ማዘመን አልተሳካም",
+    "updateFailedNetwork": "ማዘመን አልተሳካም (አውታረ መረብ)",
+    "failed": "አልተሳካም",
+    "table": "ጠረጴዛ {number}",
+    "drinkOrderUpdated": "የመጠጥ ትዕዛዝ #{orderNumber} → {status}"
   }
 }

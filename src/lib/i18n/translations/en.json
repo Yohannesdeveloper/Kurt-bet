@@ -444,5 +444,26 @@
     "codeFood50": "Code: FOOD50",
     "logout": "Logout",
     "endSession": "End your session"
+  },
+  "bartender": {
+    "title": "Bartender",
+    "drinkOrders": "{count} drink orders",
+    "live": "Live",
+    "served": "{count} served",
+    "noOrders": "No Drink Orders",
+    "noOrdersDesc": "Drink orders will appear here when customers order beverages",
+    "noOrdersColumn": "No orders",
+    "tabPending": "Pending",
+    "tabPreparing": "Preparing",
+    "tabReady": "Ready to Serve",
+    "tabServed": "Served",
+    "delete": "Delete",
+    "confirmDelete": "Delete this drink order?",
+    "deleted": "Deleted",
+    "updateFailed": "Update failed",
+    "updateFailedNetwork": "Update failed (network)",
+    "failed": "Failed",
+    "table": "Table {number}",
+    "drinkOrderUpdated": "Drink order #{orderNumber} → {status}"
   }
 }

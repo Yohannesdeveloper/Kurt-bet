@@ -20,7 +20,7 @@ import {
 interface MenuDish { id: string; name: string; description: string; price: number; image?: string; isAvailable: boolean; }
 
 const galleryImages = [
-  { label: "Kurt Bet Special", image: "/images/kurt.jpg", color: "from-ethiopian-coffee/80 to-ethiopian-charcoal/80" },
+  { label: "Habesha Kurt Bet Special", image: "/images/kurt.jpg", color: "from-ethiopian-coffee/80 to-ethiopian-charcoal/80" },
   { label: "Kitfo", image: "/images/kifo.jpg", color: "from-ethiopian-burgundy/80 to-ethiopian-charcoal/80" },
   { label: "Tibs", image: "/images/tibs.jpg", color: "from-ethiopian-earth/80 to-ethiopian-charcoal/80" },
   { label: "Gored Gored", image: "/images/gored gored.jpg", color: "from-ethiopian-gold/50 to-ethiopian-charcoal/80" },

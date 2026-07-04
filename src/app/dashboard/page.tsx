@@ -8,7 +8,8 @@ import {
   Heart, Percent, Menu, X, ChevronLeft,
   ChevronRight as ChevronRightIcon, Sparkles, Flame,
   Zap, TrendingUp, Store, CookingPot, ClipboardList, Users, LogOut,
-  Beef, Drumstick, Check, XCircle, Send, Minus, Plus, Gem, Award, Package
+  Beef, Drumstick, Check, XCircle, Send, Minus, Plus, Gem, Award, Package,
+  Coffee
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
@@ -16,6 +17,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
 import { EthiopianCornerSet, JebenaIcon, MesobIcon, InjeraIcon } from "@/components/shared/ethiopian-patterns";
 import { GoldButton } from "@/components/shared/section-header";
+import { BartenderWorkflow } from "@/components/bartender/bartender-workflow";
 
 const categoryKeys = ["tereSega", "kitfo", "tibs", "goredGored", "awazeTibs", "zilzilTibs"] as const;
 const categoryMeta: Record<string, { count: number; image: string; color: string; bg: string }> = {
@@ -148,6 +150,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
     { icon: Users, label: t("nav.employees"), href: "/employees", key: "employees" },
     { icon: Percent, label: t("nav.reports"), href: "/reports", key: "reports" },
     { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher-shop", key: "butcher-shop" },
+    { icon: Coffee, label: "Bartender", href: "/dashboard/bartender", key: "bartender" },
   ];
 
   const hiddenForClient = new Set(["inventory", "employees", "reports"]);
@@ -205,6 +208,8 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
                     onNavigate("home");
                   } else if (item.key === "butcher-shop") {
                     onNavigate("butcher-shop");
+                  } else if (item.key === "bartender") {
+                    onNavigate("bartender");
                   } else if (item.href.startsWith("/dashboard")) {
                     window.location.href = item.href;
                   } else {
@@ -213,7 +218,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
                   onClose();
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group border border-transparent ${
-                  currentView === (item.key === "butcher-shop" ? "butcher-shop" : item.href === "/dashboard" ? "home" : undefined)
+                  currentView === (item.key === "butcher-shop" ? "butcher-shop" : item.key === "bartender" ? "bartender" : item.href === "/dashboard" ? "home" : undefined)
                     ? "bg-gradient-to-r from-ethiopian-gold/10 to-ethiopian-clay/10 text-ethiopian-gold border-ethiopian-gold/20"
                     : "text-ethiopian-coffee/70 hover:bg-gradient-to-r hover:from-ethiopian-gold/10 hover:to-ethiopian-clay/10 hover:text-ethiopian-gold hover:border-ethiopian-gold/20"
                 }`}
@@ -976,6 +981,8 @@ export default function DashboardPage() {
               </>
             ) : currentView === "butcher-shop" ? (
               <ButcherOrderForm />
+            ) : currentView === "bartender" ? (
+              <BartenderWorkflow />
             ) : null}
           </div>
         </div>

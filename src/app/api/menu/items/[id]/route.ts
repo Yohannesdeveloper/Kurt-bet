@@ -33,12 +33,11 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
   if (index !== -1) {
     items.splice(index, 1);
     await writeDemoItems(items);
-  } else {
-    const deleted = await readDeletedIds();
-    if (!deleted.includes(params.id)) {
-      deleted.push(params.id);
-      await writeDeletedIds(deleted);
-    }
+  }
+  const deleted = await readDeletedIds();
+  if (!deleted.includes(params.id)) {
+    deleted.push(params.id);
+    await writeDeletedIds(deleted);
   }
   return NextResponse.json({ success: true, data: { id: params.id } });
 }

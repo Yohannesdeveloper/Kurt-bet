@@ -3,10 +3,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
-import { Beef, Clock, Package, Users, ClipboardList, CreditCard, Plus, Table } from "lucide-react";
+import { Beef, Clock, Package, Users, ClipboardList, CreditCard, Plus, Table, DollarSign } from "lucide-react";
 import { useTranslation } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { formatCurrency } from "@/lib/utils";
 
 type ButcherOrder = {
   id: string;
@@ -29,6 +30,8 @@ export default function WaiterDashboard() {
   const { data: session } = useSession();
   const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cashflowRevenue, setCashflowRevenue] = useState(0);
+  const [cashflowCount, setCashflowCount] = useState(0);
 
   const role = (session?.user as { role?: string })?.role;
 
@@ -49,6 +52,20 @@ export default function WaiterDashboard() {
     return () => clearInterval(interval);
   }, [fetchOrders]);
 
+  useEffect(() => {
+    async function fetchCashflow() {
+      try {
+        const res = await fetch("/api/cashflow?employee=waiter");
+        const data = await res.json();
+        if (data.success) {
+          setCashflowRevenue(data.data.summary.waiterRevenue);
+          setCashflowCount(data.data.summary.waiterCount);
+        }
+      } catch {}
+    }
+    fetchCashflow();
+  }, []);
+
   if (role !== "WAITER" && role !== "ADMIN") {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -65,9 +82,9 @@ export default function WaiterDashboard() {
 
   const stats = [
     { label: "Pending Butcher Orders", value: pendingButcherCount.toString(), icon: Beef, color: "from-ethiopian-gold to-ethiopian-coffee", bgColor: "bg-ethiopian-gold/10", iconColor: "text-ethiopian-gold" },
-    { label: "Active Orders", value: "0", icon: ClipboardList, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
+    { label: "Waiter Cash Flow", value: formatCurrency(cashflowRevenue), icon: DollarSign, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
+    { label: "Orders Served", value: cashflowCount.toString(), icon: ClipboardList, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
     { label: "Payments Pending", value: "0", icon: CreditCard, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
-    { label: "Orders Completed", value: "0", icon: ClipboardList, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-500/10", iconColor: "text-purple-600" },
   ];
 
   return (

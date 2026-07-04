@@ -1,18 +1,39 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Search, CreditCard, Inbox, DollarSign, TrendingUp, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { ArrowLeft, Search, CreditCard, Inbox, DollarSign, TrendingUp, ArrowUpRight, User, Beef, Coffee } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { formatCurrency } from "@/lib/utils";
 
 export default function PaymentsPage() {
+  const [cashflow, setCashflow] = useState({ waiterRevenue: 0, waiterCount: 0, butcherRevenue: 0, butcherCount: 0, bartenderRevenue: 0, bartenderCount: 0, totalRevenue: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchCashflow() {
+      try {
+        const res = await fetch("/api/cashflow");
+        const data = await res.json();
+        if (data.success) {
+          setCashflow(data.data.summary);
+        }
+      } catch {
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchCashflow();
+  }, []);
+
   const stats = [
-    { label: "Today's Revenue", value: "$0.00", icon: DollarSign, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
-    { label: "Card Payments", value: "0", icon: CreditCard, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
-    { label: "Total Tips", value: "$0.00", icon: ArrowUpRight, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
-    { label: "Refunds Today", value: "0", icon: ArrowDownRight, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },
+    { label: "Today's Revenue", value: formatCurrency(cashflow.totalRevenue), icon: DollarSign, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
+    { label: "Waiters Cash Flow", value: formatCurrency(cashflow.waiterRevenue), icon: User, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
+    { label: "Butcher Cash Flow", value: formatCurrency(cashflow.butcherRevenue), icon: Beef, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },
+    { label: "Bartender Cash Flow", value: formatCurrency(cashflow.bartenderRevenue), icon: Coffee, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
   ];
 
   return (
@@ -34,7 +55,7 @@ export default function PaymentsPage() {
           </div>
           <div>
             <h1 className="text-xl lg:text-2xl font-bold tracking-tight">Payments</h1>
-            <p className="text-sm text-muted-foreground">Process and manage payments</p>
+            <p className="text-sm text-muted-foreground">Cash flow overview by employee category</p>
           </div>
         </div>
         <div className="relative w-full sm:w-auto">
@@ -78,35 +99,86 @@ export default function PaymentsPage() {
           <CardContent className="p-6">
             <Tabs defaultValue="all">
               <TabsList className="bg-muted/50 p-1">
-                <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">All Payments</TabsTrigger>
-                <TabsTrigger value="pending" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Pending</TabsTrigger>
-                <TabsTrigger value="completed" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Completed</TabsTrigger>
+                <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2">
+                  <DollarSign className="h-4 w-4" /> All Cash Flow
+                </TabsTrigger>
+                <TabsTrigger value="waiter" className="data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2">
+                  <User className="h-4 w-4" /> Waiters
+                </TabsTrigger>
+                <TabsTrigger value="butcher" className="data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2">
+                  <Beef className="h-4 w-4" /> Butcher
+                </TabsTrigger>
+                <TabsTrigger value="bartender" className="data-[state=active]:bg-background data-[state=active]:shadow-sm gap-2">
+                  <Coffee className="h-4 w-4" /> Bartender
+                </TabsTrigger>
               </TabsList>
+
               <TabsContent value="all" className="mt-6">
-                <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                  <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
-                    <Inbox className="h-10 w-10" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="p-4 rounded-xl bg-amber-50/50 border border-amber-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <User className="h-5 w-5 text-amber-600" />
+                      <span className="font-semibold text-amber-800">Waiters</span>
+                    </div>
+                    <p className="text-2xl font-bold text-amber-700">{formatCurrency(cashflow.waiterRevenue)}</p>
+                    <p className="text-xs text-amber-600/70 mt-1">{cashflow.waiterCount} orders</p>
                   </div>
-                  <p className="text-lg font-semibold mb-2">No payments yet</p>
-                  <p className="text-sm">Payments will appear here once processed</p>
+                  <div className="p-4 rounded-xl bg-red-50/50 border border-red-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Beef className="h-5 w-5 text-red-600" />
+                      <span className="font-semibold text-red-800">Butcher</span>
+                    </div>
+                    <p className="text-2xl font-bold text-red-700">{formatCurrency(cashflow.butcherRevenue)}</p>
+                    <p className="text-xs text-red-600/70 mt-1">{cashflow.butcherCount} meat items</p>
+                  </div>
+                  <div className="p-4 rounded-xl bg-emerald-50/50 border border-emerald-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Coffee className="h-5 w-5 text-emerald-600" />
+                      <span className="font-semibold text-emerald-800">Bartender</span>
+                    </div>
+                    <p className="text-2xl font-bold text-emerald-700">{formatCurrency(cashflow.bartenderRevenue)}</p>
+                    <p className="text-xs text-emerald-600/70 mt-1">{cashflow.bartenderCount} drinks</p>
+                  </div>
                 </div>
               </TabsContent>
-              <TabsContent value="pending" className="mt-6">
-                <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                  <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
-                    <CreditCard className="h-10 w-10" />
+
+              <TabsContent value="waiter" className="mt-6">
+                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                  <div className="h-20 w-20 rounded-2xl bg-amber-100 flex items-center justify-center mb-4">
+                    <User className="h-10 w-10 text-amber-600" />
                   </div>
-                  <p className="text-lg font-semibold mb-2">No pending payments</p>
-                  <p className="text-sm">Pending payments will appear here</p>
+                  <p className="text-2xl font-bold text-amber-700 mb-1">{formatCurrency(cashflow.waiterRevenue)}</p>
+                  <p className="text-sm text-amber-600/70 mb-4">{cashflow.waiterCount} waiter orders processed</p>
+                  <p className="text-sm max-w-md text-center">
+                    Cash flow from all orders handled by waitstaff. View detailed breakdown in
+                    the Reports section.
+                  </p>
                 </div>
               </TabsContent>
-              <TabsContent value="completed" className="mt-6">
-                <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                  <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
-                    <CreditCard className="h-10 w-10" />
+
+              <TabsContent value="butcher" className="mt-6">
+                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                  <div className="h-20 w-20 rounded-2xl bg-red-100 flex items-center justify-center mb-4">
+                    <Beef className="h-10 w-10 text-red-600" />
                   </div>
-                  <p className="text-lg font-semibold mb-2">No completed payments</p>
-                  <p className="text-sm">Completed payments will appear here</p>
+                  <p className="text-2xl font-bold text-red-700 mb-1">{formatCurrency(cashflow.butcherRevenue)}</p>
+                  <p className="text-sm text-red-600/70 mb-4">{cashflow.butcherCount} meat items sold</p>
+                  <p className="text-sm max-w-md text-center">
+                    Cash flow from all meat item sales processed through the butcher department.
+                  </p>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="bartender" className="mt-6">
+                <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+                  <div className="h-20 w-20 rounded-2xl bg-emerald-100 flex items-center justify-center mb-4">
+                    <Coffee className="h-10 w-10 text-emerald-600" />
+                  </div>
+                  <p className="text-2xl font-bold text-emerald-700 mb-1">{formatCurrency(cashflow.bartenderRevenue)}</p>
+                  <p className="text-sm text-emerald-600/70 mb-4">{cashflow.bartenderCount} drinks sold</p>
+                  <p className="text-sm max-w-md text-center">
+                    Cash flow from all drink and beverage sales handled by the bartender.
+                  </p>
                 </div>
               </TabsContent>
             </Tabs>

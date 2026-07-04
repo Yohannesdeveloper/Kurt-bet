@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Beef, Check, XCircle, Clock, Package, Minus, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
+import { formatCurrency } from "@/lib/utils";
 
 const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
 const weightPresets = [0.5, 1, 2, 3, 5];
@@ -59,6 +60,23 @@ export default function ButcherDashboardPage() {
   const [fSubmitting, setFSubmitting] = useState(false);
   const searchParams = useSearchParams();
   const [showForm, setShowForm] = useState(searchParams.get("shop") === "1");
+
+  const [cashflowRevenue, setCashflowRevenue] = useState(0);
+  const [cashflowCount, setCashflowCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchCashflow() {
+      try {
+        const res = await fetch("/api/cashflow?employee=butcher");
+        const data = await res.json();
+        if (data.success) {
+          setCashflowRevenue(data.data.summary.butcherRevenue);
+          setCashflowCount(data.data.summary.butcherCount);
+        }
+      } catch {}
+    }
+    fetchCashflow();
+  }, []);
 
   const role = (session?.user as { role?: string })?.role;
 
@@ -194,6 +212,21 @@ export default function ButcherDashboardPage() {
             </p>
           </div>
         </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+          <div className="bg-white rounded-2xl shadow-md border border-red-200/50 hover:shadow-lg transition-all duration-300 p-5">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center">
+                <Beef className="h-5 w-5 text-red-600" />
+              </div>
+              <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">{cashflowCount} items</span>
+            </div>
+            <p className="text-sm text-muted-foreground font-medium mb-1">Butcher Cash Flow</p>
+            <p className="text-2xl font-bold tracking-tight text-red-700">{formatCurrency(cashflowRevenue)}</p>
+          </div>
+        </motion.div>
       </div>
 
       <div className="bg-white rounded-2xl shadow-md border border-ethiopian-gold/10 overflow-hidden">

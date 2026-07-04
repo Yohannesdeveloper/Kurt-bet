@@ -69,49 +69,19 @@ export default function ReportsPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [ordersRes] = await Promise.all([
-          fetch("/api/orders?limit=500"),
-        ]);
-        if (ordersRes.ok) {
-          const ordersData = await ordersRes.json();
-          if (ordersData.success) {
-            const allOrders = ordersData.data || [];
-            const activeOrders = allOrders.filter((o: any) => o.status !== "CANCELLED");
-
-            // Total revenue
-            const totalRev = activeOrders.reduce((sum: number, o: any) => sum + (o.total || 0), 0);
-            setRevenue(totalRev);
-
-            // Waiter revenue — all active orders
-            setWaiterRevenue(totalRev);
-            setWaiterCount(activeOrders.length);
-
-            // Butcher revenue — sum of item prices for butcher items
-            let bRev = 0;
-            let bCount = 0;
-            // Bartender revenue — sum of item prices for drink items
-            let dRev = 0;
-            let dCount = 0;
-
-            activeOrders.forEach((o: any) => {
-              (o.items || []).forEach((item: any) => {
-                const itemTotal = item.totalPrice || item.unitPrice * (item.quantity || 1);
-                if (isButcherItem(item.name)) {
-                  bRev += itemTotal;
-                  bCount += item.quantity || 1;
-                }
-                if (isDrinkItem(item.name)) {
-                  dRev += itemTotal;
-                  dCount += item.quantity || 1;
-                }
-              });
-            });
-            setButcherRevenue(bRev);
-            setButcherCount(bCount);
-            setBartenderRevenue(dRev);
-            setBartenderCount(dCount);
-
-            setRecentOrders(activeOrders.slice(0, 10));
+        const res = await fetch("/api/cashflow");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success) {
+            const s = json.data.summary;
+            setRevenue(s.totalRevenue);
+            setWaiterRevenue(s.waiterRevenue);
+            setWaiterCount(s.waiterCount);
+            setButcherRevenue(s.butcherRevenue);
+            setButcherCount(s.butcherCount);
+            setBartenderRevenue(s.bartenderRevenue);
+            setBartenderCount(s.bartenderCount);
+            setRecentOrders((json.data.transactions.waiter || []).slice(0, 10));
           }
         }
       } catch {}

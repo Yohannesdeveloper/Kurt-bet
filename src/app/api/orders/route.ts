@@ -6,7 +6,9 @@ import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
 
 const DEMO_FILE = ".demo-orders.json";
 const BUTCHER_ORDERS_FILE = ".demo-butcher-orders.json";
+const BARTENDER_ORDERS_FILE = ".demo-bartender-orders.json";
 const BUTCHER_ITEM_KEYWORDS = ["tibs", "kurt", "dulet", "tere sega", "tere siga", "gored gored"];
+const DRINK_KEYWORDS = ["coffee", "macchiato", "tej", "tella", "tea", "spris", "juice", "ambo", "soft drink", "besso", "atmet", "halwa", "cheesecake", "atayef"];
 
 export async function GET(req: NextRequest) {
   let status: string | null = null;
@@ -250,6 +252,35 @@ export async function POST(req: NextRequest) {
       }));
       await writeDemoJSON(BUTCHER_ORDERS_FILE, [...butcherOrders, ...newButcherOrders]);
     }
+    }
+
+    // Auto-create bartender orders for drink items
+    const drinkItems = (body?.items || []).filter((item: any) => {
+      const name = (item.name || "").toLowerCase();
+      return DRINK_KEYWORDS.some((kw) => name.includes(kw));
+    });
+    if (drinkItems.length > 0) {
+      const bartenderOrders = await readDemoJSON<any>(BARTENDER_ORDERS_FILE);
+      const nextDrinkNumber = bartenderOrders.length > 0 ? Math.max(...bartenderOrders.map((o: any) => o.orderNumber)) + 1 : 2001;
+      const tableNumber = body?.tableNumber || undefined;
+      const newBartenderOrder = {
+        id: `drink-${demoOrder.id}`,
+        orderNumber: nextDrinkNumber,
+        orderId: demoOrder.id,
+        customerName: (session?.user as { name?: string })?.name || "Unknown",
+        items: drinkItems.map((item: any) => ({
+          menuItemId: item.menuItemId,
+          name: item.name,
+          quantity: item.quantity || 1,
+          unitPrice: item.unitPrice || 0,
+        })),
+        tableNumber: tableNumber || null,
+        notes: "",
+        status: "PENDING",
+        createdAt: new Date().toISOString(),
+        completedAt: null,
+      };
+      await writeDemoJSON(BARTENDER_ORDERS_FILE, [...bartenderOrders, newBartenderOrder]);
     }
 
     return NextResponse.json({ success: true, data: demoOrder }, { status: 201 });

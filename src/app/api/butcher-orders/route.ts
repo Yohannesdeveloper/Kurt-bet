@@ -91,8 +91,8 @@ export async function DELETE(req: NextRequest) {
   }
 
   const role = (session.user as { role?: string }).role;
-  if (role !== "ADMIN" && role !== "KITCHEN") {
-    return NextResponse.json({ success: false, error: "Only admins and kitchen can delete" }, { status: 403 });
+  if (role !== "ADMIN") {
+    return NextResponse.json({ success: false, error: "Only admins can delete" }, { status: 403 });
   }
 
   const { searchParams } = req.nextUrl;

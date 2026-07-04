@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,14 +23,41 @@ import { motion } from "framer-motion";
 export default function ReportsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const [revenue, setRevenue] = useState(0);
+  const [expenses, setExpenses] = useState(0);
+  const [loadingData, setLoadingData] = useState(true);
+
   useEffect(() => {
     if (status !== "loading" && (!session || (session.user as any)?.role !== "ADMIN")) router.replace("/dashboard");
   }, [session, status, router]);
   if (status !== "loading" && (!session || (session.user as any)?.role !== "ADMIN")) return null;
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [ordersRes] = await Promise.all([
+          fetch("/api/orders?limit=500"),
+        ]);
+        if (ordersRes.ok) {
+          const ordersData = await ordersRes.json();
+          if (ordersData.success) {
+            const totalRev = (ordersData.data || [])
+              .filter((o: any) => o.status !== "CANCELLED")
+              .reduce((sum: number, o: any) => sum + (o.total || 0), 0);
+            setRevenue(totalRev);
+          }
+        }
+      } catch {}
+      setLoadingData(false);
+    }
+    fetchData();
+  }, []);
+
+  const netProfit = revenue - expenses;
   const stats = [
-    { label: "Total Revenue", value: formatCurrency(0), icon: TrendingUp, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
-    { label: "Total Expenses", value: formatCurrency(0), icon: TrendingDown, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },
-    { label: "Net Profit", value: formatCurrency(0), icon: DollarSign, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
+    { label: "Total Revenue", value: formatCurrency(revenue), icon: TrendingUp, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
+    { label: "Total Expenses", value: formatCurrency(expenses), icon: TrendingDown, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },
+    { label: "Net Profit", value: formatCurrency(netProfit), icon: DollarSign, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
   ];
 
   return (

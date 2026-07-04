@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
 
 const dishImages: Record<string, string> = {
   Tibs: "/images/tibs.jpg", Kurt: "/images/kurt.jpg", Kitfo: "/images/kifo.jpg",
@@ -60,6 +61,9 @@ const statsConfig = {
 };
 
 export default function KitchenDashboard() {
+  const { data: session } = useSession();
+  const userRole = (session?.user as { role?: string })?.role;
+  const isAdmin = userRole === "ADMIN";
   console.log("KITCHEN DASHBOARD MOUNTED - v3");
   const { t } = useTranslation();
   const statusLabels: Record<string, string> = {
@@ -298,15 +302,17 @@ export default function KitchenDashboard() {
                       <Check className="w-4 h-4" />
                       {actionLoading === order.id ? "Marking..." : "Mark as Received"}
                     </button>
-                    <button
-                      onClick={() => deleteButcherOrder(order.id)}
-                      disabled={actionLoading === order.id}
-                      className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 transition-all disabled:opacity-50 text-sm font-medium"
-                      title="Delete order"
-                    >
-                      {actionLoading === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                      Delete
-                    </button>
+                    {isAdmin && (
+                      <button
+                        onClick={() => deleteButcherOrder(order.id)}
+                        disabled={actionLoading === order.id}
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 transition-all disabled:opacity-50 text-sm font-medium"
+                        title="Delete order"
+                      >
+                        {actionLoading === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -361,15 +367,17 @@ export default function KitchenDashboard() {
                         <span className="text-sm font-semibold text-ethiopian-coffee">#{order.orderNumber} {order.menuItemName}</span>
                         <span className="text-xs text-ethiopian-coffee/60">{order.meatType} · {order.weight}kg · x{order.quantity}</span>
                         {order.tableNumber && <span className="text-xs font-medium text-ethiopian-gold ml-auto">Table {order.tableNumber}</span>}
-                        <button
-                          onClick={() => deleteButcherOrder(order.id)}
-                          disabled={actionLoading === order.id}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors disabled:opacity-50 text-xs font-medium"
-                          title="Delete"
-                        >
-                          {actionLoading === order.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                          Delete
-                        </button>
+                        {isAdmin && (
+                          <button
+                            onClick={() => deleteButcherOrder(order.id)}
+                            disabled={actionLoading === order.id}
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors disabled:opacity-50 text-xs font-medium"
+                            title="Delete"
+                          >
+                            {actionLoading === order.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                            Delete
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>

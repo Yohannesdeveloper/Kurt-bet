@@ -9,6 +9,7 @@ import { ArrowLeft, CookingPot, Clock, XCircle, ChevronRight, UtensilsCrossed, C
 import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
+import { useSession } from "next-auth/react";
 
 const dishImages: Record<string, string> = {
   Tibs: "/images/tibs.jpg", Kurt: "/images/kurt.jpg", Kitfo: "/images/kifo.jpg",
@@ -195,6 +196,9 @@ type ButcherOrder = {
 
 export default function KDSPage() {
   const { t } = useTranslation();
+  const { data: session } = useSession();
+  const userRole = (session?.user as { role?: string })?.role;
+  const isAdmin = userRole === "ADMIN";
   const [orders, setOrders] = useState<Order[]>([]);
   const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
   const [loading, setLoading] = useState(true);
@@ -406,21 +410,23 @@ export default function KDSPage() {
                             {bo.kitchenStatus === "RECEIVED" && (
                               <Badge variant="secondary" className="text-xs">Received</Badge>
                             )}
-                            <button
-                              onClick={async () => {
-                                if (!confirm("Delete this butcher order?")) return;
-                                try {
-                                  const res = await fetch(`/api/butcher-orders?id=${encodeURIComponent(bo.id)}`, { method: "DELETE" });
-                                  const d = await res.json();
-                                  if (d.success) { toast.success("Deleted"); fetchButcherOrders(); }
-                                  else { toast.error(d.error || "Failed"); }
-                                } catch { toast.error("Failed"); }
-                              }}
-                              className="ml-auto flex items-center gap-1 px-2 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors text-xs font-medium"
-                              title="Delete order"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" /> Delete
-                            </button>
+                            {isAdmin && (
+                              <button
+                                onClick={async () => {
+                                  if (!confirm("Delete this butcher order?")) return;
+                                  try {
+                                    const res = await fetch(`/api/butcher-orders?id=${encodeURIComponent(bo.id)}`, { method: "DELETE" });
+                                    const d = await res.json();
+                                    if (d.success) { toast.success("Deleted"); fetchButcherOrders(); }
+                                    else { toast.error(d.error || "Failed"); }
+                                  } catch { toast.error("Failed"); }
+                                }}
+                                className="ml-auto flex items-center gap-1 px-2 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors text-xs font-medium"
+                                title="Delete order"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Delete
+                              </button>
+                            )}
                           </div>
                         </CardContent>
                       </Card>

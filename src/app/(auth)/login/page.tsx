@@ -204,7 +204,7 @@ export default function LoginPage() {
           transition={{ duration: 0.5, delay: 0.6 }}
           className="text-center text-xs text-ethiopian-coffee/40 mt-6"
         >
-          Kurt Bet v1.0 &mdash; {t("landing.excellence")}
+          Habesha Kurt Bet v1.0 &mdash; {t("landing.excellence")}
         </motion.p>
       </motion.div>
     </div>

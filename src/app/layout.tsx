@@ -25,14 +25,14 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: "Kurt Bet - Premium Ethiopian Restaurant",
-    template: "%s | Kurt Bet",
+    default: "Habesha Kurt Bet - Premium Ethiopian Restaurant",
+    template: "%s | Habesha Kurt Bet",
   },
-  description: "Experience the finest Ethiopian cuisine at Kurt Bet. Fresh Tere Sega, Kitfo, Tibs, and traditional Ethiopian dishes prepared with generations of culinary expertise.",
-  keywords: ["Ethiopian restaurant", "Kurt Bet", "Tere Sega", "Ethiopian food", "Kitfo", "Tibs", "Addis Ababa", "Ethiopian cuisine"],
-  authors: [{ name: "Kurt Bet" }],
-  creator: "Kurt Bet",
-  publisher: "Kurt Bet",
+  description: "Experience the finest Ethiopian cuisine at Habesha Kurt Bet. Fresh Tere Sega, Kitfo, Tibs, and traditional Ethiopian dishes prepared with generations of culinary expertise.",
+  keywords: ["Ethiopian restaurant", "Habesha Kurt Bet", "Tere Sega", "Ethiopian food", "Kitfo", "Tibs", "Addis Ababa", "Ethiopian cuisine"],
+  authors: [{ name: "Habesha Kurt Bet" }],
+  creator: "Habesha Kurt Bet",
+  publisher: "Habesha Kurt Bet",
   robots: {
     index: true,
     follow: true,
@@ -40,9 +40,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    title: "Kurt Bet - Premium Ethiopian Restaurant",
-    description: "Experience the finest Ethiopian cuisine at Kurt Bet.",
-    siteName: "Kurt Bet",
+    title: "Habesha Kurt Bet - Premium Ethiopian Restaurant",
+    description: "Experience the finest Ethiopian cuisine at Habesha Kurt Bet.",
+    siteName: "Habesha Kurt Bet",
   },
 };
 

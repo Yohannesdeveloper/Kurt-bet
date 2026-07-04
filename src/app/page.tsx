@@ -915,7 +915,7 @@ function QRCodeSection() {
                   <div className="absolute -bottom-0.5 -right-0.5 w-8 h-8 border-b-4 border-r-4 border-ethiopian-gold rounded-br-xl" />
                   <div className="p-2 sm:p-3 bg-white rounded-2xl">
                     <QRCodeSVG
-                      value="https://kurt-bet.vercel.app/menu"
+                      value="https://habesha-kurt-bet.vercel.app/menu"
                       size={280}
                       level="H"
                       includeMargin

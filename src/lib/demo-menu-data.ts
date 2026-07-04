@@ -73,13 +73,15 @@ export const demoItems = [
 
 export async function ensureDemoItemsSeeded() {
   const persisted = await readDemoJSON<any>(".demo-menu-items.json");
+  const deletedIds = await readDemoJSON<string[]>(".demo-deleted-items.json");
+  const deletedSet = new Set(deletedIds);
   const hcIndex = new Map(demoItems.map((di: any) => [di.id, di]));
   const persistedIds = new Set(persisted.map((pi: any) => pi.id));
   const hasStaleHardcoded = persisted.some((pi: any) => {
     const hc = hcIndex.get(pi.id);
     return hc && (hc.price !== pi.price || hc.name !== pi.name || hc.image !== pi.image || hc.categoryId !== pi.categoryId || hc.requiresButcher !== pi.requiresButcher);
   });
-  const missingHardcoded = demoItems.some((di: any) => !persistedIds.has(di.id));
+  const missingHardcoded = demoItems.some((di: any) => !persistedIds.has(di.id) && !deletedSet.has(di.id));
 
   if (persisted.length === 0 || hasStaleHardcoded || missingHardcoded) {
     const userItems = persisted.filter((pi: any) => !hcIndex.has(pi.id));
@@ -90,6 +92,7 @@ export async function ensureDemoItemsSeeded() {
       category: ui.category || { id: ui.categoryId || "yefsig", name: demoCategories.find(c => c.id === (ui.categoryId || "yefsig"))?.name || "የፍስግ (Yefsig)" },
       requiresButcher: ui.requiresButcher ?? false,
     }));
-    await writeDemoJSON(".demo-menu-items.json", [...demoItems.map((di: any) => ({ ...di })), ...updatedUserItems]);
+    const seedItems = demoItems.filter((di: any) => !deletedSet.has(di.id));
+    await writeDemoJSON(".demo-menu-items.json", [...seedItems, ...updatedUserItems]);
   }
 }

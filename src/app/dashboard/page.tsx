@@ -9,12 +9,17 @@ import {
   ChevronRight as ChevronRightIcon, Sparkles, Flame,
   Zap, TrendingUp, Store, CookingPot, ClipboardList, Users, LogOut,
   Beef, Drumstick, Check, XCircle, Send, Minus, Plus, Gem, Award, Package,
-  Coffee
+  Coffee, Loader2
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+} from "@/components/ui/dialog";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
+import { formatCurrency } from "@/lib/utils";
 import { EthiopianCornerSet, JebenaIcon, MesobIcon, InjeraIcon } from "@/components/shared/ethiopian-patterns";
 import { GoldButton } from "@/components/shared/section-header";
 import { BartenderWorkflow } from "@/components/bartender/bartender-workflow";
@@ -894,6 +899,22 @@ function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => vo
   const { t } = useTranslation();
   const { notifications, markAsRead, markAllAsRead } = useNotificationStore();
   const readyNotifs = notifications.filter(n => n.type === "ORDER_READY");
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [loadingOrder, setLoadingOrder] = useState(false);
+
+  const handleNotifClick = async (n: any) => {
+    markAsRead(n.id);
+    const orderId = n.data?.orderId;
+    if (!orderId) return;
+    setLoadingOrder(true);
+    try {
+      const res = await fetch(`/api/orders/${orderId}`);
+      const d = await res.json();
+      if (d.success) setSelectedOrder(d.data);
+    } catch {} finally {
+      setLoadingOrder(false);
+    }
+  };
 
   return (
     <>
@@ -920,7 +941,7 @@ function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => vo
               readyNotifs.map((n) => (
                 <div
                   key={n.id}
-                  onClick={() => markAsRead(n.id)}
+                  onClick={() => handleNotifClick(n)}
                   className={`p-3 rounded-xl border cursor-pointer transition-colors ${
                     n.isRead
                       ? "bg-white/50 border-ethiopian-gold/5 text-ethiopian-coffee/60"
@@ -940,6 +961,67 @@ function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => vo
           </div>
         </div>
       </div>
+
+      <Dialog open={!!selectedOrder} onOpenChange={(o) => { if (!o) setSelectedOrder(null); }}>
+        <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
+          {loadingOrder ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin text-ethiopian-gold" />
+            </div>
+          ) : selectedOrder ? (
+            <>
+              <DialogHeader>
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-ethiopian-clay to-ethiopian-gold flex items-center justify-center shadow-md">
+                    <UtensilsCrossed className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-lg">Order #{selectedOrder.orderNumber}</DialogTitle>
+                    <DialogDescription>
+                      {new Date(selectedOrder.createdAt).toLocaleString()}
+                    </DialogDescription>
+                  </div>
+                </div>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Badge className={selectedOrder.status === "READY" ? "bg-green-100 text-green-700" : ""}>
+                    {selectedOrder.status}
+                  </Badge>
+                  {selectedOrder.table && (
+                    <span className="text-xs text-ethiopian-coffee/60">
+                      Table {selectedOrder.table.number || selectedOrder.table.name}
+                    </span>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-ethiopian-coffee">Items ({selectedOrder.items?.length || 0})</p>
+                  {selectedOrder.items?.map((item: any) => (
+                    <div key={item.id} className="flex items-center gap-3 p-2 rounded-lg bg-white border border-ethiopian-gold/10">
+                      {item.menuItem?.image ? (
+                        <img src={item.menuItem.image} alt="" className="h-12 w-12 rounded-lg object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 flex items-center justify-center flex-shrink-0">
+                          <UtensilsCrossed className="h-5 w-5 text-ethiopian-gold" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-ethiopian-coffee">{item.name}</p>
+                        <p className="text-xs text-ethiopian-coffee/50">x{item.quantity}</p>
+                      </div>
+                      <p className="text-sm font-semibold text-ethiopian-gold">{formatCurrency(item.totalPrice)}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-gradient-to-r from-ethiopian-coffee to-ethiopian-charcoal text-white">
+                  <span className="text-sm font-medium">Total</span>
+                  <span className="text-lg font-bold">{formatCurrency(selectedOrder.total)}</span>
+                </div>
+              </div>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

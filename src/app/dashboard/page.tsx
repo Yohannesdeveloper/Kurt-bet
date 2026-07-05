@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback, type CSSProperties } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import {
-  Search, ShoppingCart, User, MapPin, Star, Clock,
+  Search, Bell, ShoppingCart, User, MapPin, Star, Clock,
   ChevronRight, Home, UtensilsCrossed, Receipt,
   Heart, Percent, Menu, X, ChevronLeft,
   ChevronRight as ChevronRightIcon, Sparkles, Flame,
@@ -18,6 +18,8 @@ import { useTranslation } from "@/lib/i18n";
 import { EthiopianCornerSet, JebenaIcon, MesobIcon, InjeraIcon } from "@/components/shared/ethiopian-patterns";
 import { GoldButton } from "@/components/shared/section-header";
 import { BartenderWorkflow } from "@/components/bartender/bartender-workflow";
+import { useSocket } from "@/hooks/useSocket";
+import { useNotificationStore } from "@/store/useNotificationStore";
 
 const categoryKeys = ["tereSega", "kitfo", "tibs", "goredGored", "awazeTibs", "zilzilTibs"] as const;
 const categoryMeta: Record<string, { count: number; image: string; color: string; bg: string }> = {
@@ -37,11 +39,14 @@ const restaurantMeta: Record<string, { rating: number; deliveryTime: string; pri
   goredGoredHouse: { rating: 4.6, deliveryTime: "20-35", price: "420", image: "/images/gored gored.jpg", color: "from-ethiopian-coffee to-ethiopian-charcoal", tagKeys: ["goredGored", "fresh"], featured: false, discount: null },
 };
 
-function Header({ onCartClick }: { onCartClick: () => void }) {
+function Header({ onNotifClick }: { onNotifClick: () => void }) {
   const [searchFocused, setSearchFocused] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const { data: session } = useSession();
   const { t } = useTranslation();
+  const { notifications, unreadCount } = useNotificationStore();
+  const readyCount = notifications.filter(n => n.type === "ORDER_READY" && !n.isRead).length;
+  const displayCount = readyCount || unreadCount;
 
   const handleSearchKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && searchRef.current?.value.trim()) {
@@ -98,15 +103,19 @@ function Header({ onCartClick }: { onCartClick: () => void }) {
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
-              onClick={onCartClick}
+              onClick={onNotifClick}
               className="relative p-2 rounded-full hover:bg-gradient-to-r hover:from-ethiopian-gold/10 hover:to-ethiopian-clay/10 transition-colors group"
             >
-              <ShoppingCart className="w-5 h-5 text-ethiopian-coffee group-hover:text-ethiopian-gold transition-colors" />
-              <motion.span
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="absolute top-1 right-1 w-2 h-2 bg-ethiopian-clay rounded-full"
-              />
+              <Bell className="w-5 h-5 text-ethiopian-coffee group-hover:text-ethiopian-gold transition-colors" />
+              {displayCount > 0 && (
+                <motion.span
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-ethiopian-clay text-[9px] font-bold text-white"
+                >
+                  {displayCount}
+                </motion.span>
+              )}
             </motion.button>
             <motion.div whileHover={{ scale: 1.02 }} className="hidden sm:flex items-center gap-3 pl-3 border-l border-ethiopian-gold/20 cursor-pointer">
               <div className="relative">
@@ -880,36 +889,10 @@ function MobileNav() {
   );
 }
 
-function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { data: session } = useSession();
+function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
-  const [submitting, setSubmitting] = useState(false);
-  const [cartItems, setCartItems] = useState([
-    { name: "Kurt Special", qty: 2, price: 450 },
-    { name: "Kitfo", qty: 1, price: 350 },
-  ]);
-  const total = cartItems.reduce((s, i) => s + i.qty * i.price, 0);
-
-  const handleCheckout = async () => {
-    setSubmitting(true);
-    try {
-      const menuRes = await fetch("/api/menu");
-      const menuData = await menuRes.json();
-      const menuItems = menuData.success ? (menuData.data?.items || menuData.data || []) : [];
-      const items = cartItems.map((ci) => {
-        const match = menuItems.find((m: { name: string; id: string; price: number }) => m.name.toLowerCase().includes(ci.name.toLowerCase().split(" ")[0].toLowerCase()));
-        return { menuItemId: match?.id || "demo", name: ci.name, quantity: ci.qty, unitPrice: ci.price, totalPrice: ci.qty * ci.price };
-      });
-      const res = await fetch("/api/orders", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "DINE_IN", guestCount: 1, subtotal: total, total, items }),
-      });
-      const data = await res.json();
-      if (data.success) { toast.success(t("cart.orderPlaced", { orderNumber: data.data.orderNumber })); onClose(); }
-      else { toast.error(data.error || t("cart.failedToPlace")); }
-    } catch { toast.error(t("cart.failedToPlace")); }
-    finally { setSubmitting(false); }
-  };
+  const { notifications, markAsRead, markAllAsRead } = useNotificationStore();
+  const readyNotifs = notifications.filter(n => n.type === "ORDER_READY");
 
   return (
     <>
@@ -917,37 +900,42 @@ function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
       <div className={`fixed top-0 right-0 h-full w-80 sm:w-96 bg-ethiopian-cream shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4 border-b border-ethiopian-gold/10">
-            <h2 className="text-lg font-bold font-serif text-ethiopian-coffee">{t("cart.yourCart")}</h2>
-            <button onClick={onClose} className="p-1 rounded-full hover:bg-ethiopian-cream transition-colors">
-              <X className="w-5 h-5 text-ethiopian-coffee" />
-            </button>
+            <h2 className="text-lg font-bold font-serif text-ethiopian-coffee">Notifications</h2>
+            <div className="flex items-center gap-2">
+              {readyNotifs.length > 0 && (
+                <button onClick={markAllAsRead} className="text-xs text-ethiopian-gold hover:underline">
+                  Mark all read
+                </button>
+              )}
+              <button onClick={onClose} className="p-1 rounded-full hover:bg-ethiopian-cream transition-colors">
+                <X className="w-5 h-5 text-ethiopian-coffee" />
+              </button>
+            </div>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {cartItems.map((item, i) => (
-              <div key={i} className="flex items-center justify-between p-3 rounded-xl bg-white border border-ethiopian-gold/10">
-                <div>
-                  <p className="text-sm font-semibold text-ethiopian-coffee">{item.name}</p>
-                  <p className="text-xs text-ethiopian-coffee/60">{t("cart.qty", { qty: item.qty })}</p>
+            {readyNotifs.length === 0 ? (
+              <p className="text-center text-ethiopian-coffee/50 py-8 text-sm">No notifications</p>
+            ) : (
+              readyNotifs.map((n) => (
+                <div
+                  key={n.id}
+                  onClick={() => markAsRead(n.id)}
+                  className={`p-3 rounded-xl border cursor-pointer transition-colors ${
+                    n.isRead
+                      ? "bg-white/50 border-ethiopian-gold/5 text-ethiopian-coffee/60"
+                      : "bg-white border-ethiopian-gold/20 shadow-sm"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`mt-0.5 h-2 w-2 rounded-full flex-shrink-0 ${n.isRead ? "bg-gray-300" : "bg-ethiopian-clay"}`} />
+                    <div className="min-w-0">
+                      <p className={`text-sm font-medium ${n.isRead ? "" : "text-ethiopian-coffee"}`}>{n.title}</p>
+                      <p className="text-xs text-ethiopian-coffee/60 mt-0.5">{n.message}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-bold text-ethiopian-gold">{t("common.currency")} {item.qty * item.price}</p>
-                  <button onClick={() => setCartItems(prev => prev.filter((_, j) => j !== i))} className="p-1 rounded-full hover:bg-red-100 hover:text-red-500 transition-colors text-gray-400">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="p-4 border-t border-ethiopian-gold/10 space-y-3 bg-white/50">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-semibold text-ethiopian-coffee">{t("cart.total")}</span>
-              <span className="text-lg font-bold text-ethiopian-gold font-serif">{t("common.currency")} {total}</span>
-            </div>
-            <button onClick={handleCheckout} disabled={submitting}
-              className="w-full py-3 rounded-xl bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay text-white font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
-            >
-              {submitting ? t("cart.placingOrder") : t("cart.checkout")}
-            </button>
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -957,13 +945,15 @@ function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [currentView, setCurrentView] = useState("home");
+
+  useSocket();
 
   return (
     <div className="min-h-screen bg-ethiopian-cream texture-linen">
-      <Header onCartClick={() => setCartOpen(!cartOpen)} />
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      <Header onNotifClick={() => setNotifOpen(!notifOpen)} />
+      <NotificationPanel open={notifOpen} onClose={() => setNotifOpen(false)} />
 
       <div className="px-4 sm:px-6 lg:pl-0 lg:pr-6 xl:pr-8 2xl:pr-10 py-6 lg:py-8">
         <div className="flex">

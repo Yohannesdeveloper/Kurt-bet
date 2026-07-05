@@ -355,7 +355,7 @@ export default function KDSPage() {
                 try {
                   const res = await fetch("/api/orders/clear-history", { method: "DELETE" });
                   const d = await res.json();
-                  if (d.success) { toast.success(`Deleted ${d.count} delivered orders`); fetchOrders(); }
+                  if (d.success) { toast.success(`Deleted ${d.count} delivered orders`); refresh(); }
                   else { toast.error(d.error || "Failed"); }
                 } catch { toast.error("Failed"); }
               }}

@@ -27,10 +27,13 @@ export const useNotificationStore = create<NotificationStore>()(
           unreadCount: notifications.filter((n) => !n.isRead).length,
         }),
       addNotification: (notification) =>
-        set((state) => ({
-          notifications: [notification, ...state.notifications],
-          unreadCount: state.unreadCount + (notification.isRead ? 0 : 1),
-        })),
+        set((state) => {
+          if (state.notifications.some((n) => n.id === notification.id)) return state;
+          return {
+            notifications: [notification, ...state.notifications],
+            unreadCount: state.unreadCount + (notification.isRead ? 0 : 1),
+          };
+        }),
       markAsRead: (id) =>
         set((state) => ({
           notifications: state.notifications.map((n) =>
@@ -47,6 +50,17 @@ export const useNotificationStore = create<NotificationStore>()(
       setOpen: (open) => set({ isOpen: open }),
       clearNotifications: () => set({ notifications: [], unreadCount: 0 }),
     }),
-    { name: "notifications-storage", partialize: (state) => ({ notifications: state.notifications, unreadCount: state.unreadCount }) }
+    {
+      name: "notifications-storage",
+      partialize: (state) => ({ notifications: state.notifications, unreadCount: state.unreadCount }),
+      merge: (persisted, current) => ({
+        ...current,
+        ...(persisted as Partial<NotificationStore>),
+        notifications: (persisted as any).notifications?.map((n: any) => ({
+          ...n,
+          createdAt: new Date(n.createdAt),
+        })) ?? [],
+      }),
+    }
   )
 );

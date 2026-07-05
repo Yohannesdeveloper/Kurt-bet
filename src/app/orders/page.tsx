@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,7 @@ import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
 import { useSocket } from "@/hooks/useSocket";
+import { useSSENotifications } from "@/hooks/useSSENotifications";
 import { useNotificationStore } from "@/store/useNotificationStore";
 
 const statusStyles: Record<string, string> = {
@@ -122,6 +123,7 @@ export default function OrdersPage() {
   }, [fetchOrders]);
 
   useSocket();
+  useSSENotifications();
   const { notifications } = useNotificationStore();
   useEffect(() => {
     const readyNotif = notifications.find(n => n.type === "ORDER_READY" && !n.isRead);
@@ -130,35 +132,6 @@ export default function OrdersPage() {
       useNotificationStore.getState().markAsRead(readyNotif.id);
     }
   }, [notifications]);
-
-  const readyIdsRef = useRef(new Set<string>());
-  useEffect(() => {
-    const checkReady = async () => {
-      try {
-        const res = await fetch("/api/orders?status=READY");
-        const d = await res.json();
-        if (!d.success) return;
-        for (const o of d.data || []) {
-          if (!readyIdsRef.current.has(o.id)) {
-            readyIdsRef.current.add(o.id);
-            useNotificationStore.getState().addNotification({
-              id: `order-ready-${o.id}`,
-              type: "ORDER_READY",
-              title: "Order Ready",
-              message: `Order #${o.orderNumber} is ready to serve`,
-              data: { orderId: o.id, orderNumber: o.orderNumber },
-              isRead: false,
-              actionUrl: "/orders",
-              createdAt: new Date(),
-            });
-          }
-        }
-      } catch {}
-    };
-    checkReady();
-    const interval = setInterval(checkReady, 8000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleApprove = async (orderId: string, approve: boolean) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, approved: approve } : o));

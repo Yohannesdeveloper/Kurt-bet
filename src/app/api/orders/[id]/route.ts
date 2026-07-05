@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
 import { getIO } from "@/server/socket";
+import { emitOrderReady } from "@/lib/notification-emitter";
 
 const DEMO_FILE = ".demo-orders.json";
 
@@ -126,9 +127,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     });
 
     if (body.status === "READY") {
+      const restaurantId = (session.user as { restaurantId?: string }).restaurantId;
+      emitOrderReady(restaurantId || "", { orderId: order.id, orderNumber: order.orderNumber });
       const io = getIO();
-      if (io) {
-        const restaurantId = (session.user as { restaurantId?: string }).restaurantId;
+      if (io && restaurantId) {
         io.to(`restaurant:${restaurantId}`).emit("notification:new", {
           notification: {
             type: "ORDER_READY",
@@ -182,11 +184,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     await writeDemoJSON(DEMO_FILE, demoOrders);
 
     if (body.status === "READY") {
-      const io = getIO();
-      if (io) {
-        const session = await getServerSession(authOptions);
-        const restaurantId = (session?.user as { restaurantId?: string })?.restaurantId;
-        if (restaurantId) {
+      const session = await getServerSession(authOptions);
+      const restaurantId = (session?.user as { restaurantId?: string })?.restaurantId;
+      if (restaurantId) {
+        emitOrderReady(restaurantId, { orderId: params.id, orderNumber: demoOrdersMap[idx].orderNumber });
+        const io = getIO();
+        if (io) {
           io.to(`restaurant:${restaurantId}`).emit("notification:new", {
             notification: {
               type: "ORDER_READY",

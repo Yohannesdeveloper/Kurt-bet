@@ -856,12 +856,16 @@ function LocationSection() {
 }
 
 function QRCodeSection() {
-  const { t } = useTranslation();
-
   const features = [
-    t("landing.qrFeature1"), t("landing.qrFeature2"), t("landing.qrFeature3"),
-    t("landing.qrFeature4"), t("landing.qrFeature5"), t("landing.qrFeature6"),
-    t("landing.qrFeature7"), t("landing.qrFeature8"), t("landing.qrFeature9"),
+    "Browse the complete digital menu",
+    "View Kurt & Tere Sega specialties",
+    "See featured and popular dishes",
+    "Add items to your cart & place orders",
+    "Track order status in real time",
+    "Pay online or at the restaurant",
+    "Reserve a table",
+    "Save favorite dishes",
+    "View promotions and special offers",
   ];
 
   return (
@@ -890,11 +894,11 @@ function QRCodeSection() {
               <span className="text-xs tracking-[0.2em] uppercase text-ethiopian-gold font-medium">QR Code</span>
             </motion.div>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-serif font-bold text-white mb-4">
-              {t("landing.qrTitle")}
+              Scan & Explore Our Digital Menu
             </h2>
             <div className="w-16 h-0.5 bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay mx-auto rounded-full mb-6" />
             <p className="text-white/60 text-sm sm:text-base lg:text-lg max-w-3xl mx-auto leading-relaxed">
-              {t("landing.qrSubtitle")}
+              Scan the QR code to instantly access our digital restaurant, browse the menu, order your favorite dishes, reserve a table, and enjoy an authentic Ethiopian dining experience.
             </p>
           </div>
         </AnimatedSection>
@@ -923,7 +927,7 @@ function QRCodeSection() {
                     />
                   </div>
                   <p className="text-center text-xs text-ethiopian-coffee/60 mt-4 font-medium tracking-wider uppercase">
-                    {t("app.name")}
+                    Kurt Bet
                   </p>
                 </div>
               </div>
@@ -951,11 +955,11 @@ function QRCodeSection() {
 
               <div className="flex flex-col sm:flex-row gap-3 pt-2">
                 <GoldButton href="/menu">
-                  {t("landing.qrOpenMenu")}
+                  Open Menu
                   <ArrowRight className="w-4 h-4" />
                 </GoldButton>
                 <GoldButton href="/menu?category=specials" variant="outline">
-                  {t("landing.qrTodaySpecials")}
+                  Today's Specials
                 </GoldButton>
               </div>
             </div>

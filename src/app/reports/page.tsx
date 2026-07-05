@@ -89,19 +89,21 @@ function EmployeeBreakdown({ employees }: { employees: EmployeeEntry[] }) {
 function RecentTransactions({ orders }: { orders: OrderEntry[] }) {
   return (
     <div className="space-y-2 mt-4">
-      <p className="text-xs font-semibold text-ethiopian-coffee/60 uppercase tracking-wider">Recent Transactions</p>
-      {orders.slice(0, 10).map((o: any) => (
-        <div key={o.id || o.orderNumber} className="flex items-center justify-between p-2 rounded-lg bg-muted/30 border border-border/50">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-sm font-medium shrink-0">#{o.orderNumber}</span>
-            <span className="text-xs text-muted-foreground truncate">
-              {o.waiter ? `${o.waiter.firstName} ${o.waiter.lastName}` : (o.status || "")}
-            </span>
+      <p className="text-xs font-semibold text-ethiopian-coffee/60 uppercase tracking-wider sticky top-0 bg-background py-1 z-10">Recent Transactions</p>
+      <div className="max-h-80 overflow-y-auto space-y-2 pr-1">
+        {orders.map((o: any) => (
+          <div key={o.id || o.orderNumber} className="flex items-center justify-between p-2 rounded-lg bg-muted/30 border border-border/50">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-sm font-medium shrink-0">#{o.orderNumber}</span>
+              <span className="text-xs text-muted-foreground truncate">
+                {o.waiter ? `${o.waiter.firstName} ${o.waiter.lastName}` : (o.status || "")}
+              </span>
+            </div>
+            <span className="text-sm font-semibold shrink-0 ml-2">{formatCurrency(o.total || 0)}</span>
           </div>
-          <span className="text-sm font-semibold shrink-0 ml-2">{formatCurrency(o.total || 0)}</span>
-        </div>
-      ))}
-      {orders.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No transactions found</p>}
+        ))}
+        {orders.length === 0 && <p className="text-sm text-muted-foreground text-center py-4">No transactions found</p>}
+      </div>
     </div>
   );
 }

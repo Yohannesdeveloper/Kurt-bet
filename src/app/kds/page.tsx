@@ -79,10 +79,11 @@ function formatTime(iso: string) {
   return `${hrs}h ${mins % 60}m`;
 }
 
-const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Order; onStatusUpdate: (id: string, status: string) => void }) {
+const OrderCard = memo(function OrderCard({ order, onStatusUpdate, isAdmin }: { order: Order; onStatusUpdate: (id: string, status: string) => void; isAdmin?: boolean }) {
   const { t } = useTranslation();
   const s = STATUS_FLOW[order.status] || STATUS_FLOW.NEW;
   const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const statusTLabel: Record<string, string> = {
     NEW: t("orders.pending"),
@@ -180,6 +181,26 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
               >
                 <XCircle className="h-3 w-3 mr-1" />{t("common.cancel")}
               </Button>
+            )}
+            {isAdmin && order.status === "SERVED" && (
+              <button
+                onClick={async () => {
+                  if (!confirm("Delete this delivered order permanently?")) return;
+                  setDeleting(true);
+                  try {
+                    const res = await fetch(`/api/orders/${order.id}`, { method: "DELETE" });
+                    const d = await res.json();
+                    if (d.success) { toast.success("Order deleted"); onStatusUpdate(order.id, "DELETED"); }
+                    else { toast.error(d.error || "Failed"); }
+                  } catch { toast.error("Failed"); }
+                  setDeleting(false);
+                }}
+                disabled={deleting}
+                className="ml-auto flex items-center gap-1 px-2 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors text-xs font-medium disabled:opacity-50"
+                title="Delete order"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> {deleting ? "..." : "Delete"}
+              </button>
             )}
           </div>
         </CardContent>
@@ -363,7 +384,7 @@ export default function KDSPage() {
                 <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pr-1">
                   <AnimatePresence mode="popLayout">
                     {grp.orders.map(order => (
-                      <OrderCard key={order.id} order={order} onStatusUpdate={handleStatusUpdate} />
+                      <OrderCard key={order.id} order={order} onStatusUpdate={handleStatusUpdate} isAdmin={isAdmin} />
                     ))}
                   </AnimatePresence>
                   {grp.orders.length === 0 && (

@@ -29,6 +29,8 @@ import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
+import { useSocket } from "@/hooks/useSocket";
+import { useNotificationStore } from "@/store/useNotificationStore";
 
 const statusStyles: Record<string, string> = {
   NEW: "bg-blue-100 text-blue-700",
@@ -113,6 +115,21 @@ export default function OrdersPage() {
   }, [activeTab]);
 
   useEffect(() => { fetchOrders(); }, [fetchOrders]);
+
+  useEffect(() => {
+    const interval = setInterval(fetchOrders, 10000);
+    return () => clearInterval(interval);
+  }, [fetchOrders]);
+
+  useSocket();
+  const { notifications } = useNotificationStore();
+  useEffect(() => {
+    const readyNotif = notifications.find(n => n.type === "ORDER_READY" && !n.isRead);
+    if (readyNotif) {
+      toast.success(readyNotif.message, { duration: 5000, icon: "🍽️" });
+      useNotificationStore.getState().markAsRead(readyNotif.id);
+    }
+  }, [notifications]);
 
   const handleApprove = async (orderId: string, approve: boolean) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, approved: approve } : o));

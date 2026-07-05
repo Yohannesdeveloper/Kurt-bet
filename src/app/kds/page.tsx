@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
 import { useSession } from "next-auth/react";
+import { getSocket, sendKitchenUpdate } from "@/lib/socket";
 
 const dishImages: Record<string, string> = {
   Tibs: "/images/tibs.jpg", Kurt: "/images/kurt.jpg", Kitfo: "/images/kifo.jpg",
@@ -102,6 +103,14 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate }: { order: Or
       const d = await res.json();
       if (d.success) {
         toast.success(`Order #${order.orderNumber} → ${STATUS_FLOW[newStatus]?.label || newStatus}`);
+        const socket = getSocket();
+        if (socket.connected) {
+          sendKitchenUpdate(socket, {
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            status: newStatus,
+          });
+        }
       } else {
         toast.error(d.error || "Status update failed");
       }

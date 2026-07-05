@@ -57,6 +57,7 @@ export default function MenuPage() {
     descMap[item.id] ? t(descMap[item.id]) : (item.description || "");
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role || "CLIENT";
+  const isClient = userRole === "CLIENT";
   const canAddItem = ["ADMIN", "WAITER", "KITCHEN"].includes(userRole);
   const canEditDelete = userRole === "ADMIN";
   const [searchQuery, setSearchQuery] = useState("");
@@ -343,7 +344,7 @@ export default function MenuPage() {
                           </div>
                           <p className="font-bold text-base lg:text-lg text-primary">{formatCurrency(item.price)}</p>
                         </div>
-                        {item.isAvailable && (
+                        {item.isAvailable && !isClient && (
                           <div className="mt-3 pt-3 border-t flex items-center justify-between">
                             {cart.find(c => c.id === item.id) ? (
                               <div className="flex items-center gap-2">
@@ -379,7 +380,7 @@ export default function MenuPage() {
         editingItem={editingItem}
       />
 
-      {cartCount > 0 && (
+      {cartCount > 0 && !isClient && (
         <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
           <Button
             className="h-14 w-14 rounded-full shadow-xl"
@@ -393,7 +394,7 @@ export default function MenuPage() {
         </div>
       )}
 
-      {showCart && (
+      {showCart && !isClient && (
         <div className="fixed inset-0 z-50 bg-black/50" onClick={() => setShowCart(false)}>
           <div className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-background shadow-2xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between p-4 border-b">
@@ -445,13 +446,15 @@ export default function MenuPage() {
         </div>
       )}
 
-      <PlaceOrderDialog
-        open={orderDialogOpen}
-        onOpenChange={setOrderDialogOpen}
-        cart={cart}
-        cartTotal={cartTotal}
-        onOrderPlaced={() => { setCart([]); setShowCart(false); setOrderDialogOpen(false); }}
-      />
+      {!isClient && (
+        <PlaceOrderDialog
+          open={orderDialogOpen}
+          onOpenChange={setOrderDialogOpen}
+          cart={cart}
+          cartTotal={cartTotal}
+          onOrderPlaced={() => { setCart([]); setShowCart(false); setOrderDialogOpen(false); }}
+        />
+      )}
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
+import { getIO } from "@/server/socket";
 
 const DEMO_FILE = ".demo-orders.json";
 
@@ -124,6 +125,21 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       include: { items: true, payments: true },
     });
 
+    if (body.status === "READY") {
+      const io = getIO();
+      if (io) {
+        const restaurantId = (session.user as { restaurantId?: string }).restaurantId;
+        io.to(`restaurant:${restaurantId}`).emit("notification:new", {
+          notification: {
+            type: "ORDER_READY",
+            title: "Order Ready",
+            message: `Order #${order.orderNumber} is ready to serve`,
+            data: { orderId: order.id, orderNumber: order.orderNumber },
+          },
+        });
+      }
+    }
+
     return NextResponse.json({ success: true, data: order });
   } catch (error) {
     console.error("Order update error (demo mode):", error);
@@ -164,6 +180,25 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       demoOrdersMap[idx].completedAt = new Date().toISOString();
     }
     await writeDemoJSON(DEMO_FILE, demoOrders);
+
+    if (body.status === "READY") {
+      const io = getIO();
+      if (io) {
+        const session = await getServerSession(authOptions);
+        const restaurantId = (session?.user as { restaurantId?: string })?.restaurantId;
+        if (restaurantId) {
+          io.to(`restaurant:${restaurantId}`).emit("notification:new", {
+            notification: {
+              type: "ORDER_READY",
+              title: "Order Ready",
+              message: `Order #${demoOrdersMap[idx].orderNumber} is ready to serve`,
+              data: { orderId: params.id, orderNumber: demoOrdersMap[idx].orderNumber },
+            },
+          });
+        }
+      }
+    }
+
     return NextResponse.json({ success: true, data: demoOrdersMap[idx] });
   }
 }

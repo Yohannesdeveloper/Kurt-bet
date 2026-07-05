@@ -4,7 +4,10 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
 
-const DEMO_FILE = ".demo-orders.json";
+const ORDERS_FILE = ".demo-orders.json";
+const BUTCHER_FILE = ".demo-butcher-orders.json";
+
+const KDS_STATUSES = ["NEW", "PREPARING", "READY", "SERVED"];
 
 export async function DELETE() {
   const session = await getServerSession(authOptions).catch(() => null);
@@ -13,25 +16,30 @@ export async function DELETE() {
   if (!session?.user || role !== "ADMIN") {
     return NextResponse.json({ success: false, error: "Only admins can clear history" }, { status: 403 });
   }
-
   if (!restaurantId) {
     return NextResponse.json({ success: false, error: "No restaurant" }, { status: 400 });
   }
 
+  let orderCount = 0;
+
   try {
     const { count } = await prisma.order.deleteMany({
-      where: { status: "SERVED", restaurantId },
+      where: { status: { in: KDS_STATUSES as any }, restaurantId },
     });
-    return NextResponse.json({ success: true, count });
+    orderCount = count;
   } catch {
-    const demoOrders = await readDemoJSON<any>(DEMO_FILE).catch(() => [] as any[]);
-    const before = demoOrders.length;
-    const remaining = demoOrders.filter(
-      (o: any) => o.restaurantId === restaurantId ? o.status !== "SERVED" : true
+    const orders = await readDemoJSON<any>(ORDERS_FILE).catch(() => [] as any[]);
+    const before = orders.length;
+    const remaining = orders.filter(
+      (o: any) => o.restaurantId === restaurantId ? !KDS_STATUSES.includes(o.status) : true
     );
     if (remaining.length !== before) {
-      await writeDemoJSON(DEMO_FILE, remaining).catch(() => {});
+      await writeDemoJSON(ORDERS_FILE, remaining).catch(() => {});
     }
-    return NextResponse.json({ success: true, count: before - remaining.length });
+    orderCount = before - remaining.length;
   }
+
+  await writeDemoJSON(BUTCHER_FILE, []).catch(() => {});
+
+  return NextResponse.json({ success: true, orderCount, butcherCleared: true });
 }

@@ -351,11 +351,11 @@ export default function KDSPage() {
           {isAdmin && (
             <button
               onClick={async () => {
-                if (!confirm("Delete all delivered orders permanently?")) return;
+                if (!confirm("Clear all orders from KDS (New, Preparing, Ready, Delivered, Butcher)?")) return;
                 try {
                   const res = await fetch("/api/orders/clear-history", { method: "DELETE" });
                   const d = await res.json();
-                  if (d.success) { toast.success(`Deleted ${d.count} delivered orders`); refresh(); }
+                  if (d.success) { toast.success("All orders cleared"); refresh(); }
                   else { toast.error(d.error || "Failed"); }
                 } catch { toast.error("Failed"); }
               }}

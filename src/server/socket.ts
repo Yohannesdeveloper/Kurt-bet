@@ -56,7 +56,7 @@ export function initSocketServer(httpServer: HTTPServer) {
     socket.on("kitchen:update", (data: Record<string, unknown>) => {
       io?.to(restaurantRoom).emit("kitchen:updated", data);
       if (data.status === "READY") {
-        io?.to("waiters").emit("notification:new", {
+        io?.to(restaurantRoom).emit("notification:new", {
           notification: {
             type: "ORDER_READY",
             title: "Order Ready",

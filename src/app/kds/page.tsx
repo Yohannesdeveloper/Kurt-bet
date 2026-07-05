@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
 import { useSession } from "next-auth/react";
+import { useSocket } from "@/hooks/useSocket";
 import { getSocket, sendKitchenUpdate } from "@/lib/socket";
 
 const dishImages: Record<string, string> = {
@@ -211,6 +212,8 @@ export default function KDSPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useSocket();
 
   const fetchOrders = useCallback(() => {
     fetch("/api/orders?status=NEW,PREPARING,READY,SERVED")

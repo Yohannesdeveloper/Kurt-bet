@@ -348,6 +348,23 @@ export default function KDSPage() {
         <div className="flex items-center gap-2">
           <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }} className="h-2 w-2 rounded-full bg-emerald-500" />
           <span className="text-xs text-ethiopian-coffee/50">Live</span>
+          {isAdmin && (
+            <button
+              onClick={async () => {
+                if (!confirm("Delete all delivered orders permanently?")) return;
+                try {
+                  const res = await fetch("/api/orders/clear-history", { method: "DELETE" });
+                  const d = await res.json();
+                  if (d.success) { toast.success(`Deleted ${d.count} delivered orders`); fetchOrders(); }
+                  else { toast.error(d.error || "Failed"); }
+                } catch { toast.error("Failed"); }
+              }}
+              className="ml-3 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors text-xs font-medium"
+              title="Clear history"
+            >
+              <Trash2 className="w-3.5 h-3.5" /> Clear history
+            </button>
+          )}
         </div>
       </motion.div>
 

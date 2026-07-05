@@ -30,9 +30,7 @@ export async function DELETE() {
   } catch {
     const orders = await readDemoJSON<any>(ORDERS_FILE).catch(() => [] as any[]);
     const before = orders.length;
-    const remaining = orders.filter(
-      (o: any) => o.restaurantId === restaurantId ? !KDS_STATUSES.includes(o.status) : true
-    );
+    const remaining = orders.filter((o: any) => !KDS_STATUSES.includes(o.status));
     if (remaining.length !== before) {
       await writeDemoJSON(ORDERS_FILE, remaining).catch(() => {});
     }

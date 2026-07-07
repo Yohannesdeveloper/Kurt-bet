@@ -7,7 +7,7 @@ import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
 const ORDERS_FILE = ".demo-orders.json";
 const BUTCHER_FILE = ".demo-butcher-orders.json";
 
-const KDS_STATUSES = ["NEW", "PREPARING", "READY", "SERVED"];
+const ALL_STATUSES = ["NEW", "PREPARING", "READY", "SERVED", "COMPLETED", "CANCELLED", "DELAYED"];
 
 export async function DELETE() {
   const session = await getServerSession(authOptions).catch(() => null);
@@ -22,22 +22,28 @@ export async function DELETE() {
 
   let orderCount = 0;
 
-  try {
-    const { count } = await prisma.order.deleteMany({
-      where: { status: { in: KDS_STATUSES as any }, restaurantId },
-    });
-    orderCount = count;
-  } catch {
+  const demoFallback = async () => {
     const orders = await readDemoJSON<any>(ORDERS_FILE).catch(() => [] as any[]);
     const before = orders.length;
-    const remaining = orders.filter((o: any) => !KDS_STATUSES.includes(o.status));
+    const remaining = orders.filter((o: any) => !ALL_STATUSES.includes(o.status));
     if (remaining.length !== before) {
       await writeDemoJSON(ORDERS_FILE, remaining).catch(() => {});
     }
     orderCount = before - remaining.length;
-  }
+    await writeDemoJSON(BUTCHER_FILE, []).catch(() => {});
+  };
 
-  await writeDemoJSON(BUTCHER_FILE, []).catch(() => {});
+  try {
+    const { count } = await prisma.order.deleteMany({
+      where: { status: { in: ALL_STATUSES as any }, restaurantId },
+    });
+    orderCount = count;
+    if (orderCount === 0) {
+      await demoFallback();
+    }
+  } catch {
+    await demoFallback();
+  }
 
   return NextResponse.json({ success: true, orderCount, butcherCleared: true });
 }

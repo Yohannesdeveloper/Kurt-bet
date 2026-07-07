@@ -26,6 +26,7 @@ import { BartenderWorkflow } from "@/components/bartender/bartender-workflow";
 import { useSocket } from "@/hooks/useSocket";
 import { useSSENotifications } from "@/hooks/useSSENotifications";
 import { useNotificationStore } from "@/store/useNotificationStore";
+import { NotificationPopups } from "@/components/shared/NotificationPopups";
 
 const categoryKeys = ["tereSega", "kitfo", "tibs", "goredGored", "awazeTibs", "zilzilTibs"] as const;
 const categoryMeta: Record<string, { count: number; image: string; color: string; bg: string }> = {
@@ -1036,6 +1037,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-ethiopian-cream texture-linen">
+      <NotificationPopups />
       <Header onNotifClick={() => setNotifOpen(!notifOpen)} />
       <NotificationPanel open={notifOpen} onClose={() => setNotifOpen(false)} />
 

@@ -32,6 +32,7 @@ import { useTranslation } from "@/lib/i18n";
 import { useSocket } from "@/hooks/useSocket";
 import { useSSENotifications } from "@/hooks/useSSENotifications";
 import { useNotificationStore } from "@/store/useNotificationStore";
+import { NotificationPopups } from "@/components/shared/NotificationPopups";
 
 const statusStyles: Record<string, string> = {
   NEW: "bg-blue-100 text-blue-700",
@@ -128,7 +129,6 @@ export default function OrdersPage() {
   useEffect(() => {
     const readyNotif = notifications.find(n => n.type === "ORDER_READY" && !n.isRead);
     if (readyNotif) {
-      toast.success(readyNotif.message, { duration: 5000, icon: "🍽️" });
       useNotificationStore.getState().markAsRead(readyNotif.id);
     }
   }, [notifications]);
@@ -158,6 +158,7 @@ export default function OrdersPage() {
 
   return (
     <div className="space-y-8">
+      <NotificationPopups />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
 import { ensureDemoItemsSeeded } from "@/lib/demo-menu-data";
 
@@ -8,6 +10,12 @@ async function readDeletedIds(): Promise<string[]> { return readDemoJSON(".demo-
 async function writeDeletedIds(ids: string[]) { await writeDemoJSON(".demo-deleted-items.json", ids); }
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions).catch(() => null);
+  const role = (session?.user as { role?: string })?.role;
+  if (!session?.user || role !== "ADMIN") {
+    return NextResponse.json({ success: false, error: "Admin access required" }, { status: 403 });
+  }
+
   let body: any;
   try {
     body = await req.json();
@@ -28,6 +36,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+  const session = await getServerSession(authOptions).catch(() => null);
+  const role = (session?.user as { role?: string })?.role;
+  if (!session?.user || role !== "ADMIN") {
+    return NextResponse.json({ success: false, error: "Admin access required" }, { status: 403 });
+  }
+
   const items = await readDemoItems();
   const index = items.findIndex((i: any) => i.id === params.id);
   if (index !== -1) {

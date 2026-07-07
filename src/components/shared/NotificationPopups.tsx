@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useSession } from "next-auth/react";
 import { useNotificationStore } from "@/store/useNotificationStore";
 import toast from "react-hot-toast";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Bell } from "lucide-react";
 
 function formatRelativeTime(date: Date): string {
@@ -18,11 +19,14 @@ function formatRelativeTime(date: Date): string {
 }
 
 export function NotificationPopups() {
+  const { data: session } = useSession();
+  const role = (session?.user as { role?: string })?.role;
+  const isWaiter = role === "WAITER";
   const notifications = useNotificationStore((s) => s.notifications);
   const knownIds = useRef(new Set<string>());
 
   useEffect(() => {
-    if (notifications.length === 0) return;
+    if (!isWaiter || notifications.length === 0) return;
     notifications.forEach((n) => {
       if (knownIds.current.has(n.id)) return;
       knownIds.current.add(n.id);

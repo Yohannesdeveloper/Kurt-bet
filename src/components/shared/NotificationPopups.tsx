@@ -21,12 +21,12 @@ function formatRelativeTime(date: Date): string {
 export function NotificationPopups() {
   const { data: session } = useSession();
   const role = (session?.user as { role?: string })?.role;
-  const isWaiter = role === "WAITER";
+  const canNotify = role === "WAITER" || role === "ADMIN";
   const notifications = useNotificationStore((s) => s.notifications);
   const knownIds = useRef(new Set<string>());
 
   useEffect(() => {
-    if (!isWaiter || notifications.length === 0) return;
+    if (!canNotify || notifications.length === 0) return;
     notifications.forEach((n) => {
       if (knownIds.current.has(n.id)) return;
       knownIds.current.add(n.id);

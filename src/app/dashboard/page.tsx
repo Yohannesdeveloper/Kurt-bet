@@ -54,6 +54,8 @@ function Header({ onNotifClick }: { onNotifClick: () => void }) {
   const { notifications, unreadCount } = useNotificationStore();
   const readyCount = notifications.filter(n => n.type === "ORDER_READY" && !n.isRead).length;
   const displayCount = readyCount || unreadCount;
+  const role = (session?.user as { role?: string })?.role;
+  const canNotify = role === "WAITER" || role === "ADMIN";
 
   const handleSearchKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && searchRef.current?.value.trim()) {
@@ -107,23 +109,25 @@ function Header({ onNotifClick }: { onNotifClick: () => void }) {
 
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={onNotifClick}
-              className="relative p-2 rounded-full hover:bg-gradient-to-r hover:from-ethiopian-gold/10 hover:to-ethiopian-clay/10 transition-colors group"
-            >
-              <Bell className="w-5 h-5 text-ethiopian-coffee group-hover:text-ethiopian-gold transition-colors" />
-              {displayCount > 0 && (
-                <motion.span
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-ethiopian-clay text-[9px] font-bold text-white"
-                >
-                  {displayCount}
-                </motion.span>
-              )}
-            </motion.button>
+            {canNotify && (
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={onNotifClick}
+                className="relative p-2 rounded-full hover:bg-gradient-to-r hover:from-ethiopian-gold/10 hover:to-ethiopian-clay/10 transition-colors group"
+              >
+                <Bell className="w-5 h-5 text-ethiopian-coffee group-hover:text-ethiopian-gold transition-colors" />
+                {displayCount > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-ethiopian-clay text-[9px] font-bold text-white"
+                  >
+                    {displayCount}
+                  </motion.span>
+                )}
+              </motion.button>
+            )}
             <motion.div whileHover={{ scale: 1.02 }} className="hidden sm:flex items-center gap-3 pl-3 border-l border-ethiopian-gold/20 cursor-pointer">
               <div className="relative">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-ethiopian-gold to-ethiopian-clay flex items-center justify-center text-white font-semibold text-sm shadow-lg">
@@ -1052,6 +1056,9 @@ export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [currentView, setCurrentView] = useState("home");
+  const { data: session } = useSession();
+  const role = (session?.user as { role?: string })?.role;
+  const canNotify = role === "WAITER" || role === "ADMIN";
 
   useSocket();
   useSSENotifications();
@@ -1060,7 +1067,7 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-ethiopian-cream texture-linen">
       <NotificationPopups />
       <Header onNotifClick={() => setNotifOpen(!notifOpen)} />
-      <NotificationPanel open={notifOpen} onClose={() => setNotifOpen(false)} />
+      {canNotify && <NotificationPanel open={notifOpen} onClose={() => setNotifOpen(false)} />}
 
       <div className="px-4 sm:px-6 lg:pl-0 lg:pr-6 xl:pr-8 2xl:pr-10 py-6 lg:py-8">
         <div className="flex">

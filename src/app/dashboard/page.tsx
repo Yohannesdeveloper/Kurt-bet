@@ -909,13 +909,19 @@ function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => vo
   const handleNotifClick = async (n: any) => {
     markAsRead(n.id);
     const orderId = n.data?.orderId;
-    if (!orderId) return;
+    if (!orderId) {
+      if (n.actionUrl) window.location.href = n.actionUrl;
+      return;
+    }
     setLoadingOrder(true);
     try {
       const res = await fetch(`/api/orders/${orderId}`);
       const d = await res.json();
       if (d.success) setSelectedOrder(d.data);
-    } catch {} finally {
+      else if (n.actionUrl) window.location.href = n.actionUrl;
+    } catch {
+      if (n.actionUrl) window.location.href = n.actionUrl;
+    } finally {
       setLoadingOrder(false);
     }
   };

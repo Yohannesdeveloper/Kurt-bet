@@ -898,7 +898,7 @@ function MobileNav() {
 
 function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
-  const { notifications, markAsRead, markAllAsRead } = useNotificationStore();
+  const { notifications, markAsRead, markAllAsRead, clearNotifications } = useNotificationStore();
   const readyNotifs = notifications.filter(n => n.type === "ORDER_READY");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [loadingOrder, setLoadingOrder] = useState(false);
@@ -926,9 +926,19 @@ function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => vo
             <h2 className="text-lg font-bold font-serif text-ethiopian-coffee">Notifications</h2>
             <div className="flex items-center gap-2">
               {readyNotifs.length > 0 && (
-                <button onClick={markAllAsRead} className="text-xs text-ethiopian-gold hover:underline">
-                  Mark all read
-                </button>
+                <>
+                  <button onClick={markAllAsRead} className="text-xs text-ethiopian-gold hover:underline">
+                    Mark all read
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (confirm("Clear all notification history?")) clearNotifications();
+                    }}
+                    className="text-xs text-red-500 hover:underline"
+                  >
+                    Clear history
+                  </button>
+                </>
               )}
               <button onClick={onClose} className="p-1 rounded-full hover:bg-ethiopian-cream transition-colors">
                 <X className="w-5 h-5 text-ethiopian-coffee" />

@@ -189,6 +189,23 @@ export default function OrdersPage() {
           <Button variant="outline" size="icon" className="h-10 lg:h-11 w-10 lg:w-11 flex-shrink-0 border-ethiopian-gold/20 text-ethiopian-coffee">
             <Filter className="h-4 w-4" />
           </Button>
+          {isAdmin && (
+            <Button
+              variant="outline"
+              onClick={async () => {
+                if (!confirm("Clear all orders permanently?")) return;
+                try {
+                  const res = await fetch("/api/orders/clear-history", { method: "DELETE" });
+                  const d = await res.json();
+                  if (d.success) { toast.success("All orders cleared"); fetchOrders(); }
+                  else { toast.error(d.error || "Failed"); }
+                } catch { toast.error("Failed"); }
+              }}
+              className="h-10 lg:h-11 flex-shrink-0 text-red-500 border-red-200 hover:bg-red-50"
+            >
+              <Trash2 className="h-4 w-4 mr-2" /> Clear history
+            </Button>
+          )}
           {canCreateOrder && (
             <Button
               variant="premium"

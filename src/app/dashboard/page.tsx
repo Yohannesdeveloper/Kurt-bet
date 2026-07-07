@@ -898,6 +898,9 @@ function MobileNav() {
 
 function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation();
+  const { data: session } = useSession();
+  const role = (session?.user as { role?: string })?.role;
+  const isAdmin = role === "ADMIN";
   const { notifications, markAsRead, markAllAsRead, clearNotifications } = useNotificationStore();
   const readyNotifs = notifications.filter(n => n.type === "ORDER_READY");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -930,14 +933,16 @@ function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => vo
                   <button onClick={markAllAsRead} className="text-xs text-ethiopian-gold hover:underline">
                     Mark all read
                   </button>
-                  <button
-                    onClick={() => {
-                      if (confirm("Clear all notification history?")) clearNotifications();
-                    }}
-                    className="text-xs text-red-500 hover:underline"
-                  >
-                    Clear history
-                  </button>
+                  {isAdmin && (
+                    <button
+                      onClick={() => {
+                        if (confirm("Clear all notification history?")) clearNotifications();
+                      }}
+                      className="text-xs text-red-500 hover:underline"
+                    >
+                      Clear history
+                    </button>
+                  )}
                 </>
               )}
               <button onClick={onClose} className="p-1 rounded-full hover:bg-ethiopian-cream transition-colors">

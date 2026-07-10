@@ -202,7 +202,10 @@ export async function POST(req: NextRequest) {
       updatedAt: new Date().toISOString(),
       table: null,
       waiter: null,
-      items: (body?.items || []).map((item: any, i: number) => ({
+      items: (body?.items || []).filter((item: any) => {
+        const name = (item.name || "").toLowerCase();
+        return !DRINK_KEYWORDS.some((kw) => name.includes(kw));
+      }).map((item: any, i: number) => ({
         id: `demo-oi-${i}`,
         menuItemId: item.menuItemId,
         name: item.name,

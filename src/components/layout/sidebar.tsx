@@ -15,7 +15,6 @@ const LayoutDashboard = dynamic(() => import('lucide-react').then(mod => ({ defa
 const ClipboardList = dynamic(() => import('lucide-react').then(mod => ({ default: mod.ClipboardList })), { ssr: false });
 const CookingPot = dynamic(() => import('lucide-react').then(mod => ({ default: mod.CookingPot })), { ssr: false });
 const Store = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Store })), { ssr: false });
-const UtensilsCrossed = dynamic(() => import('lucide-react').then(mod => ({ default: mod.UtensilsCrossed })), { ssr: false });
 const CreditCard = dynamic(() => import('lucide-react').then(mod => ({ default: mod.CreditCard })), { ssr: false });
 const LogOut = dynamic(() => import('lucide-react').then(mod => ({ default: mod.LogOut })), { ssr: false });
 const Settings = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Settings })), { ssr: false });
@@ -28,6 +27,7 @@ const Moon = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Mo
 const Beef = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Beef })), { ssr: false });
 const Coffee = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Coffee })), { ssr: false });
 const Send = dynamic(() => import('lucide-react').then(mod => ({ default: mod.Send })), { ssr: false });
+const UtensilsCrossed = dynamic(() => import('lucide-react').then(mod => ({ default: mod.UtensilsCrossed })), { ssr: false });
 
 interface NavItemType { href: string; label: string; tKey: string; icon: any; }
 
@@ -92,17 +92,17 @@ const NavItem = memo(({ item, pathname, onClick }: {
       className={cn(
         "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 group",
           isActive
-              ? "bg-gradient-to-r from-[#C89B3C]/20 to-[#C89B3C]/5 text-[#C89B3C] shadow-sm"
+              ? "bg-gradient-to-r from-ethiopian-gold/20 to-ethiopian-gold/5 text-ethiopian-gold shadow-sm"
               : "text-sidebar-foreground/70 hover:bg-white/10 hover:text-sidebar-foreground hover:shadow-sm"
       )}
     >
         {IconComponent && <IconComponent className={cn(
         "h-4 w-4 transition-colors",
-        isActive ? "text-[#C89B3C]" : "group-hover:text-[#C89B3C]"
+        isActive ? "text-ethiopian-gold" : "group-hover:text-ethiopian-gold"
       )} />}
-      <span className={isActive ? "text-[#C89B3C]" : ""}>{t(item.tKey)}</span>
+      <span className={isActive ? "text-ethiopian-gold" : ""}>{t(item.tKey)}</span>
       {isActive && (
-        <div className="ml-auto h-1.5 w-1.5 rounded-full bg-[#C89B3C] animate-pulse" />
+        <div className="ml-auto h-1.5 w-1.5 rounded-full bg-ethiopian-gold animate-pulse" />
       )}
     </Link>
   );
@@ -153,11 +153,11 @@ export function Sidebar() {
         )}
       >
         <div className="flex h-16 items-center border-b border-sidebar-border px-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#C89B3C] to-[#3E2723] shadow-lg shadow-[#C89B3C]/20">
-            <UtensilsCrossed className="h-5 w-5 text-white" />
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden shadow-lg shadow-ethiopian-gold/20">
+            <img src="/images/Logo.jpg" alt="Habesha Kurt Bet Logo" className="h-full w-full object-cover" />
           </div>
           <div className="ml-3">
-            <span className="text-sm font-bold tracking-tight">Restaurant OS</span>
+            <span className="text-sm font-bold tracking-tight">{t("app.name")}</span>
             <p className="text-[10px] text-sidebar-foreground/60 font-medium hidden sm:block">Enterprise Management</p>
           </div>
         </div>
@@ -177,7 +177,7 @@ export function Sidebar() {
 
         <div className="border-t border-sidebar-border p-4">
           <div className="flex items-center gap-3 rounded-xl bg-white/5 p-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-[#C89B3C] to-[#3E2723]">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-ethiopian-gold to-ethiopian-coffee">
               <span className="text-xs font-bold text-white">
                 {(session?.user?.name || "U").charAt(0).toUpperCase()}
               </span>
@@ -191,7 +191,7 @@ export function Sidebar() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 text-sidebar-foreground/60 hover:text-[#A12222] hover:bg-[#A12222]/10 transition-colors"
+              className="h-8 w-8 text-sidebar-foreground/60 hover:text-ethiopian-clay hover:bg-ethiopian-clay/10 transition-colors"
               onClick={() => signOut()}
             >
               <LogOut className="h-4 w-4" />
@@ -201,18 +201,18 @@ export function Sidebar() {
       </aside>
 
       {/* Top bar */}
-      <div className="fixed left-0 lg:left-64 right-0 top-0 z-30 flex h-16 items-center border-b bg-[#F8F4EE]/80 backdrop-blur-xl px-4 sm:px-6 lg:px-8 xl:px-10 pl-16 lg:pl-6 xl:pl-8">
+      <div className="fixed left-0 lg:left-64 right-0 top-0 z-30 flex h-16 items-center border-b bg-ethiopian-cream/80 backdrop-blur-xl px-4 sm:px-6 lg:px-8 xl:px-10 pl-16 lg:pl-6 xl:pl-8">
         <div className="flex items-center justify-between w-full max-w-[1600px] mx-auto">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-[#C89B3C] animate-pulse" />
-            <span className="text-sm font-medium text-[#3E2723]">
+            <div className="h-2 w-2 rounded-full bg-ethiopian-gold animate-pulse" />
+            <span className="text-sm font-medium text-ethiopian-coffee">
               {t(navItems.find((i: NavItemType) => pathname.startsWith(i.href))?.tKey || "app.name")}
             </span>
           </div>
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 text-[#3E2723]/60 hover:text-[#3E2723]"
+            className="h-9 w-9 text-ethiopian-coffee/60 hover:text-ethiopian-coffee"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}

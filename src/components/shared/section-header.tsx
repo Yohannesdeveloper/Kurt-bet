@@ -17,8 +17,8 @@ export function SectionHeader({
   center?: boolean;
   goldAccent?: boolean;
 }) {
-  const textColor = light ? "text-white" : "text-ethiopian-coffee";
-  const mutedColor = light ? "text-white/70" : "text-ethiopian-coffee/70";
+  const textColor = light ? "text-white" : "text-ethiopian-coffee dark:text-ethiopian-cream";
+  const mutedColor = light ? "text-white/70" : "text-ethiopian-coffee/70 dark:text-ethiopian-cream/70";
   const labelColor = light ? "text-ethiopian-gold" : "text-ethiopian-gold";
 
   return (
@@ -29,7 +29,7 @@ export function SectionHeader({
         viewport={{ once: true }}
         className={`inline-block text-xs sm:text-sm tracking-[0.25em] uppercase ${labelColor} font-medium mb-3 relative`}
       >
-        <span className="inline-block px-4 py-1.5 rounded-full bg-ethiopian-gold/10 border border-ethiopian-gold/20">
+        <span className="inline-block px-4 py-1.5 rounded-full bg-ethiopian-gold/10 dark:bg-ethiopian-gold/20 border border-ethiopian-gold/20 dark:border-ethiopian-gold/30 shadow-sm">
           {label}
         </span>
       </motion.span>
@@ -59,7 +59,7 @@ export function SectionHeader({
           whileInView={{ width: "5rem" }}
           viewport={{ once: true }}
           transition={{ delay: 0.3, duration: 0.6 }}
-          className={`h-0.5 bg-gradient-to-r from-ethiopian-gold via-ethiopian-brass to-ethiopian-gold rounded-full mt-6 ${center ? "mx-auto" : ""}`}
+          className={`h-0.5 bg-gradient-to-r from-ethiopian-gold via-ethiopian-clay to-ethiopian-gold rounded-full mt-6 ${center ? "mx-auto" : ""}`}
         />
       )}
     </div>
@@ -79,7 +79,7 @@ export function EthiopianCard({
 }) {
   return (
     <div
-      className={`relative bg-white rounded-2xl overflow-hidden ${
+      className={`relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden ${
         glow ? "gold-glow" : "shadow-lg"
       } ${
         hover ? "hover:shadow-2xl hover:-translate-y-1 transition-all duration-500" : ""
@@ -111,7 +111,7 @@ export function GoldButton({
 }) {
   const baseStyles = "relative inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-semibold text-sm sm:text-base transition-all duration-300 overflow-hidden group";
   const variants = {
-    primary: "bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay text-white shadow-lg hover:shadow-xl hover:shadow-ethiopian-gold/30 hover:scale-105 active:scale-95",
+    primary: "bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay text-white shadow-lg shadow-ethiopian-gold/20 hover:shadow-xl hover:shadow-ethiopian-gold/30 hover:scale-105 active:scale-95",
     outline: "border-2 border-ethiopian-gold/40 text-ethiopian-gold hover:bg-ethiopian-gold/10 hover:border-ethiopian-gold/60 active:scale-95",
     ghost: "text-ethiopian-gold hover:bg-ethiopian-gold/10 active:scale-95",
   };
@@ -157,7 +157,7 @@ export function PatternDivider({ className = "" }: { className?: string }) {
   return (
     <div className={`relative py-8 ${className}`}>
       <div className="ethiopian-divider" />
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-ethiopian-cream border-2 border-ethiopian-gold/20 flex items-center justify-center">
+      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-ethiopian-cream dark:bg-black border-2 border-ethiopian-gold/20 flex items-center justify-center">
         <div className="w-2 h-2 bg-ethiopian-gold rounded-full" />
       </div>
     </div>
@@ -166,7 +166,7 @@ export function PatternDivider({ className = "" }: { className?: string }) {
 
 export function LoadingSpinner() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-ethiopian-cream texture-linen">
+    <div className="min-h-screen flex items-center justify-center bg-ethiopian-cream dark:bg-black texture-linen">
       <div className="relative">
         <motion.div
           animate={{ rotate: 360 }}

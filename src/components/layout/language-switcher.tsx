@@ -24,7 +24,7 @@ export function LanguageSwitcher({ light }: { light?: boolean }) {
         className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-medium transition-all ${
           light
             ? "text-white/70 hover:text-white hover:bg-white/10"
-            : "text-[#3E2723]/70 hover:text-[#C89B3C] hover:bg-[#C89B3C]/10"
+            : "text-muted-foreground dark:text-white/70 hover:text-foreground dark:hover:text-white hover:bg-muted dark:hover:bg-white/10"
         }`}
       >
         <Globe className="w-4 h-4" />
@@ -38,8 +38,8 @@ export function LanguageSwitcher({ light }: { light?: boolean }) {
               onClick={() => { setLocale(l); setOpen(false); }}
               className={`w-full text-left px-3 py-2 text-sm transition-colors ${
                 locale === l
-                  ? "text-[#C89B3C] font-semibold bg-[#C89B3C]/10"
-                  : "text-[#3E2723]/70 hover:bg-gray-50"
+                  ? "text-ethiopian-clay font-semibold bg-ethiopian-clay/10"
+                  : "text-ethiopian-clay/70 hover:bg-gray-50"
               }`}
             >
               {localeNames[l]}

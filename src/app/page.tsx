@@ -6,15 +6,16 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { useTranslation } from "@/lib/i18n";
+import { useTheme } from "next-themes";
 import { QRCodeSVG } from "qrcode.react";
 import { SectionHeader, EthiopianCard, GoldButton, PatternDivider, LoadingSpinner } from "@/components/shared/section-header";
 import { EthiopianCornerSet, JebenaIcon, MesobIcon, SpiceIcon, InjeraIcon } from "@/components/shared/ethiopian-patterns";
 import {
-  UtensilsCrossed, Coffee, Leaf, Heart, Wine, Users,
+  Coffee, Leaf, Heart, Wine, Users,
   ChevronDown, Star, MapPin, Clock, Phone, ArrowRight,
   Check, Menu, X, Quote, Play, Instagram, Facebook,
   ChevronLeft, ChevronRight, ExternalLink, Smartphone,
-  Sparkles, Flame, Gem, Award, Shield,
+  Sparkles, Flame, Gem, Award, Shield, UtensilsCrossed, Sun, Moon,
 } from "lucide-react";
 
 interface MenuDish { id: string; name: string; description: string; price: number; image?: string; isAvailable: boolean; }
@@ -50,6 +51,22 @@ function AnimatedSection({ children, className = "", delay = 0 }: { children: Re
   );
 }
 
+function ThemeToggle({ scrolled }: { scrolled: boolean }) {
+  const { theme, setTheme } = useTheme();
+  return (
+    <button
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className={`p-2 rounded-lg text-sm font-medium transition-all ${
+        scrolled
+          ? "text-ethiopian-cream/70 hover:text-ethiopian-gold hover:bg-ethiopian-gold/10"
+          : "text-white/70 hover:text-white hover:bg-white/10"
+      }`}
+    >
+      {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+    </button>
+  );
+}
+
 function FloatingNav() {
   const { t } = useTranslation();
   const [scrolled, setScrolled] = useState(false);
@@ -77,23 +94,23 @@ function FloatingNav() {
       animate={{ y: 0 }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-ethiopian-cream/95 backdrop-blur-xl shadow-lg shadow-ethiopian-charcoal/5"
-          : "bg-transparent"
+          ? "bg-ethiopian-coffee/95 backdrop-blur-2xl shadow-2xl shadow-black/50 border-b border-ethiopian-gold/10"
+          : "bg-gradient-to-b from-black/60 to-transparent"
       }`}
     >
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-3 sm:py-4 flex items-center justify-between">
         <motion.a href="#home" whileHover={{ scale: 1.02 }} className="flex items-center gap-2.5">
           <div className="relative">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-ethiopian-clay via-ethiopian-clay to-ethiopian-gold flex items-center justify-center shadow-lg">
-              <UtensilsCrossed className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden shadow-lg shadow-ethiopian-gold/20">
+              <img src="/images/Logo.jpg" alt="Habesha Kurt Bet Logo" className="w-full h-full object-cover" />
             </div>
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-              className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay opacity-25 blur-sm"
+              className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay opacity-40 blur-md"
             />
           </div>
-          <span className={`font-bold text-base sm:text-lg ${scrolled ? "text-ethiopian-coffee" : "text-white"}`}>{t("app.name")}</span>
+          <span className={`font-bold text-base sm:text-lg ${scrolled ? "text-ethiopian-gold" : "text-white"}`}>{t("app.name")}</span>
         </motion.a>
 
         <div className="hidden md:flex items-center gap-6 lg:gap-8">
@@ -104,7 +121,7 @@ function FloatingNav() {
                 key={l.href}
                 href={l.href}
                 className={`text-xs lg:text-sm tracking-wider uppercase font-medium transition-all duration-300 relative group ${
-                  scrolled ? "text-ethiopian-coffee/70 hover:text-ethiopian-gold" : "text-white/80 hover:text-white"
+                  scrolled ? "text-ethiopian-cream/70 hover:text-ethiopian-gold" : "text-white/80 hover:text-white"
                 }`}
               >
                 {l.label}
@@ -112,6 +129,7 @@ function FloatingNav() {
               </a>
             );
           })}
+          <ThemeToggle scrolled={scrolled} />
           <LanguageSwitcher light={!scrolled} />
           <GoldButton href="/dashboard">
             {t("nav.dashboard")}
@@ -124,7 +142,7 @@ function FloatingNav() {
         </div>
 
         <button className="md:hidden relative z-50" onClick={() => setMenuOpen(!menuOpen)}>
-          <div className={`w-6 h-6 flex items-center justify-center transition-colors ${scrolled ? "text-ethiopian-coffee" : "text-ethiopian-gold"}`}>
+          <div className={`w-6 h-6 flex items-center justify-center transition-colors ${scrolled ? "text-ethiopian-gold" : "text-ethiopian-gold"}`}>
             {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </div>
         </button>
@@ -136,7 +154,7 @@ function FloatingNav() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-ethiopian-cream/95 backdrop-blur-xl border-t border-ethiopian-gold/10 overflow-hidden shadow-2xl"
+            className="md:hidden bg-ethiopian-coffee/98 backdrop-blur-2xl border-t border-ethiopian-gold/10 overflow-hidden shadow-2xl shadow-black/50"
           >
             <div className="px-6 py-6 space-y-4">
               {navLinks.map(l => (
@@ -144,12 +162,12 @@ function FloatingNav() {
                   key={l.href}
                   href={l.href}
                   onClick={() => setMenuOpen(false)}
-                  className="block text-ethiopian-coffee font-medium hover:text-ethiopian-gold transition-colors border-b border-ethiopian-gold/10 pb-3"
+                  className="block text-ethiopian-cream/80 font-medium hover:text-ethiopian-gold transition-colors border-b border-ethiopian-gold/10 pb-3"
                 >
                   {l.label}
                 </a>
               ))}
-              <a href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-ethiopian-coffee font-medium hover:text-ethiopian-gold transition-colors border-b border-ethiopian-gold/10 pb-3">
+              <a href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-ethiopian-cream/80 font-medium hover:text-ethiopian-gold transition-colors border-b border-ethiopian-gold/10 pb-3">
                 {t("nav.dashboard")}
               </a>
               <div className="pt-2"><LanguageSwitcher /></div>
@@ -175,34 +193,62 @@ function HeroSection() {
 
   return (
     <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-ethiopian-charcoal">
+      {/* Animated background layers */}
       <motion.div style={{ y: heroBgY }} className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-ethiopian-coffee/95 via-ethiopian-charcoal/98 to-ethiopian-burgundy/90 z-10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-ethiopian-coffee/98 via-black to-ethiopian-burgundy/90 z-10" />
         <motion.div
           animate={{ scale: [1, 1.05, 1] }}
           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 opacity-40"
           style={{
-            backgroundImage: `radial-gradient(ellipse at 20% 50%, #C89B3C 0%, transparent 50%), radial-gradient(ellipse at 80% 30%, #A12222 0%, transparent 40%), radial-gradient(ellipse at 50% 80%, #3E2723 0%, transparent 50%)`,
+            backgroundImage: `radial-gradient(ellipse at 20% 50%, #D4A017 0%, transparent 50%), radial-gradient(ellipse at 80% 30%, #CC0000 0%, transparent 40%), radial-gradient(ellipse at 50% 80%, #1A0000 0%, transparent 50%)`,
           }}
         />
       </motion.div>
 
       {/* Ethiopian Cross Pattern Overlay */}
-      <div className="absolute inset-0 opacity-[0.04] bg-ethiopian-cross z-10" />
-      <div className="absolute inset-0 opacity-[0.02] bg-mesob-weave z-10" />
+      <div className="absolute inset-0 opacity-[0.06] bg-ethiopian-cross z-10" />
+      <div className="absolute inset-0 opacity-[0.03] bg-mesob-weave z-10" />
 
-      {/* Floating Particles */}
-      {[...Array(8)].map((_, i) => (
+      {/* Animated glow orbs */}
+      <motion.div
+        animate={{ scale: [1, 1.3, 1], x: [0, 30, 0], y: [0, -20, 0] }}
+        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-1/4 left-1/4 w-96 h-96 bg-ethiopian-gold/10 rounded-full blur-[100px] z-10"
+      />
+      <motion.div
+        animate={{ scale: [1.2, 1, 1.2], x: [0, -20, 0], y: [0, 30, 0] }}
+        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-ethiopian-clay/15 rounded-full blur-[100px] z-10"
+      />
+
+      {/* Floating Gold Particles */}
+      {[...Array(12)].map((_, i) => (
         <motion.div
           key={i}
           animate={{
-            y: [0, -30 - Math.random() * 40, 0],
-            x: [0, Math.random() > 0.5 ? 20 : -20, 0],
-            opacity: [0, 0.8, 0],
+            y: [0, -40 - Math.random() * 60, 0],
+            x: [0, (Math.random() > 0.5 ? 1 : -1) * (20 + Math.random() * 30), 0],
+            opacity: [0, 0.9, 0],
+            scale: [0.5, 1.5, 0.5],
           }}
-          transition={{ duration: 6 + Math.random() * 4, repeat: Infinity, delay: Math.random() * 3 }}
-          className="absolute w-1 h-1 bg-ethiopian-gold rounded-full blur-[1px] z-10"
-          style={{ left: `${10 + Math.random() * 80}%`, top: `${20 + Math.random() * 60}%` }}
+          transition={{ duration: 5 + Math.random() * 5, repeat: Infinity, delay: Math.random() * 4 }}
+          className="absolute w-1.5 h-1.5 bg-ethiopian-gold rounded-full z-10"
+          style={{ left: `${5 + Math.random() * 90}%`, top: `${10 + Math.random() * 80}%` }}
+        />
+      ))}
+
+      {/* Red accent particles */}
+      {[...Array(6)].map((_, i) => (
+        <motion.div
+          key={`red-${i}`}
+          animate={{
+            y: [0, -30 - Math.random() * 40, 0],
+            opacity: [0, 0.6, 0],
+          }}
+          transition={{ duration: 4 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 5 }}
+          className="absolute w-1 h-1 bg-ethiopian-clay rounded-full z-10"
+          style={{ left: `${10 + Math.random() * 80}%`, top: `${30 + Math.random() * 50}%` }}
         />
       ))}
 
@@ -212,9 +258,9 @@ function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold text-white leading-tight mb-4 sm:mb-6"
+            className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl 2xl:text-9xl font-bold leading-tight mb-4 sm:mb-6"
           >
-            {t("landing.heroTitleFull")}
+            <span className="text-gradient-fire">{t("landing.heroTitleFull")}</span>
           </motion.h1>
 
           <motion.div
@@ -228,7 +274,7 @@ function HeroSection() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
-            className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-white/70 max-w-2xl sm:max-w-3xl mx-auto mb-6 sm:mb-8 lg:mb-10 leading-relaxed font-light"
+            className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl text-ethiopian-cream/80 max-w-2xl sm:max-w-3xl mx-auto mb-6 sm:mb-8 lg:mb-10 leading-relaxed font-light"
           >
             {t("landing.heroTagline")}
           </motion.p>
@@ -256,14 +302,14 @@ function HeroSection() {
         transition={{ delay: 1.5 }}
         className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 z-20"
       >
-        <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 2.5, repeat: Infinity }} className="flex flex-col items-center gap-2 text-white/40">
+        <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 2.5, repeat: Infinity }} className="flex flex-col items-center gap-2 text-ethiopian-gold/50">
           <span className="text-[10px] sm:text-xs tracking-[0.2em] uppercase font-medium">{t("common.scroll")}</span>
           <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
         </motion.div>
       </motion.div>
 
       {/* Bottom Gradient Fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-ethiopian-cream to-transparent z-10" />
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-ethiopian-cream dark:from-black to-transparent z-10" />
     </section>
   );
 }
@@ -279,8 +325,13 @@ function FeatureHighlights() {
     { icon: Users, title: t("landing.feature6Title"), desc: t("landing.feature6Desc"), color: "from-ethiopian-gold/15 to-ethiopian-coffee/20" },
   ];
   return (
-    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-ethiopian-cream texture-linen relative overflow-hidden">
+    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-ethiopian-cream dark:bg-black texture-linen relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.03] bg-ethiopian-cross pointer-events-none" />
+      <motion.div
+        animate={{ scale: [1, 1.2, 1] }}
+        transition={{ duration: 10, repeat: Infinity }}
+        className="absolute -top-40 -left-40 w-80 h-80 bg-ethiopian-gold/5 rounded-full blur-3xl"
+      />
       <div className="max-w-[1600px] mx-auto relative z-10">
         <AnimatedSection>
           <SectionHeader label={t("landing.whyChooseUs")} title={t("landing.experienceTitle")} subtitle={t("landing.experienceSubtitle")} />
@@ -290,15 +341,15 @@ function FeatureHighlights() {
             <AnimatedSection key={f.title} delay={i * 0.1}>
               <motion.div
                 whileHover={{ y: -8 }}
-                className="group relative bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-ethiopian-gold/20 overflow-hidden"
+                className="group relative bg-white dark:bg-gray-950 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-ethiopian-gold/20 dark:hover:border-ethiopian-gold/30 overflow-hidden"
               >
-                <div className="absolute inset-0 pattern-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-br from-ethiopian-gold/5 via-transparent to-ethiopian-clay/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className={`relative z-10`}>
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300`}>
-                    <f.icon className="w-7 h-7 text-ethiopian-clay" />
+                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-lg group-hover:shadow-ethiopian-gold/20 transition-all duration-300`}>
+                    <f.icon className="w-7 h-7 text-ethiopian-clay group-hover:text-ethiopian-gold transition-colors duration-300" />
                   </div>
-                  <h3 className="text-xl font-bold text-ethiopian-coffee mb-2 font-serif">{f.title}</h3>
-                  <p className="text-ethiopian-coffee/70 leading-relaxed text-sm">{f.desc}</p>
+                  <h3 className="text-xl font-bold text-ethiopian-coffee dark:text-ethiopian-cream mb-2 font-serif">{f.title}</h3>
+                   <p className="text-ethiopian-coffee/70 dark:text-ethiopian-cream/70 leading-relaxed text-sm">{f.desc}</p>
                 </div>
               </motion.div>
             </AnimatedSection>
@@ -312,7 +363,7 @@ function FeatureHighlights() {
 function AboutSection() {
   const { t } = useTranslation();
   return (
-    <section id="about" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-white relative overflow-hidden">
+    <section id="about" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-white dark:bg-gray-950 relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.02] bg-tire-pattern pointer-events-none" />
       <div className="max-w-[1600px] mx-auto relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
@@ -357,20 +408,20 @@ function AboutSection() {
 
           <AnimatedSection delay={0.2}>
             <div className="relative pl-4 sm:pl-0">
-              <span className="inline-block text-xs sm:text-sm tracking-[0.25em] uppercase text-ethiopian-gold font-medium mb-3 px-4 py-1.5 rounded-full bg-ethiopian-gold/10 border border-ethiopian-gold/20">
+               <span className="inline-block text-xs sm:text-sm tracking-[0.25em] uppercase text-ethiopian-gold font-medium mb-3 px-4 py-1.5 rounded-full bg-ethiopian-gold/10 dark:bg-ethiopian-gold/20 border border-ethiopian-gold/20 dark:border-ethiopian-gold/30">
                 {t("landing.ourStory")}
               </span>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-ethiopian-coffee mt-4 leading-tight">
+               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-ethiopian-coffee dark:text-ethiopian-cream mt-4 leading-tight">
                 {t("landing.legacyTitle")}
               </h2>
               <div className="w-16 h-0.5 bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay mt-6 rounded-full" />
-              <p className="text-base sm:text-lg text-ethiopian-coffee/75 mt-6 sm:mt-8 leading-relaxed">
-                {t("landing.legacyDesc1")}
-              </p>
-              <p className="text-base sm:text-lg text-ethiopian-coffee/75 mt-4 leading-relaxed">
+               <p className="text-base sm:text-lg text-ethiopian-coffee/75 dark:text-ethiopian-cream/75 mt-6 sm:mt-8 leading-relaxed">
+                 {t("landing.legacyDesc1")}
+               </p>
+               <p className="text-base sm:text-lg text-ethiopian-coffee/75 dark:text-ethiopian-cream/75 mt-4 leading-relaxed">
                 {t("landing.legacyDesc2")}
               </p>
-              <div className="grid grid-cols-3 gap-4 sm:gap-8 mt-8 sm:mt-10 p-6 rounded-2xl bg-ethiopian-cream/50 border border-ethiopian-gold/10">
+               <div className="grid grid-cols-3 gap-4 sm:gap-8 mt-8 sm:mt-10 p-6 rounded-2xl bg-ethiopian-cream/50 dark:bg-black/50 border border-ethiopian-gold/10 dark:border-ethiopian-gold/20">
                 {[
                   { value: "56+", label: t("landing.yearsTradition"), color: "text-ethiopian-gold" },
                   { value: "1K+", label: t("landing.happyGuests"), color: "text-ethiopian-clay" },
@@ -378,7 +429,7 @@ function AboutSection() {
                 ].map(s => (
                   <div key={s.label} className="text-center">
                     <p className={`text-2xl sm:text-3xl md:text-4xl font-bold font-serif ${s.color}`}>{s.value}</p>
-                    <p className="text-xs sm:text-sm text-ethiopian-coffee/60 mt-1">{s.label}</p>
+                     <p className="text-xs sm:text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 mt-1">{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -399,7 +450,7 @@ function SignatureDishes() {
     }).catch(() => {});
   }, []);
   return (
-    <section id="menu" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-ethiopian-cream texture-linen relative overflow-hidden">
+    <section id="menu" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-ethiopian-cream dark:bg-black texture-linen relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.03] bg-mesob-weave pointer-events-none" />
       <div className="max-w-[1600px] mx-auto relative z-10">
         <AnimatedSection>
@@ -410,7 +461,7 @@ function SignatureDishes() {
             <AnimatedSection key={dish.id} delay={i * 0.1}>
               <motion.div
                 whileHover={{ y: -8 }}
-                className="group rounded-2xl overflow-hidden bg-white shadow-lg hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-ethiopian-gold/20"
+                className="group rounded-2xl overflow-hidden bg-white dark:bg-gray-950 shadow-lg hover:shadow-2xl transition-all duration-500 border border-transparent hover:border-ethiopian-gold/20 dark:hover:border-ethiopian-gold/30"
               >
                 <div className="relative h-56 overflow-hidden bg-gradient-to-br from-ethiopian-coffee to-ethiopian-charcoal">
                   {dish.image ? (
@@ -434,15 +485,15 @@ function SignatureDishes() {
                 </div>
                 <div className="p-5 sm:p-6">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg sm:text-xl font-bold text-ethiopian-coffee font-serif">{dish.name}</h3>
+                    <h3 className="text-lg sm:text-xl font-bold text-ethiopian-coffee dark:text-ethiopian-cream font-serif">{dish.name}</h3>
                     <span className="text-lg sm:text-xl font-bold text-ethiopian-gold">{dish.price} {t("common.currency")}</span>
                   </div>
-                  <p className="text-ethiopian-coffee/70 text-sm leading-relaxed line-clamp-2">{dish.description}</p>
+                   <p className="text-ethiopian-coffee/70 dark:text-ethiopian-cream/70 text-sm leading-relaxed line-clamp-2">{dish.description}</p>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => window.location.href = "/menu"}
-                    className="mt-4 w-full py-2.5 rounded-xl bg-gradient-to-r from-ethiopian-gold/10 to-ethiopian-clay/10 text-ethiopian-coffee font-medium text-sm hover:from-ethiopian-gold hover:to-ethiopian-clay hover:text-white transition-all duration-300 border border-ethiopian-gold/20"
+                    className="mt-4 w-full py-2.5 rounded-xl bg-gradient-to-r from-ethiopian-gold/10 to-ethiopian-clay/10 text-ethiopian-coffee dark:text-ethiopian-cream font-medium text-sm hover:from-ethiopian-gold hover:to-ethiopian-clay hover:text-white transition-all duration-300 border border-ethiopian-gold/20 dark:border-ethiopian-gold/30"
                   >
                     {t("hero.orderNow")}
                   </motion.button>
@@ -505,7 +556,7 @@ function LiveKitchenSection() {
                       <s.icon className="w-7 h-7" />
                     </motion.div>
                   </div>
-                  <div className="flex-1 bg-white/[0.03] backdrop-blur-sm rounded-2xl p-5 sm:p-6 md:p-8 border border-white/[0.06] hover:border-ethiopian-gold/20 transition-all duration-500 group">
+                  <div className="flex-1 bg-gradient-to-br from-white/[0.05] to-ethiopian-gold/[0.02] backdrop-blur-sm rounded-2xl p-5 sm:p-6 md:p-8 border border-white/[0.06] hover:border-ethiopian-gold/30 transition-all duration-500 group shadow-lg shadow-black/20">
                     <div className="flex items-center gap-3 mb-3">
                       <span className="text-ethiopian-gold/40 text-sm font-mono">{s.step}</span>
                       <div className="h-px flex-1 bg-gradient-to-r from-ethiopian-gold/20 to-transparent" />
@@ -528,8 +579,13 @@ function WhyChooseUs() {
   const icons = [Gem, Award, Shield, Heart, Star, Flame, Coffee, Leaf];
   const whyChooseUs = [t("landing.whyItem1"), t("landing.whyItem2"), t("landing.whyItem3"), t("landing.whyItem4"), t("landing.whyItem5"), t("landing.whyItem6"), t("landing.whyItem7"), t("landing.whyItem8")];
   return (
-    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-white relative overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.02] bg-tire-pattern pointer-events-none" />
+    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-ethiopian-cream dark:bg-black texture-linen relative overflow-hidden">
+      <div className="absolute inset-0 opacity-[0.03] bg-tire-pattern pointer-events-none" />
+      <motion.div
+        animate={{ scale: [1, 1.15, 1] }}
+        transition={{ duration: 12, repeat: Infinity }}
+        className="absolute -bottom-40 -right-40 w-80 h-80 bg-ethiopian-clay/5 rounded-full blur-3xl"
+      />
       <div className="max-w-[1600px] mx-auto relative z-10">
         <AnimatedSection>
           <SectionHeader label={t("landing.whyChooseUs")} title={t("landing.excellence")} />
@@ -541,16 +597,16 @@ function WhyChooseUs() {
               <AnimatedSection key={item} delay={i * 0.05}>
                 <motion.div
                   whileHover={{ scale: 1.03, y: -4 }}
-                  className="p-4 sm:p-6 rounded-2xl bg-ethiopian-cream/70 border border-ethiopian-gold/10 hover:border-ethiopian-gold/30 transition-all duration-300 text-center group gold-glow"
+                  className="p-4 sm:p-6 rounded-2xl bg-gradient-to-br from-white dark:from-gray-900 to-ethiopian-cream dark:to-black border border-ethiopian-gold/10 dark:border-ethiopian-gold/20 hover:border-ethiopian-gold/30 dark:hover:border-ethiopian-gold/40 transition-all duration-300 text-center group shadow-lg shadow-ethiopian-gold/5 hover:shadow-xl hover:shadow-ethiopian-gold/10"
                 >
                   <motion.div
                     animate={{ rotate: [0, 5, -5, 0] }}
                     transition={{ duration: 4, repeat: Infinity, delay: i * 0.2 }}
-                    className="w-10 h-10 rounded-full bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform"
+                    className="w-12 h-12 rounded-full bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 flex items-center justify-center mx-auto mb-3 group-hover:scale-110 group-hover:from-ethiopian-gold/30 group-hover:to-ethiopian-clay/30 transition-all duration-300"
                   >
-                    <Icon className="w-5 h-5 text-ethiopian-gold" />
+                    <Icon className="w-5 h-5 text-ethiopian-gold group-hover:text-ethiopian-clay transition-colors" />
                   </motion.div>
-                  <p className="font-semibold text-ethiopian-coffee text-sm sm:text-base">{item}</p>
+                   <p className="font-semibold text-ethiopian-coffee dark:text-ethiopian-cream text-sm sm:text-base">{item}</p>
                 </motion.div>
               </AnimatedSection>
             );
@@ -565,7 +621,7 @@ function GallerySection() {
   const { t } = useTranslation();
   const [selected, setSelected] = useState<number | null>(null);
   return (
-    <section id="gallery" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-ethiopian-cream texture-linen relative overflow-hidden">
+    <section id="gallery" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-ethiopian-cream dark:bg-black texture-linen relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.03] bg-ethiopian-cross pointer-events-none" />
       <div className="max-w-[1600px] mx-auto relative z-10">
         <AnimatedSection>
@@ -701,8 +757,13 @@ function CultureSection() {
     { title: t("landing.coffeeCeremony"), desc: t("landing.coffeeCeremonyDesc"), icon: SpiceIcon, color: "from-ethiopian-olive/10 to-ethiopian-gold/5" },
   ];
   return (
-    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-white relative overflow-hidden">
+    <section className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-gradient-to-br from-ethiopian-cream dark:from-black via-white dark:via-gray-900 to-ethiopian-cream dark:to-black relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.02] bg-tire-pattern pointer-events-none" />
+      <motion.div
+        animate={{ scale: [1, 1.15, 1] }}
+        transition={{ duration: 12, repeat: Infinity }}
+        className="absolute -top-40 -right-40 w-80 h-80 bg-ethiopian-gold/5 rounded-full blur-3xl"
+      />
       <div className="max-w-[1600px] mx-auto relative z-10">
         <AnimatedSection>
           <SectionHeader label={t("landing.ourHeritage")} title={t("landing.traditionTitle")} subtitle={t("landing.traditionSubtitle")} />
@@ -712,7 +773,7 @@ function CultureSection() {
             <AnimatedSection key={c.title} delay={i * 0.1}>
               <motion.div
                 whileHover={{ y: -6 }}
-                className="group relative p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-ethiopian-cream/80 to-white border border-ethiopian-gold/10 hover:border-ethiopian-gold/30 transition-all duration-500 overflow-hidden"
+                className="group relative p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-ethiopian-cream/80 dark:from-black/80 to-white dark:to-gray-900 border border-ethiopian-gold/10 dark:border-ethiopian-gold/20 hover:border-ethiopian-gold/30 dark:hover:border-ethiopian-gold/40 transition-all duration-500 overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-ethiopian-gold/10"
               >
                 <div className="absolute inset-0 pattern-overlay opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-ethiopian-gold via-ethiopian-clay to-ethiopian-gold rounded-l-lg" />
@@ -724,8 +785,8 @@ function CultureSection() {
                     <c.icon className="w-6 h-6 sm:w-7 sm:h-7 text-ethiopian-gold" />
                   </motion.div>
                   <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-ethiopian-coffee mb-2 font-serif">{c.title}</h3>
-                    <p className="text-ethiopian-coffee/70 text-sm sm:text-base leading-relaxed">{c.desc}</p>
+                     <h3 className="text-lg sm:text-xl font-bold text-ethiopian-coffee dark:text-ethiopian-cream mb-2 font-serif">{c.title}</h3>
+                     <p className="text-ethiopian-coffee/70 dark:text-ethiopian-cream/70 text-sm sm:text-base leading-relaxed">{c.desc}</p>
                   </div>
                 </div>
               </motion.div>
@@ -804,7 +865,7 @@ function LocationSection() {
     { icon: Phone, label: t("landing.phoneLabel"), value: t("landing.phone") },
   ];
   return (
-    <section id="contact" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-ethiopian-cream texture-linen relative overflow-hidden">
+    <section id="contact" className="py-16 sm:py-20 lg:py-28 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-ethiopian-cream dark:bg-black texture-linen relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.03] bg-ethiopian-cross pointer-events-none" />
       <div className="max-w-[1600px] mx-auto relative z-10">
         <AnimatedSection>
@@ -831,15 +892,15 @@ function LocationSection() {
             </div>
           </AnimatedSection>
           <AnimatedSection delay={0.2}>
-            <div className="space-y-5 sm:space-y-6 bg-white/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-ethiopian-gold/10">
+             <div className="space-y-5 sm:space-y-6 bg-white/50 dark:bg-gray-950/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-ethiopian-gold/10 dark:border-ethiopian-gold/20">
               {locationItems.map(item => (
                 <div key={item.label} className="flex items-start gap-4 group">
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-ethiopian-gold/15 to-ethiopian-clay/15 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                     <item.icon className="w-5 h-5 sm:w-6 sm:h-6 text-ethiopian-gold" />
                   </div>
                   <div>
-                    <p className="text-xs sm:text-sm text-ethiopian-coffee/50 tracking-wider uppercase">{item.label}</p>
-                    <p className="text-base sm:text-lg font-semibold text-ethiopian-coffee">{item.value}</p>
+                     <p className="text-xs sm:text-sm text-ethiopian-coffee/50 dark:text-ethiopian-cream/50 tracking-wider uppercase">{item.label}</p>
+                     <p className="text-base sm:text-lg font-semibold text-ethiopian-coffee dark:text-ethiopian-cream">{item.value}</p>
                   </div>
                 </div>
               ))}
@@ -922,7 +983,7 @@ function QRCodeSection() {
                       className="w-full h-auto max-w-[280px] mx-auto"
                     />
                   </div>
-                  <p className="text-center text-xs text-ethiopian-coffee/60 mt-4 font-medium tracking-wider uppercase">
+                  <p className="text-center text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 mt-4 font-medium tracking-wider uppercase">
                     {t("app.name")}
                   </p>
                 </div>
@@ -976,7 +1037,7 @@ function Footer() {
     { href: "#contact", label: t("landing.contact") },
   ];
   return (
-    <footer className="py-12 lg:py-16 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-ethiopian-charcoal text-white/60 relative overflow-hidden">
+    <footer className="py-12 lg:py-16 px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 bg-black text-white/60 relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.03] bg-ethiopian-cross pointer-events-none" />
       <div className="absolute inset-0 texture-wood opacity-30" />
       <div className="max-w-[1600px] mx-auto relative z-10">
@@ -984,31 +1045,31 @@ function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="relative">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ethiopian-clay to-ethiopian-gold flex items-center justify-center shadow-lg">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ethiopian-clay to-ethiopian-gold flex items-center justify-center shadow-lg shadow-ethiopian-gold/20">
                   <UtensilsCrossed className="w-5 h-5 text-white" />
                 </div>
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                  className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay opacity-25 blur-sm"
+                  className="absolute -inset-0.5 rounded-xl bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay opacity-40 blur-sm"
                 />
               </div>
-              <span className="font-bold text-lg text-white">{t("app.name")}</span>
+              <span className="font-bold text-lg text-ethiopian-gold">{t("app.name")}</span>
             </div>
             <p className="text-sm leading-relaxed text-white/50">{t("landing.footerDesc")}</p>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4 font-serif">{t("landing.quickLinks")}</h4>
+            <h4 className="font-semibold text-ethiopian-gold mb-4 font-serif">{t("landing.quickLinks")}</h4>
             <div className="space-y-2.5 text-sm">
               {footerLinks.map(l => (
-                <a key={l.href} href={l.href} className="block hover:text-ethiopian-gold transition-all duration-300 hover:translate-x-1">
+                <a key={l.href} href={l.href} className="block text-white/50 hover:text-ethiopian-gold transition-all duration-300 hover:translate-x-1">
                   {l.label}
                 </a>
               ))}
             </div>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4 font-serif">{t("landing.openingHours")}</h4>
+            <h4 className="font-semibold text-ethiopian-gold mb-4 font-serif">{t("landing.openingHours")}</h4>
             <div className="space-y-2 text-sm">
               <p className="text-white/50">{t("common.mondaySunday")}</p>
               <p className="text-white font-semibold">{t("landing.hours")}</p>
@@ -1017,7 +1078,7 @@ function Footer() {
             </div>
           </div>
           <div>
-            <h4 className="font-semibold text-white mb-4 font-serif">{t("landing.followUs")}</h4>
+            <h4 className="font-semibold text-ethiopian-gold mb-4 font-serif">{t("landing.followUs")}</h4>
             <div className="flex gap-3 mb-6">
               {[Instagram, Facebook].map((Icon, i) => (
                 <a key={i} href="#" className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/[0.08] flex items-center justify-center hover:bg-ethiopian-gold/15 hover:text-ethiopian-gold hover:border-ethiopian-gold/30 transition-all duration-300">
@@ -1025,7 +1086,7 @@ function Footer() {
                 </a>
               ))}
             </div>
-            <h4 className="font-semibold text-white mb-3 font-serif">{t("landing.newsletter")}</h4>
+            <h4 className="font-semibold text-ethiopian-gold mb-3 font-serif">{t("landing.newsletter")}</h4>
             <div className="flex">
               <input
                 type="email"
@@ -1066,7 +1127,7 @@ export default function HomePage() {
     </div>
   );
   return (
-    <div className="bg-ethiopian-cream">
+    <div className="bg-ethiopian-cream dark:bg-black">
       <FloatingNav />
       <HeroSection />
       <FeatureHighlights />

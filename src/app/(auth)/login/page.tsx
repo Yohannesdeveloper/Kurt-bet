@@ -91,7 +91,7 @@ export default function LoginPage() {
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay opacity-25 blur-sm"
             />
-            <UtensilsCrossed className="h-10 w-10 text-white relative z-10" />
+            <img src="/images/Logo.jpg" alt="Habesha Kurt Bet Logo" className="h-full w-full object-cover relative z-10" />
           </div>
           <h1 className="text-4xl font-serif font-bold tracking-tight mb-2 text-ethiopian-coffee">
             {t("app.name")}

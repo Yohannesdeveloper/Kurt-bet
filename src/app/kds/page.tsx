@@ -61,11 +61,11 @@ interface Order {
 }
 
 const STATUS_FLOW: Record<string, { next: string | null; label: string; color: string; bg: string; border: string; dot: string }> = {
-  NEW:       { next: "PREPARING", label: "Pending",       color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-200", dot: "bg-amber-500" },
-  PREPARING: { next: "READY",     label: "Preparing",     color: "text-blue-600",  bg: "bg-blue-50",  border: "border-blue-200",  dot: "bg-blue-500" },
-  READY:     { next: "SERVED",    label: "Ready for Pickup", color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200", dot: "bg-orange-500" },
-  SERVED:    { next: null,        label: "Served",        color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200", dot: "bg-emerald-500" },
-  CANCELLED: { next: null,        label: "Cancelled",     color: "text-red-600",  bg: "bg-red-50",    border: "border-red-200",   dot: "bg-red-500" },
+  NEW:       { next: "PREPARING", label: "Pending",       color: "text-ethiopian-gold", bg: "bg-ethiopian-gold/10", border: "border-ethiopian-gold/20", dot: "bg-ethiopian-gold" },
+  PREPARING: { next: "READY",     label: "Preparing",     color: "text-ethiopian-gold", bg: "bg-ethiopian-gold/10", border: "border-ethiopian-gold/20", dot: "bg-ethiopian-gold" },
+  READY:     { next: "SERVED",    label: "Ready for Pickup", color: "text-ethiopian-clay", bg: "bg-ethiopian-clay/10", border: "border-ethiopian-clay/20", dot: "bg-ethiopian-clay" },
+  SERVED:    { next: null,        label: "Served",        color: "text-ethiopian-coffee", bg: "bg-ethiopian-coffee/10", border: "border-ethiopian-coffee/20", dot: "bg-ethiopian-coffee" },
+  CANCELLED: { next: null,        label: "Cancelled",     color: "text-ethiopian-burgundy", bg: "bg-ethiopian-burgundy/10", border: "border-ethiopian-burgundy/20", dot: "bg-ethiopian-burgundy" },
 };
 
 const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
@@ -324,30 +324,30 @@ export default function KDSPage() {
   const hasOrders = orders.length > 0 || waitingButcherOrders.length > 0;
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden bg-ethiopian-cream texture-linen">
+    <div className="h-screen flex flex-col overflow-hidden bg-gradient-to-b from-ethiopian-charcoal via-black to-ethiopian-coffee">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between px-6 py-4 border-b border-ethiopian-gold/10 bg-ethiopian-cream/95 backdrop-blur-sm"
+        className="flex items-center justify-between px-6 py-4 border-b border-ethiopian-gold/10 bg-ethiopian-coffee/98 backdrop-blur-2xl shadow-2xl shadow-black/30"
       >
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard"
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 hover:from-ethiopian-gold/30 hover:to-ethiopian-clay/30 transition-all duration-200"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-ethiopian-gold/10 hover:bg-ethiopian-gold/20 transition-all duration-200 border border-ethiopian-gold/20"
           >
             <ArrowLeft className="h-5 w-5 text-ethiopian-gold" />
           </Link>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 border border-ethiopian-gold/20">
             <CookingPot className="h-5 w-5 text-ethiopian-gold" />
           </div>
           <div>
-            <h1 className="text-lg font-bold tracking-tight text-ethiopian-coffee font-serif">{t("kds.title")}</h1>
-            <p className="text-xs text-ethiopian-coffee/50">{orders.length + waitingButcherOrders.length} orders active</p>
+            <h1 className="text-lg font-bold tracking-tight text-ethiopian-gold font-serif">{t("kds.title")}</h1>
+            <p className="text-xs text-ethiopian-cream/50">{orders.length + waitingButcherOrders.length} orders active</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }} className="h-2 w-2 rounded-full bg-emerald-500" />
-          <span className="text-xs text-ethiopian-coffee/50">Live</span>
+          <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }} className="h-2 w-2 rounded-full bg-ethiopian-gold" />
+          <span className="text-xs text-ethiopian-cream/50">Live</span>
           {isAdmin && (
             <button
               onClick={async () => {
@@ -359,7 +359,7 @@ export default function KDSPage() {
                   else { toast.error(d.error || "Failed"); }
                 } catch { toast.error("Failed"); }
               }}
-              className="ml-3 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors text-xs font-medium"
+              className="ml-3 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-ethiopian-clay/10 text-ethiopian-clay hover:bg-ethiopian-clay/20 transition-colors text-xs font-medium border border-ethiopian-clay/20"
               title="Clear history"
             >
               <Trash2 className="w-3.5 h-3.5" /> Clear history
@@ -376,8 +376,8 @@ export default function KDSPage() {
               <span>{t("common.loading")}</span>
             </div>
           </div>
-        ) : !hasOrders ? (
-          <div className="flex flex-col items-center justify-center h-full text-ethiopian-coffee/50">
+          ) : !hasOrders ? (
+          <div className="flex flex-col items-center justify-center h-full text-ethiopian-cream/50">
             <div className="relative mb-6">
               <ChefHat className="h-20 w-20 opacity-20" />
               <motion.div
@@ -386,8 +386,8 @@ export default function KDSPage() {
                 className="absolute inset-0 bg-ethiopian-gold/10 rounded-full blur-xl"
               />
             </div>
-            <p className="text-lg font-semibold text-ethiopian-coffee">{t("orders.pending")}</p>
-            <p className="text-sm">{t("orders.noOrders")}</p>
+            <p className="text-lg font-semibold text-ethiopian-cream">{t("orders.pending")}</p>
+            <p className="text-sm text-ethiopian-cream/50">{t("orders.noOrders")}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 h-full">
@@ -395,8 +395,8 @@ export default function KDSPage() {
               <div key={grp.status} className="flex flex-col min-h-0">
                 <div className="flex items-center gap-2 mb-3 px-1">
                   <span className={`h-2.5 w-2.5 rounded-full ${grp.dot}`} />
-                  <h2 className="text-sm font-semibold text-ethiopian-coffee/70 uppercase tracking-wider">{grp.label}</h2>
-                  <Badge variant="secondary" className="text-xs ml-auto">{grp.orders.length}</Badge>
+                  <h2 className="text-sm font-semibold text-ethiopian-cream/70 uppercase tracking-wider">{grp.label}</h2>
+                  <Badge variant="secondary" className="text-xs ml-auto text-ethiopian-cream/70 bg-ethiopian-gold/10">{grp.orders.length}</Badge>
                 </div>
                 <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pr-1">
                   <AnimatePresence mode="popLayout">
@@ -405,7 +405,7 @@ export default function KDSPage() {
                     ))}
                   </AnimatePresence>
                   {grp.orders.length === 0 && (
-                    <div className="flex items-center justify-center h-20 text-xs text-ethiopian-coffee/50 border border-dashed border-ethiopian-gold/20 rounded-xl">
+                    <div className="flex items-center justify-center h-20 text-xs text-ethiopian-cream/40 border border-dashed border-ethiopian-gold/10 rounded-xl bg-black/20">
                       {t("orders.noOrders")}
                     </div>
                   )}
@@ -415,8 +415,8 @@ export default function KDSPage() {
             <div className="flex flex-col min-h-0">
               <div className="flex items-center gap-2 mb-3 px-1">
                 <span className="h-2.5 w-2.5 rounded-full bg-ethiopian-clay" />
-                <h2 className="text-sm font-semibold text-ethiopian-coffee/70 uppercase tracking-wider">{t("kds.butcher")}</h2>
-                <Badge variant="secondary" className="text-xs ml-auto">{butcherOrders.filter(b => b.kitchenStatus === "WAITING").length}</Badge>
+                <h2 className="text-sm font-semibold text-ethiopian-cream/70 uppercase tracking-wider">{t("kds.butcher")}</h2>
+                <Badge variant="secondary" className="text-xs ml-auto text-ethiopian-cream/70 bg-ethiopian-gold/10">{butcherOrders.filter(b => b.kitchenStatus === "WAITING").length}</Badge>
               </div>
               <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pr-1">
                 <AnimatePresence mode="popLayout">

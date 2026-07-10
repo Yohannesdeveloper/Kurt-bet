@@ -9,9 +9,10 @@ import {
   ChevronRight as ChevronRightIcon, Sparkles, Flame,
   Zap, TrendingUp, Store, CookingPot, ClipboardList, Users, LogOut,
   Beef, Drumstick, Check, XCircle, Send, Minus, Plus, Gem, Award, Package,
-  Coffee, Loader2
+  Coffee, Loader2, Sun, Moon
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
+import { useTheme } from "next-themes";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -49,6 +50,9 @@ const restaurantMeta: Record<string, { rating: number; deliveryTime: string; pri
 function Header({ onNotifClick }: { onNotifClick: () => void }) {
   const [searchFocused, setSearchFocused] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const { data: session } = useSession();
   const { t } = useTranslation();
   const { notifications, unreadCount } = useNotificationStore();
@@ -67,29 +71,29 @@ function Header({ onNotifClick }: { onNotifClick: () => void }) {
     <motion.header
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="sticky top-0 z-50 bg-ethiopian-cream/95 backdrop-blur-xl border-b border-ethiopian-gold/10 shadow-sm"
+      className="sticky top-0 z-50 bg-card/98 dark:bg-ethiopian-coffee/98 backdrop-blur-2xl border-b border-border dark:border-ethiopian-gold/10 shadow-2xl shadow-black/30"
     >
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16">
         <div className="flex items-center justify-between h-16 lg:h-20 2xl:h-24">
           <motion.div whileHover={{ scale: 1.05 }} className="flex items-center gap-2 cursor-pointer">
             <div className="relative">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ethiopian-clay to-ethiopian-gold flex items-center justify-center shadow-lg">
-                <UtensilsCrossed className="w-5 h-5 text-white" />
+              <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg shadow-ethiopian-gold/20">
+                <img src="/images/Logo.jpg" alt="Habesha Kurt Bet Logo" className="h-full w-full object-cover" />
               </div>
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-1 rounded-xl bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay opacity-25 blur-sm"
+                className="absolute -inset-1 rounded-xl bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay opacity-40 blur-md"
               />
             </div>
-            <span className="font-bold text-xl font-serif bg-gradient-to-r from-ethiopian-coffee to-ethiopian-gold bg-clip-text text-transparent">
+            <span className="font-bold text-xl font-serif text-ethiopian-gold">
               {t("brand.name")}
             </span>
           </motion.div>
 
           <div className="hidden md:flex flex-1 max-w-xl lg:max-w-2xl xl:max-w-3xl mx-4 lg:mx-8">
             <motion.div animate={{ scale: searchFocused ? 1.02 : 1 }} className="relative w-full">
-              <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${searchFocused ? "text-ethiopian-gold" : "text-gray-400"}`} />
+              <Search className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${searchFocused ? "text-ethiopian-gold" : "text-ethiopian-gold/40"}`} />
               <input
                 ref={searchRef}
                 type="text"
@@ -97,26 +101,38 @@ function Header({ onNotifClick }: { onNotifClick: () => void }) {
                 onFocus={() => setSearchFocused(true)}
                 onBlur={() => setSearchFocused(false)}
                 onKeyDown={handleSearchKeyDown}
-                className="w-full pl-12 pr-4 py-3 rounded-full bg-gradient-to-r from-ethiopian-sand/30 to-ethiopian-cream border-2 border-transparent focus:border-ethiopian-gold/40 focus:bg-white focus:shadow-lg focus:shadow-ethiopian-gold/10 outline-none transition-all duration-300 text-sm"
+                className="w-full pl-12 pr-4 py-3 rounded-full bg-muted/50 dark:bg-white/5 backdrop-blur-sm border border-primary/20 dark:border-ethiopian-gold/20 text-foreground dark:text-ethiopian-cream placeholder:text-muted-foreground dark:placeholder:text-ethiopian-cream/30 focus:border-ethiopian-gold/50 focus:bg-muted/80 dark:focus:bg-white/10 focus:shadow-lg focus:shadow-ethiopian-gold/10 outline-none transition-all duration-300 text-sm"
               />
             </motion.div>
           </div>
 
-          <motion.div whileHover={{ scale: 1.05 }} className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-ethiopian-gold/10 to-ethiopian-clay/10 text-ethiopian-coffee/70 hover:text-ethiopian-gold cursor-pointer transition-colors border border-ethiopian-gold/20">
+          <motion.div whileHover={{ scale: 1.05 }} className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 dark:bg-ethiopian-gold/10 border border-primary/20 dark:border-ethiopian-gold/20 text-muted-foreground dark:text-ethiopian-cream/70 hover:text-primary dark:hover:text-ethiopian-gold cursor-pointer transition-colors">
             <MapPin className="w-4 h-4" />
             <span className="text-sm font-medium">{t("header.location")}</span>
           </motion.div>
 
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
+            {mounted && (
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="p-2 rounded-full hover:bg-ethiopian-gold/10 transition-colors group"
+              >
+                {theme === "light" ? (
+                  <Sun className="w-5 h-5 text-muted-foreground dark:text-ethiopian-cream/70 group-hover:text-ethiopian-gold transition-colors" />
+                ) : (
+                  <Moon className="w-5 h-5 text-muted-foreground dark:text-ethiopian-cream/70 group-hover:text-ethiopian-gold transition-colors" />
+                )}
+              </button>
+            )}
             {canNotify && (
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onNotifClick}
-                className="relative p-2 rounded-full hover:bg-gradient-to-r hover:from-ethiopian-gold/10 hover:to-ethiopian-clay/10 transition-colors group"
+                className="relative p-2 rounded-full hover:bg-ethiopian-gold/10 transition-colors group"
               >
-                <Bell className="w-5 h-5 text-ethiopian-coffee group-hover:text-ethiopian-gold transition-colors" />
+                <Bell className="w-5 h-5 text-muted-foreground dark:text-ethiopian-cream/70 group-hover:text-ethiopian-gold transition-colors" />
                 {displayCount > 0 && (
                   <motion.span
                     initial={{ scale: 0 }}
@@ -130,12 +146,12 @@ function Header({ onNotifClick }: { onNotifClick: () => void }) {
             )}
             <motion.div whileHover={{ scale: 1.02 }} className="hidden sm:flex items-center gap-3 pl-3 border-l border-ethiopian-gold/20 cursor-pointer">
               <div className="relative">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-ethiopian-gold to-ethiopian-clay flex items-center justify-center text-white font-semibold text-sm shadow-lg">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-ethiopian-gold to-ethiopian-clay flex items-center justify-center text-white font-semibold text-sm shadow-lg shadow-ethiopian-gold/20">
                   {(session?.user?.email || "J").charAt(0).toUpperCase()}
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-ethiopian-cream" />
+                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-ethiopian-coffee" />
               </div>
-              <span className="text-sm font-medium text-ethiopian-coffee hidden lg:block">
+              <span className="text-sm font-medium text-muted-foreground dark:text-ethiopian-cream/70 hidden lg:block">
                 {session?.user?.email || "user@email.com"}
               </span>
             </motion.div>
@@ -144,8 +160,8 @@ function Header({ onNotifClick }: { onNotifClick: () => void }) {
 
         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="md:hidden pb-4">
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input type="text" placeholder={t("header.mobileSearchPlaceholder")} className="w-full pl-12 pr-4 py-3 rounded-full bg-gradient-to-r from-ethiopian-sand/30 to-ethiopian-cream outline-none text-sm border border-ethiopian-gold/10 focus:border-ethiopian-gold/40 transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-ethiopian-gold/40" />
+            <input type="text" placeholder={t("header.mobileSearchPlaceholder")} className="w-full pl-12 pr-4 py-3 rounded-full bg-white/5 backdrop-blur-sm border border-ethiopian-gold/20 text-ethiopian-cream placeholder:text-ethiopian-cream/30 focus:border-ethiopian-gold/50 outline-none transition-colors text-sm" />
           </div>
         </motion.div>
       </div>
@@ -192,21 +208,21 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
         )}
       </AnimatePresence>
 
-      <aside className={`fixed top-0 left-0 h-full w-72 lg:w-64 xl:w-72 2xl:w-80 bg-ethiopian-cream shadow-2xl z-50 transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:static lg:shadow-lg lg:translate-x-0 lg:block`}>
+      <aside className={`fixed top-0 left-0 h-full w-72 lg:w-64 xl:w-72 2xl:w-80 bg-card dark:bg-gradient-to-b dark:from-ethiopian-coffee dark:via-ethiopian-charcoal dark:to-black shadow-2xl shadow-black/50 z-50 transition-transform duration-300 ease-in-out ${isOpen ? "translate-x-0" : "-translate-x-full"} lg:static lg:shadow-lg lg:translate-x-0 lg:block`}>
         <div className="p-6 h-full flex flex-col">
           <motion.div whileHover={{ scale: 1.02 }} className="flex items-center gap-2 mb-8 cursor-pointer">
             <div className="relative">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ethiopian-clay to-ethiopian-gold flex items-center justify-center shadow-lg">
-                <UtensilsCrossed className="w-5 h-5 text-white" />
+              <div className="w-12 h-12 rounded-xl overflow-hidden shadow-lg shadow-ethiopian-gold/20">
+                <img src="/images/Logo.jpg" alt="Habesha Kurt Bet Logo" className="h-full w-full object-cover" />
               </div>
-              <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="absolute -inset-1 rounded-xl bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay opacity-25 blur-sm" />
+              <motion.div animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="absolute -inset-1 rounded-xl bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay opacity-40 blur-md" />
             </div>
-            <span className="font-bold text-xl font-serif bg-gradient-to-r from-ethiopian-coffee to-ethiopian-gold bg-clip-text text-transparent">
+            <span className="font-bold text-xl font-serif text-ethiopian-gold">
               {t("brand.name")}
             </span>
           </motion.div>
 
-          <motion.div whileHover={{ scale: 1.02 }} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-ethiopian-gold to-ethiopian-clay p-6 mb-8 text-white shadow-lg">
+          <motion.div whileHover={{ scale: 1.02 }} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-ethiopian-gold via-ethiopian-gold to-ethiopian-clay p-6 mb-8 text-white shadow-lg shadow-ethiopian-gold/20">
             <motion.div animate={{ rotate: [0, 5, -5, 0] }} transition={{ duration: 4, repeat: Infinity }} className="absolute -right-8 -top-8 w-24 h-24 bg-white/10 rounded-full blur-xl" />
             <motion.div animate={{ rotate: [0, -5, 5, 0] }} transition={{ duration: 3, repeat: Infinity }} className="absolute -left-4 -bottom-4 w-16 h-16 bg-white/10 rounded-full blur-lg" />
             <div className="relative z-10">
@@ -242,8 +258,8 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group border border-transparent ${
                   currentView === (item.key === "butcher-shop" ? "butcher-shop" : item.key === "bartender" ? "bartender" : item.href === "/dashboard" ? "home" : undefined)
-                    ? "bg-gradient-to-r from-ethiopian-gold/10 to-ethiopian-clay/10 text-ethiopian-gold border-ethiopian-gold/20"
-                    : "text-ethiopian-coffee/70 hover:bg-gradient-to-r hover:from-ethiopian-gold/10 hover:to-ethiopian-clay/10 hover:text-ethiopian-gold hover:border-ethiopian-gold/20"
+                    ? "bg-ethiopian-gold/15 text-ethiopian-gold border-ethiopian-gold/30 shadow-sm shadow-ethiopian-gold/10"
+                    : "text-muted-foreground dark:text-ethiopian-cream/50 hover:bg-ethiopian-gold/10 hover:text-ethiopian-gold hover:border-ethiopian-gold/20"
                 }`}
               >
                 <item.icon className="w-5 h-5" />
@@ -255,14 +271,14 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
           <div className="mt-auto pt-6 border-t border-ethiopian-gold/10">
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
-              className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-red-500/10 to-red-600/10 border border-red-200/50 hover:from-red-500/20 hover:to-red-600/20 transition-all duration-200 w-full text-left"
+              className="flex items-center gap-3 p-3 rounded-xl bg-ethiopian-clay/10 border border-ethiopian-clay/20 hover:bg-ethiopian-clay/20 transition-all duration-200 w-full text-left"
             >
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-ethiopian-clay to-ethiopian-burgundy flex items-center justify-center">
                 <LogOut className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-red-600">{t("sidebar.logout")}</p>
-                <p className="text-xs text-red-500/70">{t("sidebar.endSession")}</p>
+                <p className="text-sm font-semibold text-ethiopian-clay">{t("sidebar.logout")}</p>
+                <p className="text-xs text-ethiopian-clay/70">{t("sidebar.endSession")}</p>
               </div>
             </button>
           </div>
@@ -275,7 +291,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
 function HeroBanner() {
   const { t } = useTranslation();
   return (
-    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-ethiopian-coffee via-ethiopian-charcoal to-ethiopian-burgundy p-6 sm:p-8 lg:p-12 xl:p-16 text-white shadow-2xl">
+    <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-ethiopian-coffee via-ethiopian-charcoal to-ethiopian-burgundy p-6 sm:p-8 lg:p-12 xl:p-16 text-white shadow-2xl dark:shadow-2xl">
       <div className="absolute inset-0 overflow-hidden">
         <motion.div animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="absolute -top-20 -right-20 w-96 h-96 bg-ethiopian-gold/20 rounded-full blur-3xl" />
         <motion.div animate={{ scale: [1, 1.3, 1], rotate: [0, -90, 0] }} transition={{ duration: 25, repeat: Infinity, ease: "linear" }} className="absolute -bottom-20 -left-20 w-96 h-96 bg-ethiopian-clay/20 rounded-full blur-3xl" />
@@ -341,7 +357,7 @@ function CategoriesSection() {
   return (
     <section className="py-8">
       <div className="flex items-center justify-between mb-6">
-        <motion.h2 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-2xl font-serif font-bold bg-gradient-to-r from-ethiopian-coffee to-ethiopian-gold bg-clip-text text-transparent">
+        <motion.h2 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-2xl font-serif font-bold text-foreground dark:bg-gradient-to-r dark:from-ethiopian-clay dark:to-ethiopian-gold dark:bg-clip-text dark:text-transparent">
           {t("dashboard.categories")}
         </motion.h2>
         <motion.a initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} href="/menu" className="text-ethiopian-gold font-semibold text-sm flex items-center gap-1 hover:gap-2 transition-all group">
@@ -364,7 +380,7 @@ function CategoriesSection() {
                   {t("categories.explore")}
                 </motion.div>
               </div>
-              <motion.p whileHover={{ scale: 1.05 }} className="text-center font-semibold text-ethiopian-coffee text-sm group-hover:text-ethiopian-gold transition-colors">
+              <motion.p whileHover={{ scale: 1.05 }} className="text-center font-semibold text-foreground dark:text-ethiopian-clay text-sm group-hover:text-ethiopian-gold transition-colors">
                 {t(`categories.${key}`)}
               </motion.p>
             </motion.div>
@@ -387,7 +403,7 @@ function RestaurantCard({ restKey, index }: { restKey: string; index: number }) 
       onClick={() => window.location.href = "/menu"}
       className="group cursor-pointer"
     >
-      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-gradient-to-br from-ethiopian-sand to-ethiopian-cream mb-4 shadow-lg group-hover:shadow-2xl transition-all duration-300">
+      <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-card dark:bg-gradient-to-br dark:from-ethiopian-sand dark:to-ethiopian-cream mb-4 shadow-lg group-hover:shadow-2xl transition-all duration-300">
         <div className="absolute inset-0 opacity-[0.06] bg-ethiopian-cross pointer-events-none" />
         <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ duration: 4, repeat: Infinity, delay: index * 0.5 }} className={`absolute inset-0 bg-gradient-to-br ${restaurant.color} flex items-center justify-center`}>
           <img src={restaurant.image} alt={t(`restaurant.${restKey}`)} className="w-full h-full object-cover" />
@@ -399,14 +415,14 @@ function RestaurantCard({ restKey, index }: { restKey: string; index: number }) 
           </motion.div>
         )}
 
-        <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="absolute top-3 right-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur-sm text-xs font-semibold text-ethiopian-coffee shadow-md border border-ethiopian-gold/20">
+        <motion.div whileHover={{ scale: 1.1, rotate: 5 }} className="absolute top-3 right-3 px-3 py-1 rounded-full bg-white/90 backdrop-blur-sm text-xs font-semibold text-ethiopian-clay shadow-md border border-ethiopian-gold/20">
           {restaurant.price}
         </motion.div>
 
         {restaurant.featured && (
           <motion.div animate={{ y: [0, -5, 0] }} transition={{ duration: 2, repeat: Infinity }} className="absolute bottom-3 right-3 px-2 py-1 rounded-full bg-white/90 backdrop-blur-sm flex items-center gap-1 shadow-md">
             <TrendingUp className="w-3 h-3 text-ethiopian-gold" />
-            <span className="text-xs font-semibold text-ethiopian-coffee">{t("restaurant.featured")}</span>
+            <span className="text-xs font-semibold text-ethiopian-clay">{t("restaurant.featured")}</span>
           </motion.div>
         )}
 
@@ -416,29 +432,29 @@ function RestaurantCard({ restKey, index }: { restKey: string; index: number }) 
           initial={{ y: 20, opacity: 0 }}
           whileHover={{ y: 0, opacity: 1 }}
           onClick={() => window.location.href = "/menu"}
-          className="absolute bottom-3 left-3 right-3 px-4 py-2 rounded-full bg-white text-ethiopian-coffee font-semibold text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute bottom-3 left-3 right-3 px-4 py-2 rounded-full bg-white text-ethiopian-clay font-semibold text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
         >
           {t("restaurant.orderNow")}
         </motion.button>
       </div>
 
       <div className="space-y-2">
-        <motion.h3 whileHover={{ scale: 1.02 }} className="font-bold font-serif text-ethiopian-coffee text-lg group-hover:text-ethiopian-gold transition-colors">
+        <motion.h3 whileHover={{ scale: 1.02 }} className="font-bold font-serif text-foreground dark:text-ethiopian-clay text-lg group-hover:text-ethiopian-gold transition-colors">
           {t(`restaurant.${restKey}`)}
         </motion.h3>
         <div className="flex items-center gap-4 text-sm">
           <motion.div whileHover={{ scale: 1.1 }} className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-ethiopian-gold text-ethiopian-gold" />
-            <span className="font-semibold text-ethiopian-coffee">{restaurant.rating}</span>
+            <span className="font-semibold text-foreground dark:text-ethiopian-clay">{restaurant.rating}</span>
           </motion.div>
-          <div className="flex items-center gap-1 text-ethiopian-coffee/60">
+          <div className="flex items-center gap-1 text-muted-foreground dark:text-ethiopian-clay/60">
             <Clock className="w-4 h-4" />
             <span>{t("restaurant.deliveryTime", { time: restaurant.deliveryTime })}</span>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
           {restaurant.tagKeys.map((tagKey) => (
-            <motion.span key={tagKey} whileHover={{ scale: 1.05 }} className="px-2 py-1 rounded-full bg-gradient-to-r from-ethiopian-cream to-ethiopian-cream/50 text-xs text-ethiopian-coffee/70 border border-ethiopian-gold/20">
+            <motion.span key={tagKey} whileHover={{ scale: 1.05 }} className="px-2 py-1 rounded-full bg-gradient-to-r from-ethiopian-cream to-ethiopian-cream/50 text-xs text-ethiopian-clay/70 border border-ethiopian-gold/20">
               {t(`restaurant.${tagKey}`)}
             </motion.span>
           ))}
@@ -453,7 +469,7 @@ function PopularRestaurants() {
   return (
     <section className="py-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-serif font-bold text-ethiopian-coffee">{t("dashboard.popularRestaurants")}</h2>
+        <h2 className="text-2xl font-serif font-bold text-foreground dark:text-ethiopian-clay">{t("dashboard.popularRestaurants")}</h2>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6">
         {restaurantKeys.map((key, index) => (
@@ -610,15 +626,15 @@ function ButcherOrderForm() {
           <Beef className="w-6 h-6" />
         </motion.div>
         <div>
-          <h2 className="text-2xl font-serif font-bold text-ethiopian-coffee">Butcher Shop</h2>
-          <p className="text-xs text-ethiopian-coffee/60">Order raw meat for your dishes</p>
+          <h2 className="text-2xl font-serif font-bold text-ethiopian-clay">Butcher Shop</h2>
+          <p className="text-xs text-ethiopian-clay/60">Order raw meat for your dishes</p>
         </div>
       </div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-ethiopian-gold/10">
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Meat Type</label>
+            <label className="block text-sm font-semibold text-ethiopian-clay mb-3">Meat Type</label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {meatTypes.map((type, i) => {
                 const Icon = type.icon;
@@ -639,7 +655,7 @@ function ButcherOrderForm() {
                       <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300`}>
                         <Icon className="w-5 h-5 text-white" />
                       </div>
-                      <span className="text-sm font-bold text-ethiopian-coffee">{type.label}</span>
+                      <span className="text-sm font-bold text-ethiopian-clay">{type.label}</span>
                     </div>
                     {meatType === type.id && (
                       <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-ethiopian-gold rounded-full flex items-center justify-center shadow">
@@ -653,7 +669,7 @@ function ButcherOrderForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Dish</label>
+            <label className="block text-sm font-semibold text-ethiopian-clay mb-3">Dish</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
               {dishOptions.map((dish, i) => (
                 <motion.button
@@ -691,14 +707,14 @@ function ButcherOrderForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Weight (kg)</label>
+            <label className="block text-sm font-semibold text-ethiopian-clay mb-3">Weight (kg)</label>
             <div className="flex flex-wrap gap-2">
               {weightPresets.map((w) => (
                 <button key={w} onClick={() => { setWeight(w.toString()); setCustomWeight(false); }}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     weight === w.toString() && !customWeight
                       ? "bg-ethiopian-burgundy text-white shadow-md"
-                      : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
+                      : "bg-ethiopian-cream text-ethiopian-clay hover:bg-ethiopian-gold/20 border border-transparent"
                   }`}
                 >{w} kg</button>
               ))}
@@ -706,44 +722,44 @@ function ButcherOrderForm() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   customWeight
                     ? "bg-ethiopian-gold text-white shadow-md"
-                    : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 border border-transparent"
+                    : "bg-ethiopian-cream text-ethiopian-clay hover:bg-ethiopian-gold/20 border border-transparent"
                 }`}
               >Custom</button>
             </div>
             {customWeight && (
               <input type="number" step="0.1" min="0.1" placeholder="Enter weight in kg"
                 value={weight} onChange={(e) => setWeight(e.target.value)}
-                className="mt-2 w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none"
+                className="mt-2 w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-clay border border-transparent focus:border-ethiopian-gold focus:outline-none"
               />
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-coffee mb-3">Quantity</label>
+            <label className="block text-sm font-semibold text-ethiopian-clay mb-3">Quantity</label>
             <div className="flex items-center gap-4">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-clay hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
                 <Minus className="w-5 h-5" />
               </button>
               <span className="text-3xl font-bold text-ethiopian-gold min-w-[3rem] text-center">{quantity}</span>
-              <button onClick={() => setQuantity(Math.min(20, quantity + 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
+              <button onClick={() => setQuantity(Math.min(20, quantity + 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-clay hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
                 <Plus className="w-5 h-5" />
               </button>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-coffee mb-2">Table Number (optional)</label>
+            <label className="block text-sm font-semibold text-ethiopian-clay mb-2">Table Number (optional)</label>
             <input type="text" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)}
               placeholder="e.g., 5"
-              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none"
+              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-clay border border-transparent focus:border-ethiopian-gold focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-coffee mb-2">Notes (optional)</label>
+            <label className="block text-sm font-semibold text-ethiopian-clay mb-2">Notes (optional)</label>
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
               placeholder="Any special instructions..." rows={2}
-              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none"
+              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-clay border border-transparent focus:border-ethiopian-gold focus:outline-none"
             />
           </div>
 
@@ -757,8 +773,8 @@ function ButcherOrderForm() {
         <section className="mt-8">
           <div className="flex items-center gap-3 mb-4">
             <ClipboardList className="w-5 h-5 text-ethiopian-gold" />
-            <h3 className="text-xl font-serif font-bold text-ethiopian-coffee">Butcher Status</h3>
-            <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream text-ethiopian-coffee/60">
+            <h3 className="text-xl font-serif font-bold text-ethiopian-clay">Butcher Status</h3>
+            <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream text-ethiopian-clay/60">
               {pendingButcherOrders.length} pending
             </span>
           </div>
@@ -789,11 +805,11 @@ function ButcherOrderForm() {
           </div>
 
           {statusLoading ? (
-            <div className="text-center py-8 text-ethiopian-coffee/60">Loading...</div>
+            <div className="text-center py-8 text-ethiopian-clay/60">Loading...</div>
           ) : (activeTab === "pending" ? pendingButcherOrders : processedButcherOrders).length === 0 ? (
             <div className="text-center py-8">
               <Package className="w-10 h-10 text-ethiopian-gold mx-auto mb-2" />
-              <p className="text-ethiopian-coffee/60 text-sm">
+              <p className="text-ethiopian-clay/60 text-sm">
                 {activeTab === "pending" ? "No orders waiting for approval" : "No processed orders"}
               </p>
             </div>
@@ -808,7 +824,7 @@ function ButcherOrderForm() {
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
+                      <span className="font-bold text-ethiopian-clay">#{order.orderNumber}</span>
                       {order.tableNumber && (
                         <span className="text-xs font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
                       )}
@@ -823,20 +839,20 @@ function ButcherOrderForm() {
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20 mb-2 text-xs">
-                    <div><span className="text-ethiopian-coffee/40">Meat:</span> <span className="font-bold text-ethiopian-burgundy">{order.meatType}</span></div>
-                    <div><span className="text-ethiopian-coffee/40">Dish:</span> <span className="font-semibold text-ethiopian-coffee">{order.menuItemName}</span></div>
-                    <div><span className="text-ethiopian-coffee/40">Weight:</span> <span className="font-bold text-ethiopian-gold">{order.weight} kg</span></div>
-                    <div><span className="text-ethiopian-coffee/40">Qty:</span> <span className="font-semibold text-ethiopian-coffee">x{order.quantity}</span></div>
+                    <div><span className="text-ethiopian-clay/40">Meat:</span> <span className="font-bold text-ethiopian-burgundy">{order.meatType}</span></div>
+                    <div><span className="text-ethiopian-clay/40">Dish:</span> <span className="font-semibold text-ethiopian-clay">{order.menuItemName}</span></div>
+                    <div><span className="text-ethiopian-clay/40">Weight:</span> <span className="font-bold text-ethiopian-gold">{order.weight} kg</span></div>
+                    <div><span className="text-ethiopian-clay/40">Qty:</span> <span className="font-semibold text-ethiopian-clay">x{order.quantity}</span></div>
                   </div>
 
                   {order.notes && (
-                    <div className="text-xs text-ethiopian-coffee/70 italic border-l-2 border-ethiopian-gold/30 pl-2 mb-2">
+                    <div className="text-xs text-ethiopian-clay/70 italic border-l-2 border-ethiopian-gold/30 pl-2 mb-2">
                       "{order.notes}"
                     </div>
                   )}
 
                   <div className="flex items-center justify-between">
-                    <div className="text-xs text-ethiopian-coffee/60">
+                    <div className="text-xs text-ethiopian-clay/60">
                       {new Date(order.createdAt).toLocaleString()} &middot; {order.customerName}
                     </div>
 
@@ -885,11 +901,11 @@ function MobileNav() {
     { icon: User, label: t("nav.profile"), href: "/settings" },
   ];
   return (
-    <motion.nav initial={{ y: 100 }} animate={{ y: 0 }} className="fixed bottom-0 left-0 right-0 bg-ethiopian-cream/95 backdrop-blur-xl border-t border-ethiopian-gold/10 lg:hidden z-50 shadow-2xl">
+    <motion.nav initial={{ y: 100 }} animate={{ y: 0 }} className="fixed bottom-0 left-0 right-0 bg-background/95 dark:bg-ethiopian-cream/95 backdrop-blur-xl border-t border-border dark:border-ethiopian-gold/10 lg:hidden z-50 shadow-2xl">
       <div className="flex items-center justify-around py-2 sm:py-3">
         {mobileNavItems.map((item, index) => (
           <motion.a key={item.label} href={item.href} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
-            className="flex flex-col items-center gap-1 text-ethiopian-coffee/60 hover:text-ethiopian-gold transition-colors group relative"
+            className="flex flex-col items-center gap-1 text-muted-foreground dark:text-ethiopian-clay/60 hover:text-ethiopian-gold transition-colors group relative"
           >
             <item.icon className="w-5 h-5" />
             <span className="text-[10px] sm:text-xs font-medium group-hover:font-semibold transition-all">{item.label}</span>
@@ -936,7 +952,7 @@ function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => vo
       <div className={`fixed top-0 right-0 h-full w-80 sm:w-96 bg-ethiopian-cream shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${open ? "translate-x-0" : "translate-x-full"}`}>
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-4 border-b border-ethiopian-gold/10">
-            <h2 className="text-lg font-bold font-serif text-ethiopian-coffee">Notifications</h2>
+            <h2 className="text-lg font-bold font-serif text-ethiopian-clay">Notifications</h2>
             <div className="flex items-center gap-2">
               {readyNotifs.length > 0 && (
                 <>
@@ -956,13 +972,13 @@ function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => vo
                 </>
               )}
               <button onClick={onClose} className="p-1 rounded-full hover:bg-ethiopian-cream transition-colors">
-                <X className="w-5 h-5 text-ethiopian-coffee" />
+                <X className="w-5 h-5 text-ethiopian-clay" />
               </button>
             </div>
           </div>
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {readyNotifs.length === 0 ? (
-              <p className="text-center text-ethiopian-coffee/50 py-8 text-sm">No notifications</p>
+              <p className="text-center text-ethiopian-clay/50 py-8 text-sm">No notifications</p>
             ) : (
               readyNotifs.map((n) => (
                 <div
@@ -970,15 +986,15 @@ function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => vo
                   onClick={() => handleNotifClick(n)}
                   className={`p-3 rounded-xl border cursor-pointer transition-colors ${
                     n.isRead
-                      ? "bg-white/50 border-ethiopian-gold/5 text-ethiopian-coffee/60"
+                      ? "bg-white/50 border-ethiopian-gold/5 text-ethiopian-clay/60"
                       : "bg-white border-ethiopian-gold/20 shadow-sm"
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className={`mt-0.5 h-2 w-2 rounded-full flex-shrink-0 ${n.isRead ? "bg-gray-300" : "bg-ethiopian-clay"}`} />
                     <div className="min-w-0">
-                      <p className={`text-sm font-medium ${n.isRead ? "" : "text-ethiopian-coffee"}`}>{n.title}</p>
-                      <p className="text-xs text-ethiopian-coffee/60 mt-0.5">{n.message}</p>
+                      <p className={`text-sm font-medium ${n.isRead ? "" : "text-ethiopian-clay"}`}>{n.title}</p>
+                      <p className="text-xs text-ethiopian-clay/60 mt-0.5">{n.message}</p>
                     </div>
                   </div>
                 </div>
@@ -1015,13 +1031,13 @@ function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => vo
                     {selectedOrder.status}
                   </Badge>
                   {selectedOrder.table && (
-                    <span className="text-xs text-ethiopian-coffee/60">
+                    <span className="text-xs text-ethiopian-clay/60">
                       Table {selectedOrder.table.number || selectedOrder.table.name}
                     </span>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <p className="text-sm font-semibold text-ethiopian-coffee">Items ({selectedOrder.items?.length || 0})</p>
+                  <p className="text-sm font-semibold text-ethiopian-clay">Items ({selectedOrder.items?.length || 0})</p>
                   {selectedOrder.items?.map((item: any) => (
                     <div key={item.id} className="flex items-center gap-3 p-2 rounded-lg bg-white border border-ethiopian-gold/10">
                       {item.menuItem?.image ? (
@@ -1032,8 +1048,8 @@ function NotificationPanel({ open, onClose }: { open: boolean; onClose: () => vo
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-ethiopian-coffee">{item.name}</p>
-                        <p className="text-xs text-ethiopian-coffee/50">x{item.quantity}</p>
+                        <p className="text-sm font-medium text-ethiopian-clay">{item.name}</p>
+                        <p className="text-xs text-ethiopian-clay/50">x{item.quantity}</p>
                       </div>
                       <p className="text-sm font-semibold text-ethiopian-gold">{formatCurrency(item.totalPrice)}</p>
                     </div>
@@ -1064,7 +1080,7 @@ export default function DashboardPage() {
   useSSENotifications();
 
   return (
-    <div className="min-h-screen bg-ethiopian-cream texture-linen">
+    <div className="min-h-screen bg-background dark:bg-gradient-to-b dark:from-ethiopian-charcoal dark:via-black dark:to-ethiopian-coffee">
       <NotificationPopups />
       <Header onNotifClick={() => setNotifOpen(!notifOpen)} />
       {canNotify && <NotificationPanel open={notifOpen} onClose={() => setNotifOpen(false)} />}

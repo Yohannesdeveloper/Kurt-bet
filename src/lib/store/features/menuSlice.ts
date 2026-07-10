@@ -4,6 +4,7 @@ export interface MenuCategory {
   id: string;
   name: string;
   sortOrder: number;
+  parentId?: string | null;
 }
 
 export interface MenuItem {

@@ -117,12 +117,174 @@ export default function MenuPage() {
     [items, searchQuery]
   );
 
-  const grouped = useMemo(() =>
-    categories
-      .filter(c => filtered.some(i => i.categoryId === c.id))
-      .sort((a, b) => a.sortOrder - b.sortOrder),
-    [categories, filtered]
-  );
+  const grouped = useMemo(() => {
+    const topLevel = categories.filter(c => !c.parentId).sort((a, b) => a.sortOrder - b.sortOrder);
+    const children = categories.filter(c => c.parentId);
+    return topLevel.map(parent => {
+      const parentItems = filtered.filter(i => i.categoryId === parent.id);
+      const subs = children.filter(c => c.parentId === parent.id).sort((a, b) => a.sortOrder - b.sortOrder);
+      const subWithItems = subs.filter(s => filtered.some(i => i.categoryId === s.id));
+      if (parentItems.length === 0 && subWithItems.length === 0) return null;
+      return {
+        ...parent,
+        subcategories: subWithItems,
+        hasParentItems: parentItems.length > 0,
+      };
+    }).filter((c): c is NonNullable<typeof c> => c !== null);
+  }, [categories, filtered]);
+
+  function ItemCard({ item, catIndex, itemIndex }: { item: MenuItem; catIndex: number; itemIndex: number }) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3, delay: catIndex * 0.1 + itemIndex * 0.05 }}
+      >
+        <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/30 cursor-pointer relative overflow-hidden">
+          {item.image ? (
+            <div className="relative w-full h-52 overflow-hidden bg-muted">
+              <img src={item.image} alt={item.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-12">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm lg:text-base text-white drop-shadow-sm">{item.name}</p>
+                    {item.description && (
+                      <p className="text-xs text-white/80 line-clamp-1 mt-0.5">{itemDesc(item)}</p>
+                    )}
+                  </div>
+                  {canEditDelete && (
+                    <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-white/90 hover:text-white hover:bg-white/20"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingItem(item);
+                          setDialogOpen(true);
+                        }}
+                      >
+                        <Edit className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-white/90 hover:text-destructive hover:bg-destructive/20"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(item.id);
+                        }}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <CardContent className="p-4 lg:p-5 pb-2">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-sm lg:text-base">{item.name}</p>
+                  {item.description && (
+                    <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{itemDesc(item)}</p>
+                  )}
+                </div>
+                {canEditDelete && (
+                  <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditingItem(item);
+                        setDialogOpen(true);
+                      }}
+                    >
+                      <Edit className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(item.id);
+                      }}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          )}
+          <CardContent className="px-4 lg:px-5 py-3">
+            {canAddItem && (
+              <div className="mb-2">
+                <button
+                  type="button"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    const prev = { ...item };
+                    dispatch(optimisticToggleAvailability(item.id));
+                    try {
+                      const res = await fetch(`/api/menu/items/${item.id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ isAvailable: !item.isAvailable }),
+                      });
+                      const d = await res.json();
+                      if (d.success) {
+                        toast.success(item.isAvailable ? "Marked unavailable" : "Marked available");
+                      }
+                    } catch {
+                      dispatch(updateItemAction(prev));
+                    }
+                  }}
+                  className={`text-xs font-medium px-2 py-0.5 rounded-full border transition-colors ${
+                    item.isAvailable
+                      ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                      : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
+                  }`}
+                >
+                  {item.isAvailable ? "Available" : "Unavailable"}
+                </button>
+              </div>
+            )}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Clock className="h-3 w-3 lg:h-3.5 lg:w-3.5" />
+                <span>{item.preparationTime} min</span>
+              </div>
+              <p className="font-bold text-base lg:text-lg text-primary">{formatCurrency(item.price)}</p>
+            </div>
+            {item.isAvailable && !isClient && (
+              <div className="mt-3 pt-3 border-t flex items-center justify-between">
+                {cart.find(c => c.id === item.id) ? (
+                  <div className="flex items-center gap-2">
+                    <Button variant="outline" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); updateQty(item.id, -1); }}>
+                      <Minus className="h-3 w-3" />
+                    </Button>
+                    <span className="w-5 text-center text-sm font-medium">{cart.find(c => c.id === item.id)?.quantity || 0}</span>
+                    <Button variant="outline" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); updateQty(item.id, 1); }}>
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Button size="sm" variant="outline" className="h-7 text-xs" onClick={(e) => { e.stopPropagation(); addToCart(item); }}>
+                    <Plus className="h-3 w-3 mr-1" /> {t("menu.addToCart")}
+                  </Button>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -202,7 +364,7 @@ export default function MenuPage() {
           </Card>
         </motion.div>
       ) : (
-        <div className="space-y-10">
+        <div className="space-y-12">
           {grouped.map((cat, catIndex) => (
             <motion.div
               key={cat.id}
@@ -215,159 +377,31 @@ export default function MenuPage() {
                 <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{cat.name}</h2>
                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
-                {filtered.filter(i => i.categoryId === cat.id).map((item, itemIndex) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: catIndex * 0.1 + itemIndex * 0.05 }}
-                  >
-                    <Card className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-primary/30 cursor-pointer relative overflow-hidden">
-                      {item.image ? (
-                        <div className="relative w-full h-52 overflow-hidden bg-muted">
-                          <img src={item.image} alt={item.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-12">
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1 min-w-0">
-                                <p className="font-semibold text-sm lg:text-base text-white drop-shadow-sm">{item.name}</p>
-                                {item.description && (
-                                  <p className="text-xs text-white/80 line-clamp-1 mt-0.5">{itemDesc(item)}</p>
-                                )}
-                              </div>
-                              {canEditDelete && (
-                                <div className="flex items-center gap-1 flex-shrink-0 ml-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-7 w-7 text-white/90 hover:text-white hover:bg-white/20"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setEditingItem(item);
-                                      setDialogOpen(true);
-                                    }}
-                                  >
-                                    <Edit className="h-3.5 w-3.5" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-7 w-7 text-white/90 hover:text-destructive hover:bg-destructive/20"
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDelete(item.id);
-                                    }}
-                                  >
-                                    <Trash2 className="h-3.5 w-3.5" />
-                                  </Button>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <CardContent className="p-4 lg:p-5 pb-2">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-sm lg:text-base">{item.name}</p>
-                              {item.description && (
-                                <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{itemDesc(item)}</p>
-                              )}
-                            </div>
-                            {canEditDelete && (
-                              <div className="flex items-center gap-1 flex-shrink-0 ml-2">
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7 text-muted-foreground hover:text-primary hover:bg-primary/10"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setEditingItem(item);
-                                    setDialogOpen(true);
-                                  }}
-                                >
-                                  <Edit className="h-3.5 w-3.5" />
-                                </Button>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDelete(item.id);
-                                  }}
-                                >
-                                  <Trash2 className="h-3.5 w-3.5" />
-                                </Button>
-                              </div>
-                            )}
-                          </div>
-                        </CardContent>
-                      )}
-                        <CardContent className="px-4 lg:px-5 py-3">
-                        {canAddItem && (
-                          <div className="mb-2">
-                              <button
-                              type="button"
-                              onClick={async (e) => {
-                                e.stopPropagation();
-                                const prev = { ...item };
-                                dispatch(optimisticToggleAvailability(item.id));
-                                try {
-                                  const res = await fetch(`/api/menu/items/${item.id}`, {
-                                    method: "PATCH",
-                                    headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify({ isAvailable: !item.isAvailable }),
-                                  });
-                                  const d = await res.json();
-                                  if (d.success) {
-                                    toast.success(item.isAvailable ? "Marked unavailable" : "Marked available");
-                                  }
-                                } catch {
-                                  dispatch(updateItemAction(prev));
-                                }
-                              }}
-                              className={`text-xs font-medium px-2 py-0.5 rounded-full border transition-colors ${
-                                item.isAvailable
-                                  ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
-                                  : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
-                              }`}
-                            >
-                              {item.isAvailable ? "Available" : "Unavailable"}
-                            </button>
-                          </div>
-                        )}
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                            <Clock className="h-3 w-3 lg:h-3.5 lg:w-3.5" />
-                            <span>{item.preparationTime} min</span>
-                          </div>
-                          <p className="font-bold text-base lg:text-lg text-primary">{formatCurrency(item.price)}</p>
-                        </div>
-                        {item.isAvailable && !isClient && (
-                          <div className="mt-3 pt-3 border-t flex items-center justify-between">
-                            {cart.find(c => c.id === item.id) ? (
-                              <div className="flex items-center gap-2">
-                                <Button variant="outline" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); updateQty(item.id, -1); }}>
-                                  <Minus className="h-3 w-3" />
-                                </Button>
-                                <span className="w-5 text-center text-sm font-medium">{cart.find(c => c.id === item.id)?.quantity || 0}</span>
-                                <Button variant="outline" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); updateQty(item.id, 1); }}>
-                                  <Plus className="h-3 w-3" />
-                                </Button>
-                              </div>
-                            ) : (
-                              <Button size="sm" variant="outline" className="h-7 text-xs" onClick={(e) => { e.stopPropagation(); addToCart(item); }}>
-                                <Plus className="h-3 w-3 mr-1" /> {t("menu.addToCart")}
-                              </Button>
-                            )}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </div>
+
+              {/* Parent's own items */}
+              {cat.hasParentItems && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4 mb-8">
+                  {filtered.filter(i => i.categoryId === cat.id).map((item, itemIndex) => (
+                    <ItemCard key={item.id} item={item} catIndex={catIndex} itemIndex={itemIndex} />
+                  ))}
+                </div>
+              )}
+
+              {/* Subcategories */}
+              {cat.subcategories.map((sub, subIndex) => (
+                <div key={sub.id} className="mb-8">
+                  <div className="flex items-center gap-3 mb-4 ml-4">
+                    <div className="w-2 h-2 rounded-full bg-border" />
+                    <h3 className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider">{sub.name}</h3>
+                    <div className="h-px flex-1 bg-gradient-to-r from-border/50 to-transparent" />
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
+                    {filtered.filter(i => i.categoryId === sub.id).map((item, itemIndex) => (
+                      <ItemCard key={item.id} item={item} catIndex={catIndex + subIndex * 0.1} itemIndex={itemIndex} />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </motion.div>
           ))}
         </div>

@@ -35,17 +35,17 @@ import { useNotificationStore } from "@/store/useNotificationStore";
 import { NotificationPopups } from "@/components/shared/NotificationPopups";
 
 const statusStyles: Record<string, string> = {
-  NEW: "bg-blue-100 text-blue-700",
-  PREPARING: "bg-amber-100 text-amber-700",
-  READY: "bg-green-100 text-green-700",
-  COMPLETED: "bg-gray-100 text-gray-600",
-  DELAYED: "bg-red-100 text-red-700",
+  NEW: "bg-ethiopian-gold/15 text-ethiopian-gold",
+  PREPARING: "bg-ethiopian-gold/20 text-ethiopian-gold",
+  READY: "bg-ethiopian-clay/15 text-ethiopian-clay",
+  COMPLETED: "bg-ethiopian-coffee/15 text-ethiopian-coffee",
+  DELAYED: "bg-ethiopian-burgundy/15 text-ethiopian-burgundy",
 };
 
 const approvedBadge = (approved: boolean) =>
   approved
-    ? "bg-emerald-100 text-emerald-700"
-    : "bg-yellow-100 text-yellow-700";
+    ? "bg-ethiopian-gold/15 text-ethiopian-gold"
+    : "bg-ethiopian-clay/15 text-ethiopian-clay";
 
 interface Order {
   id: string;
@@ -162,28 +162,29 @@ export default function OrdersPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 bg-ethiopian-coffee/98 backdrop-blur-2xl border-b border-ethiopian-gold/10 shadow-2xl shadow-black/30 sticky top-0 z-30"
       >
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard"
-            className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 shadow-lg hover:from-ethiopian-gold/30 hover:to-ethiopian-clay/30 transition-all duration-200"
+            className="flex h-10 w-10 items-center justify-center rounded-xl bg-ethiopian-gold/10 hover:bg-ethiopian-gold/20 transition-all duration-200 border border-ethiopian-gold/20"
           >
             <ArrowLeft className="h-5 w-5 text-ethiopian-gold" />
           </Link>
           <div>
-            <h1 className="text-xl lg:text-2xl font-bold tracking-tight font-serif text-ethiopian-coffee">{t("orders.title")}</h1>
-            <p className="text-sm text-ethiopian-coffee/60">{t("orders.subtitle")}</p>
+            <h1 className="text-lg sm:text-xl font-bold text-ethiopian-gold font-serif">{t("nav.orders")}</h1>
+            <p className="text-xs text-ethiopian-cream/50">{orders.length} orders</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 lg:gap-3 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ethiopian-coffee/40" />
-            <Input
-              placeholder={t("orders.searchPlaceholder")}
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1 sm:flex-initial">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ethiopian-gold/40" />
+            <input
+              type="text"
+              placeholder={t("orders.search")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-10 lg:h-11 w-full sm:w-64 transition-all duration-200 focus:w-72 border-ethiopian-gold/20 focus:border-ethiopian-gold/40"
+              className="w-full sm:w-48 lg:w-64 pl-9 pr-3 py-2 rounded-lg bg-white/5 border border-ethiopian-gold/20 text-ethiopian-cream placeholder:text-ethiopian-cream/30 focus:border-ethiopian-gold/50 focus:bg-white/10 outline-none transition-all text-sm"
             />
           </div>
           <Button variant="outline" size="icon" className="h-10 lg:h-11 w-10 lg:w-11 flex-shrink-0 border-ethiopian-gold/20 text-ethiopian-coffee">
@@ -218,33 +219,33 @@ export default function OrdersPage() {
         </div>
       </motion.div>
 
-      <Card className="border border-ethiopian-gold/10">
+      <Card className="border border-ethiopian-gold/10 bg-gradient-to-b from-ethiopian-coffee/80 to-black/80 backdrop-blur-xl">
         <CardContent className="p-6">
           <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="bg-ethiopian-gold/5 border border-ethiopian-gold/10 p-1">
-              <TabsTrigger value="all" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("orders.allOrders")}</TabsTrigger>
-              <TabsTrigger value="pending" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("orders.pendingApproval")}</TabsTrigger>
-              <TabsTrigger value="NEW" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("orders.statusNew")}</TabsTrigger>
-              <TabsTrigger value="PREPARING" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("orders.statusPreparing")}</TabsTrigger>
-              <TabsTrigger value="READY" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("orders.statusReady")}</TabsTrigger>
-              <TabsTrigger value="COMPLETED" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("orders.statusCompleted")}</TabsTrigger>
+              <TabsTrigger value="all" className="data-[state=active]:bg-ethiopian-gold/15 data-[state=active]:text-ethiopian-gold data-[state=active]:shadow-sm text-ethiopian-cream/60">{t("orders.allOrders")}</TabsTrigger>
+              <TabsTrigger value="pending" className="data-[state=active]:bg-ethiopian-gold/15 data-[state=active]:text-ethiopian-gold data-[state=active]:shadow-sm text-ethiopian-cream/60">{t("orders.pendingApproval")}</TabsTrigger>
+              <TabsTrigger value="NEW" className="data-[state=active]:bg-ethiopian-gold/15 data-[state=active]:text-ethiopian-gold data-[state=active]:shadow-sm text-ethiopian-cream/60">{t("orders.statusNew")}</TabsTrigger>
+              <TabsTrigger value="PREPARING" className="data-[state=active]:bg-ethiopian-gold/15 data-[state=active]:text-ethiopian-gold data-[state=active]:shadow-sm text-ethiopian-cream/60">{t("orders.statusPreparing")}</TabsTrigger>
+              <TabsTrigger value="READY" className="data-[state=active]:bg-ethiopian-gold/15 data-[state=active]:text-ethiopian-gold data-[state=active]:shadow-sm text-ethiopian-cream/60">{t("orders.statusReady")}</TabsTrigger>
+              <TabsTrigger value="COMPLETED" className="data-[state=active]:bg-ethiopian-gold/15 data-[state=active]:text-ethiopian-gold data-[state=active]:shadow-sm text-ethiopian-cream/60">{t("orders.statusCompleted")}</TabsTrigger>
             </TabsList>
 
             <TabsContent value={activeTab} className="mt-6">
               {loading ? (
                 <div className="flex items-center justify-center py-20">
                   <div className="text-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-                    <p className="text-sm text-muted-foreground">{t("orders.loading")}</p>
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity, ease: "linear" }} className="w-8 h-8 border-2 border-ethiopian-gold/20 border-t-ethiopian-gold rounded-full mx-auto mb-4" />
+                    <p className="text-sm text-ethiopian-cream/50">{t("orders.loading")}</p>
                   </div>
                 </div>
               ) : filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                  <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
-                    <Inbox className="h-10 w-10" />
+                <div className="flex flex-col items-center justify-center py-20 text-ethiopian-cream/50">
+                  <div className="h-20 w-20 rounded-2xl bg-ethiopian-gold/5 border border-ethiopian-gold/10 flex items-center justify-center mb-4">
+                    <Inbox className="h-10 w-10 text-ethiopian-gold/40" />
                   </div>
-                  <p className="text-lg font-semibold mb-2">{t("orders.noOrders")}</p>
-                  <p className="text-sm mb-6">{t("orders.noOrdersSubtitle")}</p>
+                  <p className="text-lg font-semibold mb-2 text-ethiopian-cream/70">{t("orders.noOrders")}</p>
+                  <p className="text-sm mb-6 text-ethiopian-cream/40">{t("orders.noOrdersSubtitle")}</p>
                   {canCreateOrder && (
                     <Button
                       variant="premium"
@@ -323,9 +324,9 @@ function OrderCard({ order, index, isAdmin, canApprove, onApprove, onDelete }: {
       >
         <Card
           onClick={() => setDetailOpen(true)}
-          className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 hover:border-[#C89B3C]/30 cursor-pointer relative overflow-hidden"
+          className="group hover:shadow-xl hover:shadow-ethiopian-gold/10 transition-all duration-300 hover:-translate-y-1 border-2 border-ethiopian-gold/10 hover:border-ethiopian-gold/30 cursor-pointer relative overflow-hidden bg-gradient-to-b from-ethiopian-coffee/90 to-black/90"
         >
-          <div className="relative w-full h-40 overflow-hidden bg-muted">
+          <div className="relative w-full h-40 overflow-hidden bg-ethiopian-coffee/50">
             {order.items[0]?.menuItem?.image ? (
               <img
                 src={order.items[0].menuItem.image}
@@ -333,20 +334,20 @@ function OrderCard({ order, index, isAdmin, canApprove, onApprove, onDelete }: {
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#3E2723] to-[#C89B3C]/30">
-                <UtensilsCrossed className="h-10 w-10 text-[#C89B3C]" />
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-ethiopian-coffee to-ethiopian-gold/30">
+                <UtensilsCrossed className="h-10 w-10 text-ethiopian-gold" />
               </div>
             )}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-8">
+            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-4 pt-8">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="font-bold text-lg text-white drop-shadow-sm">#{order.orderNumber}</p>
+                    <p className="font-bold text-lg text-ethiopian-gold drop-shadow-sm">#{order.orderNumber}</p>
                     <Badge className={`${statusStyles[order.status] || ""} text-[10px] px-1.5 py-0`}>
                       {t(`orders.status${order.status}`)}
                     </Badge>
                   </div>
-                  <p className="text-xs text-white/80 mt-0.5">
+                  <p className="text-xs text-ethiopian-cream/80 mt-0.5">
                     {t(`orders.type${order.type}`)} · {order.guestCount} {t("orders.guest", { count: order.guestCount })}
                     {order.table && ` · ${order.table.name || t("orders.tableNumber", { number: order.table.number })}`}
                   </p>
@@ -360,18 +361,18 @@ function OrderCard({ order, index, isAdmin, canApprove, onApprove, onDelete }: {
 
           <div className="p-4 space-y-2">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-ethiopian-cream/50">
                 {t("orders.itemsCount", { count: order.items.length })}
               </p>
-              <p className="font-bold text-base">{formatCurrency(order.total)}</p>
+              <p className="font-bold text-base text-ethiopian-gold">{formatCurrency(order.total)}</p>
             </div>
             {order.waiter && (
-              <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <p className="text-xs text-ethiopian-cream/40 flex items-center gap-1">
                 <ChefHat className="h-3 w-3" />
                 {order.waiter.firstName} {order.waiter.lastName}
               </p>
             )}
-            <p className="text-xs text-muted-foreground flex items-center gap-1">
+            <p className="text-xs text-ethiopian-cream/40 flex items-center gap-1">
               <Clock className="h-3 w-3" />
               {new Date(order.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </p>
@@ -380,10 +381,10 @@ function OrderCard({ order, index, isAdmin, canApprove, onApprove, onDelete }: {
           {canApprove && (
             <div className="px-4 pb-4 pt-0 flex gap-2">
               <Button
-                variant={order.approved ? "outline" : "default"}
+                variant={order.approved ? "outline" : "premium"}
                 size="sm"
                 onClick={(e) => { e.stopPropagation(); onApprove(order.id, !order.approved); }}
-                className={`flex-1 h-8 text-xs ${order.approved ? "" : "bg-emerald-600 hover:bg-emerald-700 text-white"}`}
+                className={`flex-1 h-8 text-xs ${order.approved ? "border-ethiopian-gold/30 text-ethiopian-gold" : ""}`}
               >
                 {order.approved ? t("orders.unapprove") : t("orders.approve")}
               </Button>
@@ -391,7 +392,7 @@ function OrderCard({ order, index, isAdmin, canApprove, onApprove, onDelete }: {
                 <button
                   onClick={handleDelete}
                   disabled={deleting}
-                  className="p-1.5 rounded-full hover:bg-red-100 hover:text-red-500 transition-colors text-gray-400 disabled:opacity-50"
+                  className="p-1.5 rounded-full hover:bg-ethiopian-clay/20 hover:text-ethiopian-clay transition-colors text-ethiopian-cream/40 disabled:opacity-50"
                   title="Delete order"
                 >
                   {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
@@ -443,7 +444,7 @@ function OrderDetailDialog({ order, open, onClose, isAdmin }: { order: Order; op
       <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#A12222] to-[#C89B3C] flex items-center justify-center shadow-md">
+            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-ethiopian-clay to-ethiopian-gold flex items-center justify-center shadow-md">
               <UtensilsCrossed className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -494,7 +495,7 @@ function OrderDetailDialog({ order, open, onClose, isAdmin }: { order: Order; op
                   {item.menuItem?.image ? (
                     <img src={item.menuItem.image} alt="" className="h-12 w-12 rounded-lg object-cover flex-shrink-0" />
                   ) : (
-                    <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-[#C89B3C]/20 to-[#A12222]/20 flex items-center justify-center flex-shrink-0">
+                    <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-ethiopian-gold/20 to-ethiopian-clay/20 flex items-center justify-center flex-shrink-0">
                       <UtensilsCrossed className="h-5 w-5 text-[#C89B3C]" />
                     </div>
                   )}
@@ -519,7 +520,7 @@ function OrderDetailDialog({ order, open, onClose, isAdmin }: { order: Order; op
             </div>
           </div>
 
-          <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-gradient-to-r from-[#3E2723] to-[#1B1B1B] text-white">
+          <div className="flex items-center justify-between py-3 px-4 rounded-xl bg-gradient-to-r from-ethiopian-coffee to-ethiopian-charcoal text-white">
             <span className="text-sm font-medium">{t("orders.total")}</span>
             <span className="text-lg font-bold">{formatCurrency(order.total)}</span>
           </div>
@@ -743,7 +744,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
                 <p className="text-center text-sm text-muted-foreground py-4">{t("orders.noMenuItems")}</p>
               ) : (
                 filteredItems.map(item => (
-                  <div key={item.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-muted/50">
+                  <div key={item.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-ethiopian-gold/5">
                     <div>
                       <p className="text-sm font-medium">{item.name}</p>
                       <p className="text-xs text-muted-foreground">{formatCurrency(item.price)}</p>
@@ -778,7 +779,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
             </div>
 
             {cart.length > 0 && (
-              <div className="border rounded-lg p-3 space-y-2 bg-muted/30">
+              <div className="border border-ethiopian-gold/10 rounded-lg p-3 space-y-2 bg-ethiopian-gold/5">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cart</p>
                 {cart.map(item => (
                   <div key={item.menuItemId} className="flex items-center justify-between gap-2">

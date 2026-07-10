@@ -18,7 +18,7 @@ import {
   Sparkles, Flame, Gem, Award, Shield, UtensilsCrossed, Sun, Moon,
 } from "lucide-react";
 
-interface MenuDish { id: string; name: string; description: string; price: number; image?: string; isAvailable: boolean; }
+interface MenuDish { id: string; name: string; description: string; price: number; kiloPrice?: string; image?: string; isAvailable: boolean; }
 
 const galleryImages = [
   { label: "Habesha Kurt Bet Special", image: "/images/kurt.jpg", color: "from-ethiopian-coffee/80 to-ethiopian-charcoal/80" },
@@ -486,7 +486,11 @@ function SignatureDishes() {
                 <div className="p-5 sm:p-6">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-lg sm:text-xl font-bold text-ethiopian-coffee dark:text-ethiopian-cream font-serif">{dish.name}</h3>
-                    <span className="text-lg sm:text-xl font-bold text-ethiopian-gold">{dish.price} {t("common.currency")}</span>
+                    <div className="text-right">
+                      {dish.kiloPrice && (
+                        <span className="text-lg sm:text-xl font-bold text-ethiopian-gold whitespace-nowrap">{dish.kiloPrice.split("–")[0].trim()} ETB</span>
+                      )}
+                    </div>
                   </div>
                    <p className="text-ethiopian-coffee/70 dark:text-ethiopian-cream/70 text-sm leading-relaxed line-clamp-2">{dish.description}</p>
                   <motion.button

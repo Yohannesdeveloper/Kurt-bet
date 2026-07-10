@@ -10,7 +10,7 @@ const buttonVariants = cva(
       variant: {
         default: "bg-ethiopian-coffee text-ethiopian-cream hover:bg-ethiopian-coffee/90 shadow-sm hover:shadow-md",
         destructive: "bg-ethiopian-clay text-white hover:bg-ethiopian-clay/90 shadow-sm",
-        outline: "border-2 border-ethiopian-gold/30 bg-background hover:bg-ethiopian-gold/10 text-ethiopian-coffee",
+        outline: "border-2 border-ethiopian-gold/30 bg-background hover:bg-ethiopian-gold/10 text-ethiopian-coffee dark:text-ethiopian-cream",
         secondary: "bg-ethiopian-gold text-white hover:bg-ethiopian-gold/80 shadow-sm",
         ghost: "hover:bg-ethiopian-gold/10 text-ethiopian-coffee",
         link: "text-ethiopian-gold underline-offset-4 hover:underline",

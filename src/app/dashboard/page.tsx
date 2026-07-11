@@ -279,8 +279,8 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
                 <LogOut className="w-5 h-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-ethiopian-clay">{t("sidebar.logout")}</p>
-                <p className="text-xs text-ethiopian-clay/70">{t("sidebar.endSession")}</p>
+                <p className="text-sm font-semibold text-ethiopian-clay dark:text-white">{t("sidebar.logout")}</p>
+                <p className="text-xs text-ethiopian-clay/70 dark:text-white/70">{t("sidebar.endSession")}</p>
               </div>
             </button>
           </div>

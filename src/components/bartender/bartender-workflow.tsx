@@ -115,7 +115,7 @@ export function BartenderWorkflow() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="flex items-center gap-2 text-ethiopian-coffee/50">
+        <div className="flex items-center gap-2 text-ethiopian-coffee/50 dark:text-ethiopian-cream/50">
           <div className="w-4 h-4 border-2 border-ethiopian-gold/20 border-t-ethiopian-gold rounded-full animate-spin" />
           <span>{t("common.loading")}</span>
         </div>
@@ -125,9 +125,9 @@ export function BartenderWorkflow() {
 
   if (orders.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64 text-ethiopian-coffee/50">
+      <div className="flex flex-col items-center justify-center h-64 text-ethiopian-coffee/50 dark:text-ethiopian-cream/50">
         <Coffee className="h-20 w-20 opacity-20 mb-4" />
-        <p className="text-lg font-semibold text-ethiopian-coffee">{t("bartender.noOrders")}</p>
+        <p className="text-lg font-semibold text-ethiopian-coffee dark:text-ethiopian-cream">{t("bartender.noOrders")}</p>
         <p className="text-sm">{t("bartender.noOrdersDesc")}</p>
       </div>
     );
@@ -137,12 +137,12 @@ export function BartenderWorkflow() {
     <>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold text-ethiopian-coffee font-serif">{t("bartender.title")}</h2>
-          <span className="text-sm text-ethiopian-coffee/50">{t("bartender.drinkOrders", { count: orders.length })}</span>
+          <h2 className="text-lg font-bold text-ethiopian-coffee dark:text-ethiopian-cream font-serif">{t("bartender.title")}</h2>
+          <span className="text-sm text-ethiopian-coffee/50 dark:text-ethiopian-cream/50">{t("bartender.drinkOrders", { count: orders.length })}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-xs text-ethiopian-coffee/50">{t("bartender.live")}</span>
+          <span className="text-xs text-ethiopian-coffee/50 dark:text-ethiopian-cream/50">{t("bartender.live")}</span>
           {servedOrders.length > 0 && (
             <Badge variant="secondary" className="text-xs ml-2">{t("bartender.served", { count: servedOrders.length })}</Badge>
           )}
@@ -154,7 +154,7 @@ export function BartenderWorkflow() {
           <div key={grp.status} className="flex flex-col min-h-0">
             <div className="flex items-center gap-2 mb-3 px-1">
               <span className={`h-2.5 w-2.5 rounded-full ${grp.dot}`} />
-              <h2 className="text-sm font-semibold text-ethiopian-coffee/70 uppercase tracking-wider">{grp.label}</h2>
+              <h2 className="text-sm font-semibold text-ethiopian-coffee/70 dark:text-ethiopian-cream/70 uppercase tracking-wider">{grp.label}</h2>
               <Badge variant="secondary" className="text-xs ml-auto">{grp.orders.length}</Badge>
             </div>
             <div className="flex-1 space-y-3 overflow-y-auto min-h-0 pr-1 max-h-[calc(100vh-18rem)]">
@@ -170,10 +170,10 @@ export function BartenderWorkflow() {
                             <div>
                               <div className="flex items-center gap-2 mb-1">
                                 <span className={`h-2.5 w-2.5 rounded-full ${s.dot}`} />
-                                <span className="font-bold text-base text-ethiopian-coffee">#{order.orderNumber}</span>
+                                <span className="font-bold text-base text-ethiopian-coffee dark:text-ethiopian-cream">#{order.orderNumber}</span>
                                 <Badge variant={order.status === "PENDING" ? "premium" : "outline"} className={`text-xs ${s.color}`}>{statusLabel}</Badge>
                               </div>
-                              <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60">
+                              <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">
                                 <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(order.createdAt)}</span>
                                 {order.tableNumber && <span>{t("bartender.table", { number: order.tableNumber })}</span>}
                               </div>
@@ -182,11 +182,11 @@ export function BartenderWorkflow() {
                           <div className="space-y-1 mb-3">
                             {order.items.map((item, i) => (
                               <div key={i} className="flex items-center gap-2 text-sm">
-                                <span className="font-medium text-ethiopian-coffee"><span className="text-ethiopian-coffee/50 mr-1">×{item.quantity}</span>{item.name}</span>
+                                <span className="font-medium text-ethiopian-coffee dark:text-ethiopian-cream"><span className="text-ethiopian-coffee/50 dark:text-ethiopian-cream/50 mr-1">×{item.quantity}</span>{item.name}</span>
                               </div>
                             ))}
                           </div>
-                          {order.notes && <p className="text-xs text-ethiopian-coffee/50 italic mb-2">"{order.notes}"</p>}
+                              {order.notes && <p className="text-xs text-ethiopian-coffee/50 dark:text-ethiopian-cream/50 italic mb-2">"{order.notes}"</p>}
                           <div className="flex items-center gap-2 pt-2 border-t border-ethiopian-gold/10">
                             {s.next && (
                               <Button size="sm" variant="premium" onClick={() => handleStatus(order.id, s.next!)} className="h-8 text-xs gap-1">
@@ -199,7 +199,7 @@ export function BartenderWorkflow() {
                             {isAdmin && (
                               <button
                                 onClick={() => handleDelete(order.id)}
-                                className="ml-auto flex items-center gap-1 px-2 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors text-xs font-medium"
+                                className="ml-auto flex items-center gap-1 px-2 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors text-xs font-medium"
                                 title={t("bartender.delete")}
                               >
                                 <Trash2 className="w-3.5 h-3.5" /> {t("bartender.delete")}
@@ -213,7 +213,7 @@ export function BartenderWorkflow() {
                 })}
               </AnimatePresence>
               {grp.orders.length === 0 && (
-                <div className="flex items-center justify-center h-20 text-xs text-ethiopian-coffee/50 border border-dashed border-ethiopian-gold/20 rounded-xl">
+                <div className="flex items-center justify-center h-20 text-xs text-ethiopian-coffee/50 dark:text-ethiopian-cream/50 border border-dashed border-ethiopian-gold/20 rounded-xl">
                   {t("bartender.noOrdersColumn")}
                 </div>
               )}

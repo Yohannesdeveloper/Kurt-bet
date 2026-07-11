@@ -8,7 +8,14 @@ const DEMO_FILE = ".demo-orders.json";
 const BUTCHER_ORDERS_FILE = ".demo-butcher-orders.json";
 const BARTENDER_ORDERS_FILE = ".demo-bartender-orders.json";
 const BUTCHER_ITEM_KEYWORDS = ["tibs", "kurt", "dulet", "tere sega", "tere siga", "gored gored"];
-const DRINK_KEYWORDS = ["coffee", "macchiato", "tej", "tella", "tea", "spris", "juice", "ambo", "soft drink", "besso", "atmet", "halwa", "cheesecake", "atayef"];
+const DRINK_KEYWORDS = ["coffee", "macchiato", "tej", "tella", "tea", "spris", "juice", "ambo", "soft drink", "besso", "atmet", "halwa", "cheesecake", "atayef", "beer", "wine", "shot", "liquor", "spirit", "tekshino", "teknshino", "areke", "arake", "red bull", "amarula", "tequila", "sambuca", "draft", "jack", "foreign"];
+
+function isDrinkItem(item: any): boolean {
+  const catName = (item.menuItem?.category?.name || item.menuItem?.categoryId || "").toLowerCase();
+  if (catName.includes("drink")) return true;
+  const name = (item.name || "").toLowerCase();
+  return DRINK_KEYWORDS.some((kw) => name.includes(kw));
+}
 
 export async function GET(req: NextRequest) {
   let status: string | null = null;
@@ -23,6 +30,7 @@ export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;
   status = searchParams.get("status");
   approvedFilter = searchParams.get("approved");
+  const station = searchParams.get("station"); // "kitchen" to exclude drinks
   const limit = parseInt(searchParams.get("limit") || "50");
   const page = parseInt(searchParams.get("page") || "1");
 
@@ -55,7 +63,7 @@ export async function GET(req: NextRequest) {
           waiter: { select: { firstName: true, lastName: true } },
           customer: { select: { firstName: true, lastName: true } },
           items: {
-            include: { menuItem: { select: { image: true } } },
+            include: { menuItem: { select: { image: true, categoryId: true, category: { select: { name: true } } } } },
             orderBy: { sortOrder: "asc" },
           },
           payments: {
@@ -73,9 +81,16 @@ export async function GET(req: NextRequest) {
       prisma.order.count({ where }),
     ]);
 
+    const kitchenOrders = station === "kitchen"
+      ? orders.map((o: any) => ({
+          ...o,
+          items: o.items.filter((item: any) => !isDrinkItem(item)),
+        })).filter((o: any) => o.items.length > 0)
+      : orders;
+
     return NextResponse.json({
       success: true,
-      data: orders,
+      data: kitchenOrders,
       meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
     });
   } catch {
@@ -89,7 +104,9 @@ export async function GET(req: NextRequest) {
       approved: o.approved ?? false,
       items: (o.items || []).map((item: any) => ({
         ...item,
-        menuItem: menuMap.has(item.menuItemId) ? { image: menuMap.get(item.menuItemId).image } : null,
+        menuItem: menuMap.has(item.menuItemId)
+          ? { image: menuMap.get(item.menuItemId).image, categoryId: menuMap.get(item.menuItemId).categoryId, category: { name: menuMap.get(item.menuItemId).category?.name || "" } }
+          : null,
       })),
     }));
     const currentUserId = (session?.user as { id?: string })?.id;
@@ -102,10 +119,16 @@ export async function GET(req: NextRequest) {
       const matchesUser = isStaff || !currentUserId || o.userId === currentUserId;
       return matchesStatus && matchesApproved && matchesUser;
     });
+    const kitchenFiltered = station === "kitchen"
+      ? filtered.map((o: any) => ({
+          ...o,
+          items: o.items.filter((item: any) => !isDrinkItem(item)),
+        })).filter((o: any) => o.items.length > 0)
+      : filtered;
     return NextResponse.json({
       success: true,
-      data: filtered,
-      meta: { page: 1, limit: 50, total: filtered.length, totalPages: 1 },
+      data: kitchenFiltered,
+      meta: { page: 1, limit: 50, total: kitchenFiltered.length, totalPages: 1 },
     });
   }
 }

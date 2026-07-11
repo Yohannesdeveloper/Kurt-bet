@@ -679,11 +679,11 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
           <div className="space-y-4 py-2">
             <div className="grid gap-2">
               <Label>{t("orders.orderType")}</Label>
-              <Select value={orderType} onValueChange={setOrderType}>
-                <SelectTrigger>
+                <Select value={orderType} onValueChange={setOrderType}>
+                <SelectTrigger className="!bg-white dark:!bg-gray-950 hover:!bg-gray-50 dark:hover:!bg-gray-900">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="!bg-white dark:!bg-gray-950">
                   <SelectItem value="DINE_IN">{t("orders.dineIn")}</SelectItem>
                   <SelectItem value="TAKEOUT">{t("orders.takeout")}</SelectItem>
                   <SelectItem value="DELIVERY">{t("orders.delivery")}</SelectItem>
@@ -695,10 +695,10 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
               <div className="grid gap-2">
                 <Label>{t("orders.table")}</Label>
                 <Select value={tableId} onValueChange={setTableId}>
-                  <SelectTrigger>
+                  <SelectTrigger className="!bg-white dark:!bg-gray-950 hover:!bg-gray-50 dark:hover:!bg-gray-900">
                     <SelectValue placeholder={t("orders.selectTable")} />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="!bg-white dark:!bg-gray-950">
                     {tables.map(tbl => (
                       <SelectItem key={tbl.id} value={tbl.id}>
                         {tbl.name || t("orders.tableNumber", { number: tbl.number })}
@@ -709,17 +709,17 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
               </div>
             )}
 
-            <div className="grid gap-2">
-              <Label>{t("orders.guestCount")}</Label>
-              <Input type="number" min={1} value={guestCount} onChange={e => setGuestCount(e.target.value)} />
-            </div>
+              <div className="grid gap-2">
+                <Label>{t("orders.guestCount")}</Label>
+                <Input type="number" min={1} value={guestCount} onChange={e => setGuestCount(e.target.value)} className="bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900" />
+              </div>
 
             <div className="grid gap-2">
               <Label>{t("orders.notes")}</Label>
               <textarea
                 value={notes}
                 onChange={e => setNotes(e.target.value)}
-                className="flex h-20 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm"
+                className="flex h-20 w-full rounded-xl border border-input !bg-white dark:!bg-gray-950 px-3 py-2 text-sm hover:!bg-gray-50 dark:hover:!bg-gray-900"
                 placeholder={t("orders.notesPlaceholder")}
               />
             </div>
@@ -734,7 +734,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
                 placeholder={t("orders.searchMenu")}
                 value={menuSearch}
                 onChange={e => setMenuSearch(e.target.value)}
-                className="pl-9"
+                className="pl-9 bg-white dark:bg-gray-950 hover:bg-gray-50 dark:hover:bg-gray-900"
               />
             </div>
 

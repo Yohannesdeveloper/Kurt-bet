@@ -322,7 +322,7 @@ export default function MenuPage() {
             <Button
               variant="premium"
               onClick={() => { setEditingItem(null); setDialogOpen(true); }}
-              className="h-10 lg:h-11 flex-shrink-0"
+              className="h-10 lg:h-11 flex-shrink-0 hover:from-ethiopian-clay hover:to-ethiopian-burgundy"
             >
               <Plus className="h-4 w-4 mr-2" /> Add Item
             </Button>
@@ -354,7 +354,7 @@ export default function MenuPage() {
                   <Button
                     variant="premium"
                     onClick={() => { setEditingItem(null); setDialogOpen(true); }}
-                    className="h-11"
+                    className="h-11 hover:from-ethiopian-clay hover:to-ethiopian-burgundy"
                   >
                     <Plus className="h-4 w-4 mr-2" /> Add Item
                   </Button>
@@ -634,7 +634,7 @@ function AddItemDialog({ open, onOpenChange, categories, editingItem }: {
           </div>
           <DialogFooter className="mt-6 gap-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="h-11">{t("common.cancel")}</Button>
-            <Button type="submit" variant="premium" disabled={submitting} className="h-11">
+            <Button type="submit" variant="premium" disabled={submitting} className="h-11 hover:from-ethiopian-clay hover:to-ethiopian-burgundy">
               {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Adding...</> : "Add Item"}
             </Button>
           </DialogFooter>

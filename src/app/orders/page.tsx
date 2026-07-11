@@ -790,7 +790,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
             </div>
 
             {cart.length > 0 && (
-              <div className="border border-ethiopian-gold/10 rounded-lg p-3 space-y-2 bg-ethiopian-gold/5">
+              <div className="border border-ethiopian-gold/10 rounded-lg p-3 space-y-2 bg-red-50 dark:bg-red-950/20">
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cart</p>
                 {cart.map(item => (
                   <div key={item.menuItemId} className="flex items-center justify-between gap-2">

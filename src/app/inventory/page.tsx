@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "@/lib/i18n";
@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Search, Plus, Package, AlertTriangle, TrendingDown, Inbox, X } from "lucide-react";
+import { ArrowLeft, Search, Plus, Package, AlertTriangle, TrendingDown, Inbox, Pen, X } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 
@@ -49,6 +49,8 @@ export default function InventoryPage() {
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
 
   const [itemId, setItemId] = useState("");
   const [name, setName] = useState("");
@@ -62,14 +64,42 @@ export default function InventoryPage() {
     setQuantity("");
     setUnit("");
     setCategory("");
+    setEditingItem(null);
   };
 
-  const handleSubmit = () => {
+  const openAdd = () => {
+    resetForm();
+    setDialogOpen(true);
+  };
+
+  const openEdit = (item: InventoryItem) => {
+    setEditingItem(item);
+    setItemId(item.id);
+    setName(item.name);
+    setQuantity(item.quantity.toString());
+    setUnit(item.unit);
+    setCategory(item.category);
+    setDialogOpen(true);
+  };
+
+  const fetchItems = useCallback(() => {
+    fetch("/api/inventory")
+      .then(r => r.json())
+      .then(d => { if (d.success) setItems(d.data); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetchItems();
+  }, [fetchItems]);
+
+  const handleSubmit = async () => {
     if (!itemId.trim() || !name.trim() || !quantity || !unit || !category) {
       toast.error(t("inventory.fillAllFields"));
       return;
     }
-    if (items.some((i) => i.id === itemId.trim())) {
+    if (!editingItem && items.some((i) => i.id === itemId.trim())) {
       toast.error(t("inventory.itemIdExists"));
       return;
     }
@@ -78,22 +108,36 @@ export default function InventoryPage() {
       toast.error(t("inventory.invalidQuantity"));
       return;
     }
-    const newItem: InventoryItem = {
-      id: itemId.trim(),
-      name: name.trim(),
-      quantity: qty,
-      unit,
-      category,
-    };
-    setItems((prev) => [newItem, ...prev]);
-    toast.success(t("inventory.added"));
-    setDialogOpen(false);
-    resetForm();
+    const url = "/api/inventory";
+    const method = editingItem ? "PATCH" : "POST";
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(editingItem
+        ? { id: itemId.trim(), name: name.trim(), quantity: qty, unit, category }
+        : { id: itemId.trim(), name: name.trim(), quantity: qty, unit, category },
+      ),
+    });
+    const d = await res.json();
+    if (d.success) {
+      toast.success(editingItem ? t("inventory.updated") : t("inventory.added"));
+      setDialogOpen(false);
+      resetForm();
+      fetchItems();
+    } else {
+      toast.error(d.error || t("inventory.failed"));
+    }
   };
 
-  const handleDelete = (id: string) => {
-    setItems((prev) => prev.filter((i) => i.id !== id));
-    toast.success(t("inventory.removed"));
+  const handleDelete = async (id: string) => {
+    const res = await fetch(`/api/inventory?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+    const d = await res.json();
+    if (d.success) {
+      toast.success(t("inventory.removed"));
+      fetchItems();
+    } else {
+      toast.error(d.error || t("inventory.failed"));
+    }
   };
 
   if (status !== "loading" && (!session || (session.user as any)?.role !== "ADMIN")) return null;
@@ -140,10 +184,7 @@ export default function InventoryPage() {
           </div>
           <Button
             variant="premium"
-            onClick={() => {
-              resetForm();
-              setDialogOpen(true);
-            }}
+            onClick={openAdd}
             className="h-10 lg:h-11 flex-shrink-0"
           >
             <Plus className="h-4 w-4 mr-2" /> {t("inventory.addItem")}
@@ -155,7 +196,7 @@ export default function InventoryPage() {
         {[
           { label: t("inventory.totalItems"), value: totalValue.toString(), icon: Package, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
           { label: t("inventory.categories"), value: new Set(items.map(i => i.category)).size.toString(), icon: Package, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-500/10", iconColor: "text-purple-600" },
-          { label: t("inventory.lowStock"), value: items.filter(i => i.quantity < 10).toString(), icon: AlertTriangle, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },
+          { label: t("inventory.lowStock"), value: items.filter(i => i.quantity < 10).length.toString(), icon: AlertTriangle, color: "from-red-500 to-rose-600", bgColor: "bg-red-500/10", iconColor: "text-red-600" },
           { label: t("inventory.totalValue"), value: items.length.toString(), icon: TrendingDown, color: "from-emerald-500 to-green-600", bgColor: "bg-emerald-500/10", iconColor: "text-emerald-600" },
         ].map((stat, index) => (
           <motion.div
@@ -197,10 +238,7 @@ export default function InventoryPage() {
               <Button
                 variant="premium"
                 className="h-11"
-                onClick={() => {
-                  resetForm();
-                  setDialogOpen(true);
-                }}
+                onClick={openAdd}
               >
                 <Plus className="h-4 w-4 mr-2" /> {t("inventory.addItem")}
               </Button>
@@ -240,12 +278,21 @@ export default function InventoryPage() {
                           </span>
                         </td>
                         <td className="p-4 text-right">
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="p-1.5 rounded-lg hover:bg-red-100 text-red-500 transition-colors"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => openEdit(item)}
+                              className="p-1.5 rounded-lg hover:bg-blue-100 text-blue-500 transition-colors"
+                              title={t("inventory.edit")}
+                            >
+                              <Pen className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(item.id)}
+                              className="p-1.5 rounded-lg hover:bg-red-100 text-red-500 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -257,11 +304,11 @@ export default function InventoryPage() {
         </motion.div>
       )}
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog open={dialogOpen} onOpenChange={(open) => { if (!open) resetForm(); setDialogOpen(open); }}>
         <DialogContent className="sm:max-w-[450px] !bg-white dark:!bg-gray-900 !text-gray-900 dark:!text-gray-100 opacity-100">
           <DialogHeader>
-            <DialogTitle>{t("inventory.addItem")}</DialogTitle>
-            <DialogDescription>{t("inventory.addItemDescription")}</DialogDescription>
+            <DialogTitle>{editingItem ? t("inventory.editItem") : t("inventory.addItem")}</DialogTitle>
+            <DialogDescription>{editingItem ? t("inventory.editItemDescription") : t("inventory.addItemDescription")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="grid gap-2">
@@ -328,7 +375,7 @@ export default function InventoryPage() {
               {t("common.cancel")}
             </Button>
             <Button variant="premium" onClick={handleSubmit}>
-              {t("inventory.addItem")}
+              {editingItem ? t("common.save") : t("inventory.addItem")}
             </Button>
           </DialogFooter>
         </DialogContent>

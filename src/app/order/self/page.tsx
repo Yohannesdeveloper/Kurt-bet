@@ -119,7 +119,7 @@ function SelfOrderContent() {
             ) : (
               <div className="space-y-3">
                 {cart.map((item) => (
-                  <div key={item.id} className="flex items-center justify-between bg-muted/50 rounded-xl p-3">
+                  <div key={item.id} className="flex items-center justify-between bg-muted rounded-xl p-3">
                     <div className="flex items-center gap-3">
                       {item.image && <img src={item.image} alt="" className="h-10 w-10 rounded-lg object-cover" />}
                       <div>

@@ -1,5 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
+import Link from "next/link";
 import { EthiopianCornerSet } from "./ethiopian-patterns";
 
 export function SectionHeader({
@@ -129,14 +130,9 @@ export function GoldButton({
 
   if (href) {
     return (
-      <motion.a
-        href={href}
-        whileHover={{ scale: 1.03 }}
-        whileTap={{ scale: 0.97 }}
-        className={`${baseStyles} ${variants[variant]} ${className}`}
-      >
+      <Link href={href} className={`${baseStyles} ${variants[variant]} ${className}`}>
         {content}
-      </motion.a>
+      </Link>
     );
   }
 

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
+import { getInventoryNameForDrink } from "@/lib/drink-inventory-map";
 
 const DEMO_FILE = ".demo-bartender-orders.json";
 
@@ -122,6 +123,31 @@ export async function PATCH(req: NextRequest) {
   order.status = status;
   if (status === "SERVED") order.completedAt = new Date().toISOString();
   await writeDemoJSON(DEMO_FILE, orders);
+
+  // Deduct inventory when drink order is READY (bartender takes the bottle off the shelf)
+  if (status === "READY") {
+    try {
+      const INVENTORY_FILE = ".demo-inventory.json";
+      const inventory = await readDemoJSON<any>(INVENTORY_FILE);
+      let changed = false;
+      for (const item of order.items) {
+        const invName = getInventoryNameForDrink(item.menuItemId);
+        if (invName) {
+          const invIdx = inventory.findIndex((inv: any) => inv.name === invName);
+          if (invIdx >= 0) {
+            inventory[invIdx].quantity = Math.max(0, inventory[invIdx].quantity - item.quantity);
+            changed = true;
+          }
+        }
+      }
+      if (changed) {
+        await writeDemoJSON(INVENTORY_FILE, inventory);
+      }
+    } catch (err) {
+      console.error("Failed to deduct inventory:", err);
+    }
+  }
+
   return NextResponse.json({ success: true, data: orders[index] });
 }
 

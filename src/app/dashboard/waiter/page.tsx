@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Beef, Clock, Package, Users, ClipboardList, CreditCard, Plus, Table, DollarSign } from "lucide-react";
+import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -223,28 +224,28 @@ export default function WaiterDashboard() {
             <CardContent>
               <div className="space-y-3">
                 <Button className="w-full justify-start gap-2" variant="default" asChild>
-                  <a href="/orders">
+                  <Link href="/orders">
                     <Plus className="h-4 w-4" />
                     {t("orders.newOrder")}
-                  </a>
+                  </Link>
                 </Button>
                 <Button className="w-full justify-start gap-2" variant="outline" asChild>
-                  <a href="/tables">
+                  <Link href="/tables">
                     <Table className="h-4 w-4" />
                     {t("nav.tables")}
-                  </a>
+                  </Link>
                 </Button>
                 <Button className="w-full justify-start gap-2" variant="outline" asChild>
-                  <a href="/menu">
+                  <Link href="/menu">
                     <ClipboardList className="h-4 w-4" />
                     View Menu
-                  </a>
+                  </Link>
                 </Button>
                 <Button className="w-full justify-start gap-2" variant="outline" asChild>
-                  <a href="/payments">
+                  <Link href="/payments">
                     <CreditCard className="h-4 w-4" />
                     Process Payments
-                  </a>
+                  </Link>
                 </Button>
               </div>
             </CardContent>

@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -360,9 +362,11 @@ function CategoriesSection() {
         <motion.h2 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="text-2xl font-serif font-bold text-foreground dark:bg-gradient-to-r dark:from-ethiopian-clay dark:to-ethiopian-gold dark:bg-clip-text dark:text-transparent">
           {t("dashboard.categories")}
         </motion.h2>
-        <motion.a initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} href="/menu" className="text-ethiopian-gold font-semibold text-sm flex items-center gap-1 hover:gap-2 transition-all group">
-          {t("common.viewAll")} <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </motion.a>
+        <Link href="/menu">
+          <motion.span initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="text-ethiopian-gold font-semibold text-sm flex items-center gap-1 hover:gap-2 transition-all group">
+            {t("common.viewAll")} <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </motion.span>
+        </Link>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 lg:gap-6">
@@ -393,6 +397,7 @@ function CategoriesSection() {
 
 function RestaurantCard({ restKey, index }: { restKey: string; index: number }) {
   const { t } = useTranslation();
+  const router = useRouter();
   const restaurant = restaurantMeta[restKey];
   return (
     <motion.div
@@ -400,7 +405,7 @@ function RestaurantCard({ restKey, index }: { restKey: string; index: number }) 
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
       whileHover={{ y: -10 }}
-      onClick={() => window.location.href = "/menu"}
+      onClick={() => router.push("/menu")}
       className="group cursor-pointer"
     >
       <div className="relative aspect-[4/3] rounded-2xl overflow-hidden bg-card dark:bg-gradient-to-br dark:from-ethiopian-sand dark:to-ethiopian-cream mb-4 shadow-lg group-hover:shadow-2xl transition-all duration-300">
@@ -431,7 +436,7 @@ function RestaurantCard({ restKey, index }: { restKey: string; index: number }) 
         <motion.button
           initial={{ y: 20, opacity: 0 }}
           whileHover={{ y: 0, opacity: 1 }}
-          onClick={() => window.location.href = "/menu"}
+          onClick={() => router.push("/menu")}
           className="absolute bottom-3 left-3 right-3 px-4 py-2 rounded-full bg-white text-ethiopian-clay font-semibold text-sm shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
         >
           {t("restaurant.orderNow")}
@@ -626,15 +631,15 @@ function ButcherOrderForm() {
           <Beef className="w-6 h-6" />
         </motion.div>
         <div>
-          <h2 className="text-2xl font-serif font-bold text-ethiopian-clay">Butcher Shop</h2>
-          <p className="text-xs text-ethiopian-clay/60">Order raw meat for your dishes</p>
+          <h2 className="text-2xl font-serif font-bold text-red-600 dark:text-red-500">Butcher Shop</h2>
+          <p className="text-xs text-red-600/60 dark:text-red-500/60">Order raw meat for your dishes</p>
         </div>
       </div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white p-6 sm:p-8 rounded-2xl shadow-lg border border-ethiopian-gold/10">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white dark:bg-card p-6 sm:p-8 rounded-2xl shadow-lg border border-ethiopian-gold/10">
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-clay mb-3">Meat Type</label>
+            <label className="block text-sm font-semibold text-red-600 dark:text-red-500 mb-3">Meat Type</label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {meatTypes.map((type, i) => {
                 const Icon = type.icon;
@@ -655,7 +660,7 @@ function ButcherOrderForm() {
                       <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${type.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300`}>
                         <Icon className="w-5 h-5 text-white" />
                       </div>
-                      <span className="text-sm font-bold text-ethiopian-clay">{type.label}</span>
+                      <span className="text-sm font-bold text-red-600 dark:text-red-500">{type.label}</span>
                     </div>
                     {meatType === type.id && (
                       <div className="absolute top-1.5 right-1.5 w-5 h-5 bg-ethiopian-gold rounded-full flex items-center justify-center shadow">
@@ -669,7 +674,7 @@ function ButcherOrderForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-clay mb-3">Dish</label>
+            <label className="block text-sm font-semibold text-red-600 dark:text-red-500 mb-3">Dish</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
               {dishOptions.map((dish, i) => (
                 <motion.button
@@ -707,14 +712,14 @@ function ButcherOrderForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-clay mb-3">Weight (kg)</label>
+            <label className="block text-sm font-semibold text-red-600 dark:text-red-500 mb-3">Weight (kg)</label>
             <div className="flex flex-wrap gap-2">
               {weightPresets.map((w) => (
                 <button key={w} onClick={() => { setWeight(w.toString()); setCustomWeight(false); }}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                     weight === w.toString() && !customWeight
                       ? "bg-ethiopian-burgundy text-white shadow-md"
-                      : "bg-ethiopian-cream text-ethiopian-clay hover:bg-ethiopian-gold/20 border border-transparent"
+                      : "bg-ethiopian-cream text-red-600 dark:text-red-500 hover:bg-ethiopian-gold/20 border border-transparent"
                   }`}
                 >{w} kg</button>
               ))}
@@ -722,44 +727,44 @@ function ButcherOrderForm() {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   customWeight
                     ? "bg-ethiopian-gold text-white shadow-md"
-                    : "bg-ethiopian-cream text-ethiopian-clay hover:bg-ethiopian-gold/20 border border-transparent"
+                    : "bg-ethiopian-cream text-red-600 dark:text-red-500 hover:bg-ethiopian-gold/20 border border-transparent"
                 }`}
               >Custom</button>
             </div>
             {customWeight && (
               <input type="number" step="0.1" min="0.1" placeholder="Enter weight in kg"
                 value={weight} onChange={(e) => setWeight(e.target.value)}
-                className="mt-2 w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-clay border border-transparent focus:border-ethiopian-gold focus:outline-none"
+                className="mt-2 w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-red-600 dark:text-red-500 border border-transparent focus:border-ethiopian-gold focus:outline-none"
               />
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-clay mb-3">Quantity</label>
+            <label className="block text-sm font-semibold text-red-600 dark:text-red-500 mb-3">Quantity</label>
             <div className="flex items-center gap-4">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-clay hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-red-600 dark:text-red-500 hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
                 <Minus className="w-5 h-5" />
               </button>
-              <span className="text-3xl font-bold text-ethiopian-gold min-w-[3rem] text-center">{quantity}</span>
-              <button onClick={() => setQuantity(Math.min(20, quantity + 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-ethiopian-clay hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
+              <span className="text-3xl font-bold text-red-600 dark:text-red-500 min-w-[3rem] text-center">{quantity}</span>
+              <button onClick={() => setQuantity(Math.min(20, quantity + 1))} className="w-12 h-12 rounded-xl bg-ethiopian-cream text-red-600 dark:text-red-500 hover:bg-ethiopian-gold/20 transition-all flex items-center justify-center">
                 <Plus className="w-5 h-5" />
               </button>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-clay mb-2">Table Number (optional)</label>
+            <label className="block text-sm font-semibold text-red-600 dark:text-red-500 mb-2">Table Number (optional)</label>
             <input type="text" value={tableNumber} onChange={(e) => setTableNumber(e.target.value)}
               placeholder="e.g., 5"
-              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-clay border border-transparent focus:border-ethiopian-gold focus:outline-none"
+              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-red-600 dark:text-red-500 border border-transparent focus:border-ethiopian-gold focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-ethiopian-clay mb-2">Notes (optional)</label>
+            <label className="block text-sm font-semibold text-red-600 dark:text-red-500 mb-2">Notes (optional)</label>
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)}
               placeholder="Any special instructions..." rows={2}
-              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-ethiopian-clay border border-transparent focus:border-ethiopian-gold focus:outline-none"
+              className="w-full px-4 py-2 rounded-lg bg-ethiopian-cream text-red-600 dark:text-red-500 border border-transparent focus:border-ethiopian-gold focus:outline-none"
             />
           </div>
 
@@ -773,8 +778,8 @@ function ButcherOrderForm() {
         <section className="mt-8">
           <div className="flex items-center gap-3 mb-4">
             <ClipboardList className="w-5 h-5 text-ethiopian-gold" />
-            <h3 className="text-xl font-serif font-bold text-ethiopian-clay">Butcher Status</h3>
-            <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream text-ethiopian-clay/60">
+            <h3 className="text-xl font-serif font-bold text-red-600 dark:text-red-500">Butcher Status</h3>
+            <span className="ml-auto text-xs px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-500">
               {pendingButcherOrders.length} pending
             </span>
           </div>
@@ -784,32 +789,32 @@ function ButcherOrderForm() {
               onClick={() => setActiveTab("pending")}
               className={`pb-2 px-3 text-sm font-medium border-b-2 transition-all ${
                 activeTab === "pending"
-                  ? "border-ethiopian-burgundy text-ethiopian-burgundy"
+                  ? "border-red-600 text-red-600 dark:border-red-500 dark:text-red-500"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
               Pending Orders
-              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream">{pendingButcherOrders.length}</span>
+              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-900/20">{pendingButcherOrders.length}</span>
             </button>
             <button
               onClick={() => setActiveTab("status")}
               className={`pb-2 px-3 text-sm font-medium border-b-2 transition-all ${
                 activeTab === "status"
-                  ? "border-ethiopian-burgundy text-ethiopian-burgundy"
+                  ? "border-red-600 text-red-600 dark:border-red-500 dark:text-red-500"
                   : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
               Butcher Status
-              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream">{processedButcherOrders.length}</span>
+              <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-red-50 dark:bg-red-900/20">{processedButcherOrders.length}</span>
             </button>
           </div>
 
           {statusLoading ? (
-            <div className="text-center py-8 text-ethiopian-clay/60">Loading...</div>
+            <div className="text-center py-8 text-red-600/60 dark:text-red-500/60">Loading...</div>
           ) : (activeTab === "pending" ? pendingButcherOrders : processedButcherOrders).length === 0 ? (
             <div className="text-center py-8">
               <Package className="w-10 h-10 text-ethiopian-gold mx-auto mb-2" />
-              <p className="text-ethiopian-clay/60 text-sm">
+              <p className="text-red-600/60 dark:text-red-500/60 text-sm">
                 {activeTab === "pending" ? "No orders waiting for approval" : "No processed orders"}
               </p>
             </div>
@@ -824,9 +829,9 @@ function ButcherOrderForm() {
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-ethiopian-clay">#{order.orderNumber}</span>
+                      <span className="font-bold text-red-600 dark:text-red-500">#{order.orderNumber}</span>
                       {order.tableNumber && (
-                        <span className="text-xs font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                        <span className="text-xs font-semibold text-red-600 dark:text-red-500">Table {order.tableNumber}</span>
                       )}
                     </div>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${
@@ -838,21 +843,21 @@ function ButcherOrderForm() {
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20 mb-2 text-xs">
-                    <div><span className="text-ethiopian-clay/40">Meat:</span> <span className="font-bold text-ethiopian-burgundy">{order.meatType}</span></div>
-                    <div><span className="text-ethiopian-clay/40">Dish:</span> <span className="font-semibold text-ethiopian-clay">{order.menuItemName}</span></div>
-                    <div><span className="text-ethiopian-clay/40">Weight:</span> <span className="font-bold text-ethiopian-gold">{order.weight} kg</span></div>
-                    <div><span className="text-ethiopian-clay/40">Qty:</span> <span className="font-semibold text-ethiopian-clay">x{order.quantity}</span></div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 p-2 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20 mb-2 text-xs">
+                    <div><span className="text-red-600/40 dark:text-red-500/40">Meat:</span> <span className="font-bold text-red-600 dark:text-red-500">{order.meatType}</span></div>
+                    <div><span className="text-red-600/40 dark:text-red-500/40">Dish:</span> <span className="font-semibold text-red-600 dark:text-red-500">{order.menuItemName}</span></div>
+                    <div><span className="text-red-600/40 dark:text-red-500/40">Weight:</span> <span className="font-bold text-red-600 dark:text-red-500">{order.weight} kg</span></div>
+                    <div><span className="text-red-600/40 dark:text-red-500/40">Qty:</span> <span className="font-semibold text-red-600 dark:text-red-500">x{order.quantity}</span></div>
                   </div>
 
                   {order.notes && (
-                    <div className="text-xs text-ethiopian-clay/70 italic border-l-2 border-ethiopian-gold/30 pl-2 mb-2">
+                    <div className="text-xs text-red-600/70 dark:text-red-500/70 italic border-l-2 border-ethiopian-gold/30 pl-2 mb-2">
                       "{order.notes}"
                     </div>
                   )}
 
                   <div className="flex items-center justify-between">
-                    <div className="text-xs text-ethiopian-clay/60">
+                    <div className="text-xs text-red-600/60 dark:text-red-500/60">
                       {new Date(order.createdAt).toLocaleString()} &middot; {order.customerName}
                     </div>
 

@@ -406,7 +406,11 @@
     "itemIdExists": "Item ID already exists",
     "invalidQuantity": "Quantity must be a valid positive number",
     "added": "Inventory item added",
-    "removed": "Item removed"
+    "removed": "Item removed",
+    "editItem": "Edit Item",
+    "editItemDescription": "Update the item details below",
+    "updated": "Item updated",
+    "edit": "Edit"
   },
   "brand": {
     "name": "Habesha Kurt Bet"

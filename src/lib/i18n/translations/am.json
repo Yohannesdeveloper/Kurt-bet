@@ -406,7 +406,11 @@
     "itemIdExists": "የእቃ መለያ ቀድሞውኑ አለ",
     "invalidQuantity": "ብዛት ዋጋ ያለው አዎንታዊ ቁጥር መሆን አለበት",
     "added": "የእቃ ክምችት ታክሏል",
-    "removed": "እቃ ተወግዷል"
+    "removed": "እቃ ተወግዷል",
+    "editItem": "አርትዕ ያድርጉ",
+    "editItemDescription": "የእቃውን ዝርዝሮች ያዘምኑ",
+    "updated": "እቃው ተዘምኗል",
+    "edit": "አርትዕ"
   },
   "brand": {
     "name": "ሐበሻ ቁርጥ ቤት"

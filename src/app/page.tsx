@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LanguageSwitcher } from "@/components/layout/language-switcher";
 import { useTranslation } from "@/lib/i18n";
@@ -167,14 +168,14 @@ function FloatingNav() {
                   {l.label}
                 </a>
               ))}
-              <a href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-ethiopian-cream/80 font-medium hover:text-ethiopian-gold transition-colors border-b border-ethiopian-gold/10 pb-3">
+              <Link href="/dashboard" onClick={() => setMenuOpen(false)} className="block text-ethiopian-cream/80 font-medium hover:text-ethiopian-gold transition-colors border-b border-ethiopian-gold/10 pb-3">
                 {t("nav.dashboard")}
-              </a>
+              </Link>
               <div className="pt-2"><LanguageSwitcher /></div>
               {isAuthenticated && (
-                <a href="/orders" onClick={() => setMenuOpen(false)} className="block text-center px-6 py-3 rounded-full bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay text-white font-semibold shadow-lg">
+                <Link href="/orders" onClick={() => setMenuOpen(false)} className="block text-center px-6 py-3 rounded-full bg-gradient-to-r from-ethiopian-gold to-ethiopian-clay text-white font-semibold shadow-lg">
                   {t("nav.myOrders")}
-                </a>
+                </Link>
               )}
             </div>
           </motion.div>
@@ -443,6 +444,7 @@ function AboutSection() {
 
 function SignatureDishes() {
   const { t } = useTranslation();
+  const router = useRouter();
   const [dishes, setDishes] = useState<MenuDish[]>([]);
   useEffect(() => {
     fetch("/api/menu").then(r => r.json()).then(d => {
@@ -496,7 +498,7 @@ function SignatureDishes() {
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => window.location.href = "/menu"}
+                    onClick={() => router.push("/menu")}
                     className="mt-4 w-full py-2.5 rounded-xl bg-gradient-to-r from-ethiopian-gold/10 to-ethiopian-clay/10 text-ethiopian-coffee dark:text-ethiopian-cream font-medium text-sm hover:from-ethiopian-gold hover:to-ethiopian-clay hover:text-white transition-all duration-300 border border-ethiopian-gold/20 dark:border-ethiopian-gold/30"
                   >
                     {t("hero.orderNow")}
@@ -804,6 +806,7 @@ function CultureSection() {
 
 function SpecialOffers() {
   const { t } = useTranslation();
+  const router = useRouter();
   const specialOffers = [
     { title: t("landing.offer1Title"), desc: t("landing.offer1Desc"), badge: t("landing.offer1Badge"), icon: Flame },
     { title: t("landing.offer2Title"), desc: t("landing.offer2Desc"), badge: t("landing.offer2Badge"), icon: Coffee },
@@ -847,10 +850,10 @@ function SpecialOffers() {
                   </span>
                   <h3 className="text-lg sm:text-xl font-bold text-white mb-2 font-serif">{offer.title}</h3>
                   <p className="text-white/50 text-sm sm:text-base mb-5 sm:mb-6 leading-relaxed">{offer.desc}</p>
-                  <a href="/menu" className="inline-flex items-center gap-2 text-ethiopian-gold font-semibold text-sm group-hover:gap-3 transition-all">
+                  <button onClick={() => router.push("/menu")} className="inline-flex items-center gap-2 text-ethiopian-gold font-semibold text-sm group-hover:gap-3 transition-all">
                     {t("landing.claimOffer")}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </a>
+                  </button>
                 </motion.div>
               </AnimatedSection>
             );

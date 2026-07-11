@@ -6,6 +6,7 @@ import { UtensilsCrossed, Clock, History, User, ShoppingBag, Search } from "luci
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
 import { useState } from "react";
+import Link from "next/link";
 import { EthiopianCornerSet } from "@/components/shared/ethiopian-patterns";
 
 export default function ClientDashboard() {
@@ -81,10 +82,10 @@ export default function ClientDashboard() {
                 />
               </div>
               <Button className="w-full" asChild>
-                <a href="/menu">
+                <Link href="/menu">
                   <ShoppingBag className="h-4 w-4 mr-2" />
                   View Full Menu
-                </a>
+                </Link>
               </Button>
             </CardContent>
           </Card>
@@ -109,9 +110,9 @@ export default function ClientDashboard() {
                 <p className="text-sm">Your order history will appear here</p>
               </div>
               <Button variant="outline" className="w-full mt-4" asChild>
-                <a href="/orders">
+                <Link href="/orders">
                   View All Orders
-                </a>
+                </Link>
               </Button>
             </CardContent>
           </Card>

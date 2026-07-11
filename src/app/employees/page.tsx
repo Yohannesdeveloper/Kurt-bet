@@ -124,13 +124,13 @@ export default function EmployeesPage() {
             <Users className="h-5 w-5 lg:h-6 lg:w-6 text-ethiopian-gold" />
           </div>
           <div>
-            <h1 className="text-xl lg:text-2xl font-bold tracking-tight font-serif text-ethiopian-coffee">{t("employees.title")}</h1>
-            <p className="text-sm text-ethiopian-coffee/60">{t("employees.subtitle")}</p>
+            <h1 className="text-xl lg:text-2xl font-bold tracking-tight font-serif text-ethiopian-coffee dark:text-ethiopian-cream">{t("employees.title")}</h1>
+            <p className="text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">{t("employees.subtitle")}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 lg:gap-3 w-full sm:w-auto">
           <div className="relative flex-1 sm:flex-none">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ethiopian-coffee/40" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-ethiopian-coffee/40 dark:text-ethiopian-cream/40" />
             <Input
               placeholder={t("employees.search")}
               value={searchQuery}
@@ -170,8 +170,8 @@ export default function EmployeesPage() {
                     <stat.icon className={`h-5 w-5 lg:h-6 lg:w-6 ${stat.iconColor}`} />
                   </div>
                 </div>
-                <p className="text-xs lg:text-sm text-ethiopian-coffee/60 font-medium mb-1">{stat.label}</p>
-                <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee">{stat.value}</p>
+                <p className="text-xs lg:text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 font-medium mb-1">{stat.label}</p>
+                <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee dark:text-ethiopian-cream">{stat.value}</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -187,10 +187,10 @@ export default function EmployeesPage() {
           <Card className="border-2 border-dashed border-ethiopian-gold/20">
             <CardContent className="flex flex-col items-center justify-center py-20 text-center">
               <div className="h-20 w-20 rounded-2xl bg-ethiopian-gold/5 flex items-center justify-center mb-4 border border-ethiopian-gold/10">
-                <Inbox className="h-10 w-10 text-ethiopian-coffee/30" />
+                <Inbox className="h-10 w-10 text-ethiopian-coffee/30 dark:text-ethiopian-cream/30" />
               </div>
-              <h3 className="text-lg font-semibold text-ethiopian-coffee mb-2 font-serif">{t("employees.noEmployees")}</h3>
-              <p className="text-sm text-ethiopian-coffee/50 mb-6">
+              <h3 className="text-lg font-semibold text-ethiopian-coffee dark:text-ethiopian-cream mb-2 font-serif">{t("employees.noEmployees")}</h3>
+              <p className="text-sm text-ethiopian-coffee/50 dark:text-ethiopian-cream/50 mb-6">
                 {t("employees.addFirstEmployee")}
               </p>
               <Button
@@ -217,29 +217,29 @@ export default function EmployeesPage() {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b bg-ethiopian-gold/5">
-                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70">{t("employees.name")}</th>
-                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70">{t("employees.fatherName")}</th>
-                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70">{t("employees.age")}</th>
-                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70">{t("employees.position")}</th>
-                      <th className="text-right p-4 text-sm font-semibold text-ethiopian-coffee/70">{t("employees.action")}</th>
+                    <tr className="border-b bg-ethiopian-gold/5 dark:bg-ethiopian-gold/10">
+                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70 dark:text-ethiopian-cream/70">{t("employees.name")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70 dark:text-ethiopian-cream/70">{t("employees.fatherName")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70 dark:text-ethiopian-cream/70">{t("employees.age")}</th>
+                      <th className="text-left p-4 text-sm font-semibold text-ethiopian-coffee/70 dark:text-ethiopian-cream/70">{t("employees.position")}</th>
+                      <th className="text-right p-4 text-sm font-semibold text-ethiopian-coffee/70 dark:text-ethiopian-cream/70">{t("employees.action")}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filtered.map((emp) => (
                       <tr key={emp.id} className="border-b border-ethiopian-gold/5 last:border-0 hover:bg-ethiopian-gold/5 transition-colors">
-                        <td className="p-4 text-sm font-medium text-ethiopian-coffee">{emp.name}</td>
-                        <td className="p-4 text-sm text-ethiopian-coffee/60">{emp.fatherName}</td>
-                        <td className="p-4 text-sm text-ethiopian-coffee">{emp.age}</td>
+                        <td className="p-4 text-sm font-medium text-ethiopian-coffee dark:text-ethiopian-cream">{emp.name}</td>
+                        <td className="p-4 text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">{emp.fatherName}</td>
+                        <td className="p-4 text-sm text-ethiopian-coffee dark:text-ethiopian-cream">{emp.age}</td>
                         <td className="p-4">
-                          <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-ethiopian-gold/10 text-ethiopian-gold border border-ethiopian-gold/20">
+                          <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium bg-ethiopian-gold/10 dark:bg-ethiopian-gold/20 text-ethiopian-gold border border-ethiopian-gold/20 dark:border-ethiopian-gold/30">
                             {emp.position}
                           </span>
                         </td>
                         <td className="p-4 text-right">
                           <button
                             onClick={() => handleDelete(emp.id)}
-                            className="p-1.5 rounded-lg hover:bg-red-100 text-red-500 transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-950/50 text-red-500 transition-colors"
                           >
                             <X className="w-4 h-4" />
                           </button>

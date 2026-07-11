@@ -575,7 +575,7 @@ function AddItemDialog({ open, onOpenChange, categories, editingItem }: {
         setTimeout(() => { setName(""); setDescription(""); setPrice(""); setCategoryId(""); setPrepTime("15"); setImage(""); }, 100);
       }
     }}>
-      <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto !bg-white dark:!bg-gray-900 !text-gray-900 dark:!text-gray-100 opacity-100">
         <DialogHeader>
           <DialogTitle className="text-xl">{editingItem ? "Edit Menu Item" : "Add Menu Item"}</DialogTitle>
           <DialogDescription>{editingItem ? "Update the menu item details" : "Add a new item to your menu"}</DialogDescription>

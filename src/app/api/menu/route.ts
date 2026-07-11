@@ -26,7 +26,7 @@ export async function GET(_req: NextRequest) {
     const merged = demoItems
       .filter((di: any) => !overrideIds.has(di.id))
       .concat(persistedWithCategory);
-    const allItems = merged.filter((i: any) => !deletedIds.includes(i.id));
+    const allItems = merged.filter((i: any) => !deletedIds.includes(i.id) && i.isAvailable !== false && i.isActive !== false);
 
     return NextResponse.json({ success: true, data: { items: allItems, categories: demoCategories } });
 }
@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
     categoryId: body.categoryId,
     category: { id: body.categoryId, name: "" },
     isAvailable: true,
+    isActive: true,
     preparationTime: body.preparationTime || 15,
     variants: [],
     extras: [],

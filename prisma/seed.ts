@@ -146,13 +146,36 @@ async function main() {
     },
   });
 
-  console.log({ restaurant, admin, client, kitchen, waiter, bartender });
+  // Create tables
+  const tables = [];
+  for (let i = 1; i <= 12; i++) {
+    const table = await prisma.restaurantTable.upsert({
+      where: { id: `table-${i}` },
+      update: {},
+      create: {
+        id: `table-${i}`,
+        restaurantId: restaurant.id,
+        number: i,
+        name: `Table ${i}`,
+        capacity: 4,
+        minCapacity: 1,
+        section: i <= 6 ? "Main" : "Patio",
+        isActive: true,
+      },
+    });
+    tables.push(table);
+  }
+
+  console.log({ restaurant, admin, client, kitchen, waiter, bartender, tables });
   console.log("\n=== Test Users Created ===");
   console.log("Admin: admin@restaurant.com / admin123");
   console.log("Client: client@restaurant.com / admin123");
   console.log("Kitchen: kitchen@restaurant.com / admin123");
   console.log("Waiter: waiter@restaurant.com / admin123");
   console.log("Bartender: bartender@restaurant.com / admin123");
+  console.log(`\n=== ${tables.length} Tables Created ===`);
+  console.log("Tables 1-6: Main Section");
+  console.log("Tables 7-12: Patio Section");
 }
 
 main()

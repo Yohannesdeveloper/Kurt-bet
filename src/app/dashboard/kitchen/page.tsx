@@ -176,16 +176,16 @@ export default function KitchenDashboard() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight font-serif text-ethiopian-coffee">
+          <h1 className="text-3xl font-bold tracking-tight font-serif text-ethiopian-coffee dark:text-ethiopian-cream">
             {t("nav.kitchen")} Dashboard
           </h1>
-          <p className="text-ethiopian-coffee/60 mt-1">Manage incoming orders and kitchen queue</p>
+          <p className="text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 mt-1">Manage incoming orders and kitchen queue</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-300">v3</span>
           <div className="h-2 w-2 rounded-full bg-ethiopian-gold animate-pulse" />
           <ChefHat className="h-5 w-5 text-ethiopian-gold" />
-          <span className="text-sm font-medium text-ethiopian-coffee">{total} active</span>
+          <span className="text-sm font-medium text-ethiopian-coffee dark:text-ethiopian-cream">{total} active</span>
         </div>
       </div>
 
@@ -206,8 +206,8 @@ export default function KitchenDashboard() {
                       <s.icon className={`h-5 w-5 lg:h-6 lg:w-6 ${s.iconColor}`} />
                     </div>
                   </div>
-                  <p className="text-xs lg:text-sm text-ethiopian-coffee/60 font-medium mb-1">{statusLabels[status]}</p>
-                  <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee">{counts[status]}</p>
+                  <p className="text-xs lg:text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 font-medium mb-1">{statusLabels[status]}</p>
+                  <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee dark:text-ethiopian-cream">{counts[status]}</p>
                 </CardContent>
               </Card>
             </motion.div>
@@ -225,8 +225,8 @@ export default function KitchenDashboard() {
                   <Beef className="h-5 w-5 lg:h-6 lg:w-6 text-ethiopian-burgundy" />
                 </div>
               </div>
-              <p className="text-xs lg:text-sm text-ethiopian-coffee/60 font-medium mb-1">{t("dashboard.butcherOrders")}</p>
-              <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee">{waitingOrders.length}</p>
+              <p className="text-xs lg:text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 font-medium mb-1">{t("dashboard.butcherOrders")}</p>
+              <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee dark:text-ethiopian-cream">{waitingOrders.length}</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -235,11 +235,11 @@ export default function KitchenDashboard() {
       {/* Butcher Orders - Awaiting Receipt */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee">Butcher Orders</h2>
-          <span className="text-xs text-ethiopian-coffee/40">In New Orders: {localReceivedOrders.length}</span>
+          <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee dark:text-ethiopian-cream">Butcher Orders</h2>
+          <span className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">In New Orders: {localReceivedOrders.length}</span>
         </div>
         {waitingOrders.length === 0 ? (
-          <div className="text-center py-6 text-ethiopian-coffee/60 bg-white rounded-2xl shadow-md border border-ethiopian-gold/10">
+          <div className="text-center py-6 text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 bg-white dark:bg-gray-950 rounded-2xl shadow-md border border-ethiopian-gold/10">
             <CheckCircle className="w-8 h-8 mx-auto mb-2 text-emerald-500" />
             <p className="text-sm">All butcher orders received</p>
           </div>
@@ -250,45 +250,45 @@ export default function KitchenDashboard() {
                 key={order.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-white rounded-2xl shadow-md border border-ethiopian-gold/10 hover:shadow-xl hover:border-ethiopian-gold/20 transition-all duration-300 p-5"
+                className="bg-white dark:bg-gray-950 rounded-2xl shadow-md border border-ethiopian-gold/10 hover:shadow-xl hover:border-ethiopian-gold/20 transition-all duration-300 p-5"
               >
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-3 flex-wrap">
                     <DishThumb name={order.menuItemName} />
-                    <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
+                    <span className="text-lg font-bold text-ethiopian-coffee dark:text-ethiopian-cream">#{order.orderNumber}</span>
                     {order.tableNumber && (
                       <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
                     )}
-                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-amber-100 text-amber-800 border-amber-300">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700">
                       Waiting
                     </span>
-                    <span className="text-sm text-ethiopian-coffee/60 flex items-center gap-1">
+                    <span className="text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" />
                       {order.approvedAt ? new Date(order.approvedAt).toLocaleString() : ""}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20 dark:bg-gray-800/50">
                     <div>
-                      <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
-                      <p className="text-sm font-bold text-ethiopian-burgundy">{order.meatType}</p>
+                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">Meat Type</p>
+                      <p className="text-sm font-bold text-ethiopian-burgundy dark:text-red-400">{order.meatType}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-ethiopian-coffee/40">Dish</p>
-                      <p className="text-sm font-semibold text-ethiopian-coffee">{order.menuItemName}</p>
+                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">Dish</p>
+                      <p className="text-sm font-semibold text-ethiopian-coffee dark:text-ethiopian-cream">{order.menuItemName}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-ethiopian-coffee/40">Weight</p>
+                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">Weight</p>
                       <p className="text-sm font-bold text-ethiopian-gold">{order.weight} kg</p>
                     </div>
                     <div>
-                      <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
-                      <p className="text-sm font-semibold text-ethiopian-coffee">x{order.quantity}</p>
+                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">Quantity</p>
+                      <p className="text-sm font-semibold text-ethiopian-coffee dark:text-ethiopian-cream">x{order.quantity}</p>
                     </div>
                     {order.notes && (
                       <div className="col-span-2 sm:col-span-4">
-                        <p className="text-xs text-ethiopian-coffee/40">Notes</p>
-                        <p className="text-sm italic text-ethiopian-coffee/70">{order.notes}</p>
+                        <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">Notes</p>
+                        <p className="text-sm italic text-ethiopian-coffee/70 dark:text-ethiopian-cream/70">{order.notes}</p>
                       </div>
                     )}
                   </div>
@@ -306,7 +306,7 @@ export default function KitchenDashboard() {
                       <button
                         onClick={() => deleteButcherOrder(order.id)}
                         disabled={actionLoading === order.id}
-                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-100 text-red-600 hover:bg-red-200 transition-all disabled:opacity-50 text-sm font-medium"
+                        className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-100 dark:bg-red-950/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/40 transition-all disabled:opacity-50 text-sm font-medium"
                         title="Delete order"
                       >
                         {actionLoading === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
@@ -328,7 +328,7 @@ export default function KitchenDashboard() {
       >
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 font-serif text-ethiopian-coffee">
+            <CardTitle className="flex items-center gap-2 font-serif text-ethiopian-coffee dark:text-ethiopian-cream">
               <AlertCircle className="h-5 w-5 text-ethiopian-gold" />
               Order Queue
             </CardTitle>
@@ -344,34 +344,34 @@ export default function KitchenDashboard() {
                     <div className={`h-12 w-12 rounded-full ${colors[status]} flex items-center justify-center mx-auto mb-2 shadow-lg`}>
                       <span className="text-white font-bold text-lg">{count}</span>
                     </div>
-                    <p className="text-sm font-medium text-ethiopian-coffee">{labels[status]}</p>
+                    <p className="text-sm font-medium text-ethiopian-coffee dark:text-ethiopian-cream">{labels[status]}</p>
                   </div>
                 );
               })}
             </div>
             {total === 0 && receivedOrders.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-ethiopian-coffee/60">
-                <ChefHat className="h-16 w-16 mb-4 opacity-30 text-ethiopian-coffee" />
-                <p className="font-medium mb-1 text-ethiopian-coffee">No orders in queue</p>
-                <p className="text-sm text-ethiopian-coffee/60">New orders will appear here</p>
+              <div className="flex flex-col items-center justify-center py-12 text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">
+                <ChefHat className="h-16 w-16 mb-4 opacity-30 text-ethiopian-coffee dark:text-ethiopian-cream" />
+                <p className="font-medium mb-1 text-ethiopian-coffee dark:text-ethiopian-cream">No orders in queue</p>
+                <p className="text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">New orders will appear here</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {receivedOrders.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-xs font-semibold text-ethiopian-coffee/60 uppercase tracking-wider">New Orders</p>
+                    <p className="text-xs font-semibold text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 uppercase tracking-wider">New Orders</p>
                     {receivedOrders.map((order) => (
-                      <div key={order.id} className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 border border-amber-200">
+                      <div key={order.id} className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/30">
                         <DishThumb name={order.menuItemName} size="sm" />
                         <Beef className="w-4 h-4 text-ethiopian-burgundy flex-shrink-0" />
-                        <span className="text-sm font-semibold text-ethiopian-coffee">#{order.orderNumber} {order.menuItemName}</span>
-                        <span className="text-xs text-ethiopian-coffee/60">{order.meatType} · {order.weight}kg · x{order.quantity}</span>
+                        <span className="text-sm font-semibold text-ethiopian-coffee dark:text-ethiopian-cream">#{order.orderNumber} {order.menuItemName}</span>
+                        <span className="text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">{order.meatType} · {order.weight}kg · x{order.quantity}</span>
                         {order.tableNumber && <span className="text-xs font-medium text-ethiopian-gold ml-auto">Table {order.tableNumber}</span>}
                         {isAdmin && (
                           <button
                             onClick={() => deleteButcherOrder(order.id)}
                             disabled={actionLoading === order.id}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors disabled:opacity-50 text-xs font-medium"
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 hover:text-red-600 transition-colors disabled:opacity-50 text-xs font-medium"
                             title="Delete"
                           >
                             {actionLoading === order.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
@@ -385,10 +385,10 @@ export default function KitchenDashboard() {
                 <div className="space-y-2">
                   {STATUS_ORDER.flatMap(status =>
                     Array.from({ length: Math.min(counts[status], 3) }).map((_, i) => (
-                      <div key={`${status}-${i}`} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                      <div key={`${status}-${i}`} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 dark:bg-gray-800/50">
                         <div className={`h-2 w-2 rounded-full ${statsConfig[status as keyof typeof statsConfig].bgColor}`} />
-                        <span className="text-sm font-medium text-ethiopian-coffee">{statusLabels[status]}</span>
-                        <span className="text-xs text-ethiopian-coffee/60 ml-auto">In queue</span>
+                        <span className="text-sm font-medium text-ethiopian-coffee dark:text-ethiopian-cream">{statusLabels[status]}</span>
+                        <span className="text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 ml-auto">In queue</span>
                       </div>
                     ))
                   )}

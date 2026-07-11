@@ -635,7 +635,6 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
       if (data.success) {
         const order = data.data;
         const table = tables.find(t => t.id === tableId);
-        // Create butcher orders for any items that require butcher processing
         for (const cartItem of cart) {
           const menuItem = menuItems.find(m => m.id === cartItem.menuItemId);
           if (menuItem?.requiresButcher) {
@@ -739,32 +738,44 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
               />
             </div>
 
-            <div className="max-h-64 overflow-y-auto space-y-1">
+            <div className="max-h-[300px] overflow-y-auto grid grid-cols-2 gap-2 pr-1">
               {filteredItems.length === 0 ? (
-                <p className="text-center text-sm text-muted-foreground py-4">{t("orders.noMenuItems")}</p>
+                <div className="col-span-2 text-center text-sm text-muted-foreground py-4">{t("orders.noMenuItems")}</div>
               ) : (
                 filteredItems.map(item => (
-                  <div key={item.id} className="flex items-center justify-between p-2 rounded-lg hover:bg-ethiopian-gold/5">
-                    <div>
-                      <p className="text-sm font-medium">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">{formatCurrency(item.price)}</p>
+                  <div
+                    key={item.id}
+                    className="group relative overflow-hidden rounded-xl border hover:shadow-lg transition-all duration-200 cursor-pointer bg-card"
+                  >
+                    <div className="relative h-24 overflow-hidden bg-muted">
+                      {item.image ? (
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary/5">
+                          <UtensilsCrossed className="h-6 w-6 text-muted-foreground/40" />
+                        </div>
+                      )}
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-2 pt-6">
+                        <p className="text-xs font-semibold text-white drop-shadow-sm leading-tight line-clamp-1">{item.name}</p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="p-2 flex items-center justify-between gap-1">
+                      <p className="text-xs font-bold text-primary">{formatCurrency(item.price)}</p>
                       {cart.find(c => c.menuItemId === item.id) ? (
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQty(item.id, -1)}>
+                        <div className="flex items-center gap-1">
+                          <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQty(item.id, -1)}>
                             <Minus className="h-3 w-3" />
                           </Button>
-                          <span className="w-5 text-center text-sm font-medium">
+                          <span className="w-4 text-center text-xs font-medium">
                             {cart.find(c => c.menuItemId === item.id)?.quantity || 0}
                           </span>
-                          <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQty(item.id, 1)}>
+                          <Button variant="outline" size="icon" className="h-6 w-6" onClick={() => updateQty(item.id, 1)}>
                             <Plus className="h-3 w-3" />
                           </Button>
                         </div>
                       ) : (
-                        <Button size="sm" variant="outline" onClick={() => addToCart(item)}>
-                          <Plus className="h-3 w-3 mr-1" /> {t("orders.add")}
+                        <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => addToCart(item)}>
+                          <Plus className="h-3 w-3 mr-1" /> Add
                         </Button>
                       )}
                     </div>

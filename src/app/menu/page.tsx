@@ -186,9 +186,9 @@ export default function MenuPage() {
             <CardContent className="p-4 lg:p-5 pb-2">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm lg:text-base">{item.name}</p>
+                  <p className="font-semibold text-sm lg:text-base text-foreground dark:text-ethiopian-cream">{item.name}</p>
                   {item.description && (
-                    <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{itemDesc(item)}</p>
+                    <p className="text-xs text-muted-foreground dark:text-ethiopian-cream/60 line-clamp-1 mt-0.5">{itemDesc(item)}</p>
                   )}
                 </div>
                 {canEditDelete && (
@@ -259,7 +259,7 @@ export default function MenuPage() {
                 <Clock className="h-3 w-3 lg:h-3.5 lg:w-3.5" />
                 <span>{item.preparationTime} min</span>
               </div>
-              <p className="font-bold text-base lg:text-lg text-primary">{formatCurrency(item.price)}</p>
+              <p className="font-bold text-base lg:text-lg text-primary dark:text-ethiopian-cream">{formatCurrency(item.price)}</p>
             </div>
             {item.isAvailable && !isClient && (
               <div className="mt-3 pt-3 border-t flex items-center justify-between">

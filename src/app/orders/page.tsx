@@ -101,8 +101,8 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
 
-  const fetchOrders = useCallback(async () => {
-    setLoading(true);
+  const fetchOrders = useCallback(async (showLoader = false) => {
+    if (showLoader) setLoading(true);
     try {
       const statusParam = activeTab === "pending" ? "all" : activeTab;
       const approvedParam = activeTab === "pending" ? "false" : "";
@@ -112,14 +112,14 @@ export default function OrdersPage() {
       if (data.success) setOrders(data.data);
     } catch {
     } finally {
-      setLoading(false);
+      if (showLoader) setLoading(false);
     }
   }, [activeTab]);
 
-  useEffect(() => { fetchOrders(); }, [fetchOrders]);
+  useEffect(() => { fetchOrders(true); }, [fetchOrders]);
 
   useEffect(() => {
-    const interval = setInterval(fetchOrders, 10000);
+    const interval = setInterval(() => fetchOrders(false), 10000);
     return () => clearInterval(interval);
   }, [fetchOrders]);
 
@@ -162,7 +162,7 @@ export default function OrdersPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 bg-ethiopian-coffee/98 backdrop-blur-2xl border-b border-ethiopian-gold/10 shadow-2xl shadow-black/30 sticky top-0 z-30"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-4 bg-ethiopian-coffee border-b border-ethiopian-gold/10 shadow-2xl shadow-black/30 sticky top-0 z-30"
       >
         <div className="flex items-center gap-3">
           <Link
@@ -173,7 +173,7 @@ export default function OrdersPage() {
           </Link>
           <div>
             <h1 className="text-lg sm:text-xl font-bold text-ethiopian-gold font-serif">{t("nav.orders")}</h1>
-            <p className="text-xs text-ethiopian-cream/50">{orders.length} orders</p>
+            <p className="text-xs text-ethiopian-cream/80">{orders.length} orders</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -665,7 +665,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[85vh] overflow-y-auto !bg-white dark:!bg-gray-900 !text-gray-900 dark:!text-gray-100 opacity-100">
         <DialogHeader>
           <DialogTitle>
             {step === "setup" ? t("orders.newOrder") : step === "items" ? t("orders.addItems") : t("orders.reviewOrder")}

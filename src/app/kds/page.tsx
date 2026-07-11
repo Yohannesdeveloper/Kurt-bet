@@ -64,7 +64,7 @@ const STATUS_FLOW: Record<string, { next: string | null; label: string; color: s
   NEW:       { next: "PREPARING", label: "Pending",       color: "text-ethiopian-gold", bg: "bg-ethiopian-gold/10", border: "border-ethiopian-gold/20", dot: "bg-ethiopian-gold" },
   PREPARING: { next: "READY",     label: "Preparing",     color: "text-ethiopian-gold", bg: "bg-ethiopian-gold/10", border: "border-ethiopian-gold/20", dot: "bg-ethiopian-gold" },
   READY:     { next: "SERVED",    label: "Ready for Pickup", color: "text-ethiopian-clay", bg: "bg-ethiopian-clay/10", border: "border-ethiopian-clay/20", dot: "bg-ethiopian-clay" },
-  SERVED:    { next: null,        label: "Served",        color: "text-ethiopian-coffee", bg: "bg-ethiopian-coffee/10", border: "border-ethiopian-coffee/20", dot: "bg-ethiopian-coffee" },
+  SERVED:    { next: null,        label: "Served",        color: "text-ethiopian-coffee dark:text-ethiopian-cream", bg: "bg-ethiopian-coffee/10", border: "border-ethiopian-coffee/20", dot: "bg-ethiopian-coffee" },
   CANCELLED: { next: null,        label: "Cancelled",     color: "text-ethiopian-burgundy", bg: "bg-ethiopian-burgundy/10", border: "border-ethiopian-burgundy/20", dot: "bg-ethiopian-burgundy" },
 };
 
@@ -131,17 +131,17 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate, isAdmin }: { 
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className={`h-2.5 w-2.5 rounded-full ${s.dot}`} />
-                <span className="font-bold text-base text-ethiopian-coffee">#{order.orderNumber}</span>
+                <span className="font-bold text-base text-ethiopian-coffee dark:text-ethiopian-cream">#{order.orderNumber}</span>
                 <Badge variant={order.status === "NEW" ? "premium" : "outline"} className={`text-xs ${s.color}`}>{statusTLabel[order.status]}</Badge>
               </div>
-              <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60">
+              <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/70">
                 <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(order.createdAt)}</span>
                 {order.table && <span className="flex items-center gap-1"><UtensilsCrossed className="h-3 w-3" />Table {order.table.number}</span>}
                 {order.guestCount && <span>{order.guestCount} guests</span>}
               </div>
             </div>
             {order.notes && (
-              <div className="text-xs text-ethiopian-coffee/50 max-w-[120px] text-right truncate" title={order.notes}>
+              <div className="text-xs text-ethiopian-coffee/50 dark:text-ethiopian-cream/50 max-w-[120px] text-right truncate" title={order.notes}>
                 {order.notes}
               </div>
             )}
@@ -153,8 +153,8 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate, isAdmin }: { 
                 {item.menuItem?.image && (
                   <img src={item.menuItem.image} alt="" className="h-8 w-8 rounded-md object-cover flex-shrink-0" />
                 )}
-                <span className="font-medium text-ethiopian-coffee"><span className="text-ethiopian-coffee/50 mr-1">×{item.quantity}</span>{item.name}</span>
-                {item.cookingNotes && <span className="text-xs text-ethiopian-coffee/50 ml-2">({item.cookingNotes})</span>}
+                <span className="font-medium text-ethiopian-coffee dark:text-ethiopian-cream"><span className="text-ethiopian-coffee/50 dark:text-ethiopian-cream/50 mr-1">×{item.quantity}</span>{item.name}</span>
+                {item.cookingNotes && <span className="text-xs text-ethiopian-coffee/50 dark:text-ethiopian-cream/50 ml-2">({item.cookingNotes})</span>}
               </div>
             ))}
           </div>
@@ -371,7 +371,7 @@ export default function KDSPage() {
       <div className="flex-1 overflow-auto p-4 lg:p-6">
         {loading ? (
           <div className="flex items-center justify-center h-full">
-            <div className="flex items-center gap-2 text-ethiopian-coffee/50">
+            <div className="flex items-center gap-2 text-ethiopian-coffee/50 dark:text-ethiopian-cream/70">
               <motion.div animate={{ rotate: 360 }} transition={{ duration: 2, repeat: Infinity }} className="w-4 h-4 border-2 border-ethiopian-gold/20 border-t-ethiopian-gold rounded-full" />
               <span>{t("common.loading")}</span>
             </div>
@@ -429,10 +429,10 @@ export default function KDSPage() {
                               <DishThumb name={bo.menuItemName} size="sm" />
                               <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="font-bold text-base text-ethiopian-coffee">#{bo.orderNumber}</span>
+                                  <span className="font-bold text-base text-ethiopian-coffee dark:text-ethiopian-cream">#{bo.orderNumber}</span>
                                   <Badge variant="outline" className="text-xs text-ethiopian-clay border-ethiopian-clay/30">{t("kds.butcher")}</Badge>
                                 </div>
-                                <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60">
+                                <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/70">
                                   <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(bo.createdAt)}</span>
                                   {bo.tableNumber && <span>Table {bo.tableNumber}</span>}
                                 </div>
@@ -442,14 +442,14 @@ export default function KDSPage() {
                           <div className="space-y-1 mb-3">
                             <div className="flex items-center gap-2 text-sm">
                               <span className="font-medium text-ethiopian-clay">{bo.menuItemName}</span>
-                              <span className="font-semibold text-ethiopian-coffee">×{bo.quantity}</span>
+                              <span className="font-semibold text-ethiopian-coffee dark:text-ethiopian-cream">×{bo.quantity}</span>
                             </div>
-                            <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60">
+                            <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/70">
                               <span className="text-ethiopian-burgundy font-medium">{bo.meatType}</span>
                               <span>·</span>
                               <span>{bo.weight} kg</span>
                             </div>
-                            {bo.notes && <p className="text-xs text-ethiopian-coffee/50 italic">"{bo.notes}"</p>}
+                            {bo.notes && <p className="text-xs text-ethiopian-coffee/50 dark:text-ethiopian-cream/50 italic">"{bo.notes}"</p>}
                           </div>
                           <div className="flex items-center gap-2 pt-2 border-t border-ethiopian-gold/10">
                             {bo.kitchenStatus === "WAITING" && (
@@ -484,7 +484,7 @@ export default function KDSPage() {
                   ))}
                 </AnimatePresence>
                 {butcherOrders.filter(b => b.kitchenStatus === "WAITING").length === 0 && (
-                  <div className="flex items-center justify-center h-20 text-xs text-ethiopian-coffee/50 border border-dashed border-ethiopian-gold/20 rounded-xl">
+                  <div className="flex items-center justify-center h-20 text-xs text-ethiopian-coffee/50 dark:text-ethiopian-cream/50 border border-dashed border-ethiopian-gold/20 rounded-xl">
                     {t("orders.noOrders")}
                   </div>
                 )}

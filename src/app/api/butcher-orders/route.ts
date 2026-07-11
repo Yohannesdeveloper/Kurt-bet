@@ -148,8 +148,8 @@ export async function PATCH(req: NextRequest) {
     }
     order.kitchenStatus = kitchenStatus;
   } else if (order.status === "PENDING" && status === "APPROVED") {
-    if (role !== "BUTCHER" && role !== "ADMIN") {
-      return NextResponse.json({ success: false, error: "Only butchers can approve" }, { status: 403 });
+    if (role !== "BUTCHER" && role !== "ADMIN" && role !== "WAITER") {
+      return NextResponse.json({ success: false, error: "Only butchers, waiters, or admins can approve" }, { status: 403 });
     }
     order.status = "APPROVED";
     order.approvedAt = now;

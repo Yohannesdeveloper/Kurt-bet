@@ -186,6 +186,10 @@ export default function OrdersPage() {
     o.menuItemName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const handleButcherApprove = (id: string) => {
+    setButcherOrders(prev => prev.map(o => o.id === id ? { ...o, status: "APPROVED" as const } : o));
+  };
+
   return (
     <div className="space-y-8">
       <NotificationPopups />
@@ -289,7 +293,7 @@ export default function OrdersPage() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
                   {filteredButcher.map((bo, index) => (
-                    <ButcherOrderCard key={bo.id} order={bo} index={index} />
+                    <ButcherOrderCard key={bo.id} order={bo} index={index} canApprove={canApprove} onApprove={handleButcherApprove} />
                   ))}
                   {filtered.map((order, index) => (
                     <OrderCard
@@ -316,7 +320,8 @@ export default function OrdersPage() {
   );
 }
 
-function ButcherOrderCard({ order, index }: { order: ButcherOrder; index: number }) {
+function ButcherOrderCard({ order, index, canApprove, onApprove }: { order: ButcherOrder; index: number; canApprove: boolean; onApprove: (id: string) => void }) {
+  const [approving, setApproving] = useState(false);
   const statusColors: Record<string, string> = {
     PENDING: "bg-amber-100 text-amber-800",
     APPROVED: "bg-emerald-100 text-emerald-800",
@@ -326,6 +331,28 @@ function ButcherOrderCard({ order, index }: { order: ButcherOrder; index: number
     PENDING: "border-l-amber-400",
     APPROVED: "border-l-emerald-400",
     REJECTED: "border-l-red-400",
+  };
+
+  const handleApprove = async () => {
+    setApproving(true);
+    try {
+      const res = await fetch("/api/butcher-orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: order.id, status: "APPROVED" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Order #${order.orderNumber} approved & sent to kitchen`);
+        onApprove(order.id);
+      } else {
+        toast.error(data.error || "Failed");
+      }
+    } catch {
+      toast.error("Failed to approve");
+    } finally {
+      setApproving(false);
+    }
   };
 
   return (
@@ -364,6 +391,24 @@ function ButcherOrderCard({ order, index }: { order: ButcherOrder; index: number
           </div>
           {order.notes && (
             <p className="text-xs text-ethiopian-cream/40 italic truncate">"{order.notes}"</p>
+          )}
+          {canApprove && order.status === "PENDING" && (
+            <div className="pt-2 border-t border-ethiopian-gold/10">
+              <Button
+                variant="premium"
+                size="sm"
+                disabled={approving}
+                onClick={handleApprove}
+                className="h-8 text-xs gap-1"
+              >
+                {approving ? "..." : <><Check className="h-3 w-3" /> Approve & Send to Kitchen</>}
+              </Button>
+            </div>
+          )}
+          {order.status === "APPROVED" && (
+            <div className="pt-2 border-t border-ethiopian-gold/10">
+              <span className="text-xs text-emerald-500 font-medium flex items-center gap-1"><Check className="h-3 w-3" /> Sent to kitchen</span>
+            </div>
           )}
         </div>
       </Card>

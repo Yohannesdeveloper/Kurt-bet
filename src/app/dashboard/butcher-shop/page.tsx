@@ -18,8 +18,7 @@ const dishOptions = [
   { name: "Tibs", image: "/images/tibs.jpg", description: "Sautéed meat with onions, peppers & spices" },
   { name: "Kurt", image: "/images/kurt.jpg", description: "Ethiopian-style steak tartare" },
   { name: "Kitfo", image: "/images/kifo.jpg", description: "Minced raw beef mitmita & niter kibbeh" },
-  { name: "Dulet", image: "/images/Awaze Tibs.jpg", description: "Minced tripe, liver & lean beef" },
-  { name: "Tere Sega", image: "/images/zilzil tibs.jpg", description: "Raw beef strips with gored-gored spices" },
+  { name: "Dulet", image: "/images/Yefseg/kurs/ዱለት (Dulet).jpg", description: "Minced tripe, liver & lean beef" },
   { name: "Gored Gored", image: "/images/gored gored.jpg", description: "Cubed raw beef with awaze & spices" },
 ];
 

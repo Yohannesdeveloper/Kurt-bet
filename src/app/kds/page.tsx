@@ -15,11 +15,11 @@ import { getSocket, sendKitchenUpdate } from "@/lib/socket";
 
 const dishImages: Record<string, string> = {
   Tibs: "/images/tibs.jpg", Kurt: "/images/kurt.jpg", Kitfo: "/images/kifo.jpg",
-  Dulet: "/images/Awaze Tibs.jpg", "Tere Sega": "/images/zilzil tibs.jpg", "Gored Gored": "/images/gored gored.jpg",
+  Dulet: "/images/Yefseg/kurs/ዱለት (Dulet).jpg", "Gored Gored": "/images/gored gored.jpg",
 };
 const dishColors: Record<string, string> = {
   Tibs: "bg-red-600", Kurt: "bg-amber-700", Kitfo: "bg-orange-600",
-  Dulet: "bg-emerald-700", "Tere Sega": "bg-rose-700", "Gored Gored": "bg-purple-700",
+  Dulet: "bg-emerald-700", "Gored Gored": "bg-purple-700",
 };
 function DishThumb({ name, size = "md" }: { name: string; size?: "sm" | "md" }) {
   const [err, setErr] = useState(false);

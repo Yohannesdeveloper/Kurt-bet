@@ -11,7 +11,7 @@ import { formatCurrency } from "@/lib/utils";
 
 const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
 const weightPresets = [0.5, 1, 2, 3, 5];
-const dishOptions = ["Tibs", "Kurt", "Dulet", "Tere Sega", "Gored Gored"];
+const dishOptions = ["Tibs", "Kurt", "Dulet", "Gored Gored"];
 
 type ButcherOrder = {
   id: string;

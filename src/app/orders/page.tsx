@@ -23,7 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Search, Plus, Filter, Inbox, Minus, X, Loader2, ShoppingCart, Check, Clock, UtensilsCrossed, ChefHat, MapPin, Users, FileText, Trash2 } from "lucide-react";
+import { ArrowLeft, Search, Plus, Filter, Inbox, Minus, X, Loader2, ShoppingCart, Check, Clock, UtensilsCrossed, ChefHat, MapPin, Users, FileText, Trash2, Beef } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
@@ -88,6 +88,22 @@ interface CartItem {
   image?: string;
 }
 
+interface ButcherOrder {
+  id: string;
+  orderNumber: number;
+  orderId?: string;
+  customerName: string;
+  meatType: string;
+  menuItemName: string;
+  weight: number;
+  quantity: number;
+  tableNumber: string | null;
+  notes: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  kitchenStatus: "WAITING" | "RECEIVED";
+  createdAt: string;
+}
+
 export default function OrdersPage() {
   const { t } = useTranslation();
   const { data: session } = useSession();
@@ -98,6 +114,7 @@ export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("all");
 
@@ -116,12 +133,20 @@ export default function OrdersPage() {
     }
   }, [activeTab]);
 
-  useEffect(() => { fetchOrders(true); }, [fetchOrders]);
+  const fetchButcherOrders = useCallback(async () => {
+    try {
+      const res = await fetch("/api/butcher-orders?status=PENDING,APPROVED");
+      const data = await res.json();
+      if (data.success) setButcherOrders(data.data);
+    } catch {}
+  }, []);
+
+  useEffect(() => { fetchOrders(true); fetchButcherOrders(); }, [fetchOrders, fetchButcherOrders]);
 
   useEffect(() => {
-    const interval = setInterval(() => fetchOrders(false), 10000);
+    const interval = setInterval(() => { fetchOrders(false); fetchButcherOrders(); }, 10000);
     return () => clearInterval(interval);
-  }, [fetchOrders]);
+  }, [fetchOrders, fetchButcherOrders]);
 
   useSocket();
   useSSENotifications();
@@ -156,6 +181,11 @@ export default function OrdersPage() {
     o.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const filteredButcher = butcherOrders.filter(o =>
+    o.orderNumber.toString().includes(searchQuery) ||
+    o.menuItemName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="space-y-8">
       <NotificationPopups />
@@ -173,7 +203,7 @@ export default function OrdersPage() {
           </Link>
           <div>
             <h1 className="text-lg sm:text-xl font-bold text-ethiopian-gold font-serif">{t("nav.orders")}</h1>
-            <p className="text-xs text-ethiopian-cream/80">{orders.length} orders</p>
+            <p className="text-xs text-ethiopian-cream/80">{orders.length + filteredButcher.length} orders</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -239,7 +269,7 @@ export default function OrdersPage() {
                     <p className="text-sm text-ethiopian-cream/50">{t("orders.loading")}</p>
                   </div>
                 </div>
-              ) : filtered.length === 0 ? (
+              ) : filtered.length === 0 && filteredButcher.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-ethiopian-cream/50">
                   <div className="h-20 w-20 rounded-2xl bg-ethiopian-gold/5 border border-ethiopian-gold/10 flex items-center justify-center mb-4">
                     <Inbox className="h-10 w-10 text-ethiopian-gold/40" />
@@ -258,6 +288,9 @@ export default function OrdersPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
+                  {filteredButcher.map((bo, index) => (
+                    <ButcherOrderCard key={bo.id} order={bo} index={index} />
+                  ))}
                   {filtered.map((order, index) => (
                     <OrderCard
                       key={order.id}
@@ -280,6 +313,61 @@ export default function OrdersPage() {
         setOrders(prev => [order, ...prev]);
       }} />
     </div>
+  );
+}
+
+function ButcherOrderCard({ order, index }: { order: ButcherOrder; index: number }) {
+  const statusColors: Record<string, string> = {
+    PENDING: "bg-amber-100 text-amber-800",
+    APPROVED: "bg-emerald-100 text-emerald-800",
+    REJECTED: "bg-red-100 text-red-800",
+  };
+  const statusBorder: Record<string, string> = {
+    PENDING: "border-l-amber-400",
+    APPROVED: "border-l-emerald-400",
+    REJECTED: "border-l-red-400",
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.3, delay: index * 0.05 }}
+    >
+      <Card className={`group hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 ${statusBorder[order.status] || "border-l-gray-400"} bg-gradient-to-b from-ethiopian-coffee/90 to-black/90 relative overflow-hidden`}>
+        <div className="p-4 space-y-3">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <p className="font-bold text-lg text-ethiopian-gold">#{order.orderNumber}</p>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${statusColors[order.status] || ""}`}>
+                  {order.status}
+                </span>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-ethiopian-burgundy/15 text-ethiopian-burgundy">
+                  Butcher
+                </span>
+              </div>
+              <p className="text-xs text-ethiopian-cream/60 flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {new Date(order.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                {order.tableNumber && <span className="ml-2">Table {order.tableNumber}</span>}
+              </p>
+            </div>
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-sm">
+              <Beef className="h-3.5 w-3.5 text-ethiopian-burgundy" />
+              <span className="font-medium text-ethiopian-cream">{order.menuItemName}</span>
+              <span className="text-ethiopian-cream/50">x{order.quantity}</span>
+            </div>
+            <p className="text-xs text-ethiopian-cream/50">{order.meatType} · {order.weight} kg</p>
+          </div>
+          {order.notes && (
+            <p className="text-xs text-ethiopian-cream/40 italic truncate">"{order.notes}"</p>
+          )}
+        </div>
+      </Card>
+    </motion.div>
   );
 }
 

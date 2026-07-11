@@ -40,32 +40,11 @@ export default function ButcherShopPage() {
     if (!w || w <= 0) { toast.error("Select a weight"); return; }
     setSubmitting(true);
     try {
-      const orderRes = await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          type: "DINE_IN",
-          guestCount: 1,
-          subtotal: 0,
-          total: 0,
-          skipButcherAutoCreate: true,
-          items: [{
-            menuItemId: `butcher-${menuItemName.toLowerCase().replace(/\s+/g, "-")}`,
-            name: menuItemName,
-            quantity,
-            unitPrice: 0,
-            totalPrice: 0,
-          }],
-        }),
-      });
-      const orderData = await orderRes.json();
-      const orderId = orderData.success ? orderData.data.id : `order-${Date.now()}`;
-
       const res = await fetch("/api/butcher-orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          orderId,
+          orderId: `order-${Date.now()}`,
           meatType,
           menuItemName,
           weight: w,

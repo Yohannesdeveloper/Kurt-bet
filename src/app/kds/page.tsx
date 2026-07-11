@@ -13,6 +13,8 @@ import { useSession } from "next-auth/react";
 import { useSocket } from "@/hooks/useSocket";
 import { getSocket, sendKitchenUpdate } from "@/lib/socket";
 
+const DRINK_KEYWORDS = ["coffee", "macchiato", "tej", "tella", "tea", "spris", "juice", "ambo", "soft drink", "besso", "atmet", "halwa", "cheesecake", "atayef"];
+
 const dishImages: Record<string, string> = {
   Tibs: "/images/tibs.jpg", Kurt: "/images/kurt.jpg", Kitfo: "/images/kifo.jpg",
   Dulet: "/images/kurt.jpg", "Tere Sega": "/images/gored gored.jpg", "Gored Gored": "/images/gored gored.jpg",
@@ -67,6 +69,15 @@ const STATUS_FLOW: Record<string, { next: string | null; label: string; color: s
   SERVED:    { next: null,        label: "Served",        color: "text-ethiopian-coffee dark:text-ethiopian-cream", bg: "bg-ethiopian-coffee/10", border: "border-ethiopian-coffee/20", dot: "bg-ethiopian-coffee" },
   CANCELLED: { next: null,        label: "Cancelled",     color: "text-ethiopian-burgundy", bg: "bg-ethiopian-burgundy/10", border: "border-ethiopian-burgundy/20", dot: "bg-ethiopian-burgundy" },
 };
+
+function isDrinkItem(name: string): boolean {
+  const lower = name.toLowerCase();
+  return DRINK_KEYWORDS.some((kw) => lower.includes(kw));
+}
+
+function filterFoodItems(items: OrderItem[]): OrderItem[] {
+  return items.filter((item) => !isDrinkItem(item.name));
+}
 
 const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
 
@@ -312,16 +323,21 @@ export default function KDSPage() {
     READY: t("kds.ready"),
     SERVED: t("orders.delivered"),
   };
+
+  const kitchenOrders = orders
+    .map((o) => ({ ...o, items: filterFoodItems(o.items) }))
+    .filter((o) => o.items.length > 0);
+
   const grouped = STATUS_ORDER.map(status => ({
     status,
     label: colLabel[status] || STATUS_FLOW[status]?.label || status,
     color: STATUS_FLOW[status]?.color || "",
     dot: STATUS_FLOW[status]?.dot || "",
-    orders: orders.filter(o => o.status === status),
+    orders: kitchenOrders.filter(o => o.status === status),
   }));
 
   const waitingButcherOrders = butcherOrders.filter(b => b.kitchenStatus === "WAITING");
-  const hasOrders = orders.length > 0 || waitingButcherOrders.length > 0;
+  const hasOrders = kitchenOrders.length > 0 || waitingButcherOrders.length > 0;
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-gradient-to-b from-ethiopian-charcoal via-black to-ethiopian-coffee">
@@ -342,7 +358,7 @@ export default function KDSPage() {
           </div>
           <div>
             <h1 className="text-lg font-bold tracking-tight text-ethiopian-gold font-serif">{t("kds.title")}</h1>
-            <p className="text-xs text-ethiopian-cream/50">{orders.length + waitingButcherOrders.length} orders active</p>
+            <p className="text-xs text-ethiopian-cream/50">{kitchenOrders.length + waitingButcherOrders.length} orders active</p>
           </div>
         </div>
         <div className="flex items-center gap-2">

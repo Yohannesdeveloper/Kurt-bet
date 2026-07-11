@@ -101,8 +101,8 @@ function FloatingNav() {
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 2xl:px-16 py-3 sm:py-4 flex items-center justify-between">
         <motion.a href="#home" whileHover={{ scale: 1.02 }} className="flex items-center gap-2.5">
           <div className="relative">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden shadow-lg shadow-ethiopian-gold/20">
-              <img src="/images/Logo.jpg" alt="Habesha Kurt Bet Logo" className="w-full h-full object-cover" />
+            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden shadow-lg shadow-ethiopian-gold/20">
+              <img src="/images/Logo 2.png" alt="Habesha Kurt Bet Logo" className="w-full h-full object-cover" />
             </div>
             <motion.div
               animate={{ rotate: 360 }}
@@ -1049,8 +1049,8 @@ function Footer() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="relative">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-ethiopian-clay to-ethiopian-gold flex items-center justify-center shadow-lg shadow-ethiopian-gold/20">
-                  <UtensilsCrossed className="w-5 h-5 text-white" />
+                <div className="w-14 h-14 rounded-xl overflow-hidden shadow-lg shadow-ethiopian-gold/20">
+                  <img src="/images/Logo 2.png" alt="Habesha Kurt Bet Logo" className="w-full h-full object-cover" />
                 </div>
                 <motion.div
                   animate={{ rotate: 360 }}

@@ -150,11 +150,12 @@ export default function OrdersPage() {
 
   useSocket();
   useSSENotifications();
-  const { notifications } = useNotificationStore();
+  const notifications = useNotificationStore((s) => s.notifications);
   useEffect(() => {
-    const readyNotif = notifications.find(n => n.type === "ORDER_READY" && !n.isRead);
-    if (readyNotif) {
-      useNotificationStore.getState().markAsRead(readyNotif.id);
+    const unreadReady = notifications.filter(n => n.type === "ORDER_READY" && !n.isRead);
+    if (unreadReady.length > 0) {
+      const store = useNotificationStore.getState();
+      unreadReady.forEach(n => store.markAsRead(n.id));
     }
   }, [notifications]);
 

@@ -246,7 +246,7 @@ export default function KDSPage() {
   }, []);
 
   const fetchButcherOrders = useCallback(() => {
-    fetch("/api/butcher-orders?status=PENDING,APPROVED")
+    fetch("/api/butcher-orders?status=APPROVED")
       .then(r => r.json())
       .then(d => {
         if (d.success) setButcherOrders(d.data);

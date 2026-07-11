@@ -57,7 +57,8 @@ function Header({ onNotifClick }: { onNotifClick: () => void }) {
   useEffect(() => setMounted(true), []);
   const { data: session } = useSession();
   const { t } = useTranslation();
-  const { notifications, unreadCount } = useNotificationStore();
+  const notifications = useNotificationStore((s) => s.notifications);
+  const unreadCount = useNotificationStore((s) => s.unreadCount);
   const readyCount = notifications.filter(n => n.type === "ORDER_READY" && !n.isRead).length;
   const displayCount = readyCount || unreadCount;
   const role = (session?.user as { role?: string })?.role;

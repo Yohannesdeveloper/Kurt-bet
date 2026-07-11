@@ -150,14 +150,6 @@ export default function OrdersPage() {
 
   useSocket();
   useSSENotifications();
-  const notifications = useNotificationStore((s) => s.notifications);
-  useEffect(() => {
-    const unreadReady = notifications.filter(n => n.type === "ORDER_READY" && !n.isRead);
-    if (unreadReady.length > 0) {
-      const store = useNotificationStore.getState();
-      unreadReady.forEach(n => store.markAsRead(n.id));
-    }
-  }, [notifications]);
 
   const handleApprove = async (orderId: string, approve: boolean) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, approved: approve } : o));

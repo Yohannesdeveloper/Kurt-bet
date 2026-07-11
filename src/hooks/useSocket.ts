@@ -10,9 +10,12 @@ import { useSession } from "next-auth/react";
 export function useSocket() {
   const { data: session } = useSession();
   const connected = useRef(false);
-  const { addOrder, updateOrder, removeOrder, setKdsOrders } = useOrderStore();
-  const { updateTable } = useTableStore();
-  const { addNotification } = useNotificationStore();
+  const addOrder = useOrderStore((s) => s.addOrder);
+  const updateOrder = useOrderStore((s) => s.updateOrder);
+  const removeOrder = useOrderStore((s) => s.removeOrder);
+  const setKdsOrders = useOrderStore((s) => s.setKdsOrders);
+  const updateTable = useTableStore((s) => s.updateTable);
+  const addNotification = useNotificationStore((s) => s.addNotification);
 
   const connect = useCallback(() => {
     if (!session?.user) return;

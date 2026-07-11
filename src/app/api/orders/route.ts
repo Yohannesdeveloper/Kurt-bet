@@ -184,6 +184,41 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Auto-create bartender orders for drink items (Prisma path)
+    const drinkItems = (body.items || []).filter((item: any) => {
+      const name = (item.name || "").toLowerCase();
+      return DRINK_KEYWORDS.some((kw) => name.includes(kw));
+    });
+    if (drinkItems.length > 0) {
+      try {
+        const bartenderOrders = await readDemoJSON<any>(BARTENDER_ORDERS_FILE);
+        const nextDrinkNumber = bartenderOrders.length > 0 ? Math.max(...bartenderOrders.map((o: any) => o.orderNumber)) + 1 : 2001;
+        const tableObj = (order as any).table;
+        const tableNumber = tableObj?.number || body?.tableNumber || null;
+        const userName = (session?.user as { name?: string })?.name || "Unknown";
+        const newBartenderOrder = {
+          id: `drink-${order.id}`,
+          orderNumber: nextDrinkNumber,
+          orderId: order.id,
+          customerName: userName,
+          items: drinkItems.map((item: any) => ({
+            menuItemId: item.menuItemId,
+            name: item.name,
+            quantity: item.quantity || 1,
+            unitPrice: item.unitPrice || 0,
+          })),
+          tableNumber,
+          notes: "",
+          status: "PENDING",
+          createdAt: new Date().toISOString(),
+          completedAt: null,
+        };
+        await writeDemoJSON(BARTENDER_ORDERS_FILE, [...bartenderOrders, newBartenderOrder]);
+      } catch (err) {
+        console.error("Failed to create bartender order:", err);
+      }
+    }
+
     return NextResponse.json({ success: true, data: order }, { status: 201 });
   } catch (error) {
     console.error("Order create error (demo mode):", error);

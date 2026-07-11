@@ -15,7 +15,7 @@ import { getSocket, sendKitchenUpdate } from "@/lib/socket";
 
 const dishImages: Record<string, string> = {
   Tibs: "/images/tibs.jpg", Kurt: "/images/kurt.jpg", Kitfo: "/images/kifo.jpg",
-  Dulet: "/images/kurt.jpg", "Tere Sega": "/images/gored gored.jpg", "Gored Gored": "/images/gored gored.jpg",
+  Dulet: "/images/Awaze Tibs.jpg", "Tere Sega": "/images/zilzil tibs.jpg", "Gored Gored": "/images/gored gored.jpg",
 };
 const dishColors: Record<string, string> = {
   Tibs: "bg-red-600", Kurt: "bg-amber-700", Kitfo: "bg-orange-600",

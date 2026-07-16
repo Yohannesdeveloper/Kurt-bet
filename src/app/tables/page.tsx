@@ -35,7 +35,7 @@ const statusColors: Record<string, string> = {
 
 export default function TablesPage() {
   const { data: session } = useSession();
-  const isLoggedIn = !!session?.user;
+  const isAdmin = (session?.user as { role?: string })?.role === "ADMIN";
   const [tables, setTables] = useState<TableData[]>([]);
   const [loading, setLoading] = useState(true);
   const [reserveDialogOpen, setReserveDialogOpen] = useState(false);
@@ -60,8 +60,7 @@ export default function TablesPage() {
 
   const openReserveDialog = (table: TableData) => {
     setSelectedTable(table);
-    const userName = (session?.user as { name?: string })?.name || "";
-    setGuestName(userName);
+    setGuestName("");
     setGuestCount(String(Math.min(2, table.capacity)));
     setReserveDialogOpen(true);
   };
@@ -213,7 +212,7 @@ export default function TablesPage() {
                           </p>
                         </div>
                       )}
-                      {table.status === "AVAILABLE" && isLoggedIn && (
+                      {table.status === "AVAILABLE" && isAdmin && (
                         <div className="mt-3 pt-3 border-t">
                           <Button size="sm" variant="outline" className="w-full" onClick={() => openReserveDialog(table)}>
                             <CalendarCheck className="h-3.5 w-3.5 mr-1" /> Reserve

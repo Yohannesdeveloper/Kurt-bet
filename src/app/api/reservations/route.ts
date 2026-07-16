@@ -24,13 +24,14 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions).catch(() => null);
     const currentUserId = (session?.user as { id?: string })?.id;
     const body = await req.json();
     const reservations = await readDemoReservations();
     const demo = {
       id: `demo-res-${Date.now()}`,
       ...body,
+      status: "CONFIRMED",
       userId: currentUserId || null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

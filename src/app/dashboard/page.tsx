@@ -513,6 +513,7 @@ function ButcherOrderForm() {
   const [menuItemName, setMenuItemName] = useState("Tibs");
   const [weight, setWeight] = useState("1");
   const [customWeight, setCustomWeight] = useState(false);
+  const [selectedDishObj, setSelectedDishObj] = useState<{ name: string; image: string; description: string; meatType: string; weights: Partial<Record<number, number>> } | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [tableNumber, setTableNumber] = useState("");
   const [notes, setNotes] = useState("");
@@ -524,13 +525,61 @@ function ButcherOrderForm() {
     { id: "Goat", icon: Beef, color: "from-ethiopian-coffee to-stone-700", bg: "bg-stone-50", label: "Goat" },
     { id: "Chicken", icon: Drumstick, color: "from-ethiopian-gold to-yellow-600", bg: "bg-yellow-50", label: "Chicken" },
   ];
-  const weightPresets = [0.5, 1, 2, 3, 5];
+  const weightPresets = [0.25, 0.5, 1];
   const dishOptions = [
-    { name: "Tibs", image: "/images/tibs.jpg", description: "Sautéed meat with onions, peppers & spices" },
-    { name: "Kurt", image: "/images/kurt.jpg", description: "Ethiopian-style steak tartare" },
-    { name: "Kitfo", image: "/images/kifo.jpg", description: "Minced raw beef mitmita & niter kibbeh" },
-    { name: "Dulet", image: "/images/Yefseg/kurs/ዱለት (Dulet).jpg", description: "Minced tripe, liver & lean beef" },
-    { name: "Gored Gored", image: "/images/gored gored.jpg", description: "Cubed raw beef with awaze & spices" },
+    // ── Yefsig Main ──
+    { name: "Kurt (ቁርጥ)", image: "/images/kurt.jpg", description: "Fresh raw beef cubes seasoned with mitmita and niter kibbeh", meatType: "Beef", weights: { 1: 350 } },
+    { name: "Kitfo (ክትፎ)", image: "/images/kifo.jpg", description: "Minced raw beef marinated in mitmita, niter kibbeh and cardamom", meatType: "Beef", weights: { 1: 300 } },
+    { name: "Gored Gored (ጎረድ ጎረድ)", image: "/images/gored gored.jpg", description: "Large cubes of raw beef served with awaze dipping sauce", meatType: "Beef", weights: { 1: 320 } },
+    { name: "Tere Sega (ጠረ ስጋ)", image: "/images/zilzil tibs.jpg", description: "Thinly sliced raw beef strips seasoned with traditional spices", meatType: "Beef", weights: { 1: 400 } },
+    { name: "Dulet (ዱለት)", image: "/images/Yefseg/kurs/ዱለት (Dulet).jpg", description: "Minced tripe, liver and beef sautéed with onions and mitmita", meatType: "Beef", weights: { 1: 200 } },
+    { name: "Lamb Tibs", image: "/images/tibs.jpg", description: "Tender lamb cubes sautéed with rosemary and garlic", meatType: "Lamb", weights: { 1: 350 } },
+    { name: "Yeheb Gorrod (የሀብ ጎረድ)", image: "/images/gored gored.jpg", description: "Grilled lamb ribs seasoned with Ethiopian spices", meatType: "Lamb", weights: { 1: 380 } },
+    { name: "Sambusa (ሳምቡሳ)", image: "/images/kurt.jpg", description: "Crispy pastry filled with spiced minced meat — 3 pieces", meatType: "Beef", weights: { 1: 100 } },
+    { name: "Tibs (ጥብስ)", image: "/images/tibs.jpg", description: "Sautéed beef with onions, jalapeños, tomatoes and rosemary", meatType: "Beef", weights: { 1: 280 } },
+    { name: "Awaze Tibs (አዋዜ ጥብስ)", image: "/images/Awaze Tibs.jpg", description: "Beef tibs simmered in spicy awaze sauce", meatType: "Beef", weights: { 1: 300 } },
+    { name: "Zilzil Tibs (ዝልዝል ጥብስ)", image: "/images/zilzil tibs.jpg", description: "Thinly sliced beef strips sautéed with garlic and peppers", meatType: "Beef", weights: { 1: 320 } },
+    { name: "Shekla Tibs (ሸክላ ጥብስ)", image: "/images/Yefseg/Lunch and dinner/shekla.jpg", description: "Beef tibs served sizzling in a traditional clay pot", meatType: "Beef", weights: { 1: 380 } },
+    { name: "Beyaynetu (በያይነቱ)", image: "/images/Yetsom/በያይነቱ (Beyaynetu ).webp", description: "Ethiopian combination platter — tibs, kitfo, doro wat and vegetarian dishes", meatType: "Beef", weights: { 1: 500 } },
+    { name: "Doro Wat (ዶሮ ወጥ)", image: "/images/kurt.jpg", description: "Spicy chicken stew slow-cooked with berbere, served with hard-boiled egg", meatType: "Chicken", weights: { 1: 250 } },
+    { name: "Kai Wat (ቀይ ወጥ)", image: "/images/kurt.jpg", description: "Rich spicy beef stew with berbere and niter kibbeh", meatType: "Beef", weights: { 1: 220 } },
+    { name: "Minchet Abish (ምንጬ አብሽ)", image: "/images/kurt.jpg", description: "Minced beef stew simmered with berbere and seasoned butter", meatType: "Beef", weights: { 1: 200 } },
+    { name: "Alicha Wat (አሊጫ ወጥ)", image: "/images/kurt.jpg", description: "Mild turmeric-based beef or lamb stew with potatoes and carrots", meatType: "Beef", weights: { 1: 200 } },
+    { name: "Sega Wat (ሥጋ ወጥ)", image: "/images/kurt.jpg", description: "Hearty lamb or beef chunks in traditional spiced sauce", meatType: "Beef", weights: { 1: 260 } },
+    { name: "Gomen Besega (ጎመን በሥጋ)", image: "/images/Yetsom/ጎመን ጥብስ (Gomen Tibs).jpg", description: "Collard greens cooked with beef chunks and spices", meatType: "Beef", weights: { 1: 220 } },
+    { name: "Beg Wat (በግ ወጥ)", image: "/images/kurt.jpg", description: "Slow-cooked lamb stew in rich berbere sauce", meatType: "Lamb", weights: { 1: 280 } },
+    { name: "Enkulal Firfir (እንቁላል ፍርፍር)", image: "/images/kurt.jpg", description: "Shredded injera with scrambled eggs and berbere sauce", meatType: "Beef", weights: { 1: 150 } },
+    { name: "Dorho Fitfit (ዶሮ ፍትፍት)", image: "/images/kurt.jpg", description: "Shredded injera with chicken and berbere sauce", meatType: "Chicken", weights: { 1: 180 } },
+    // ── Per-Kilo (Goat) ──
+    { name: "ቅቅል የፍየል (Goat Meat Soup - Kikil)", image: "/images/Yefseg/Lunch and dinner/kekel.jpg", description: "Goat meat soup", meatType: "Goat", weights: { 0.25: 175, 0.5: 350, 1: 700 } },
+    { name: "የፍየል ቁርጥ / ሸክላ ጥብስ 1/4 ኪሎ (Goat Qurt / Shekla Tibs 1/4 kg)", image: "/images/Yefseg/Lunch and dinner/shekla.jpg", description: "Goat Qurt (Raw) / Shekla Tibs 1/4 kg", meatType: "Goat", weights: { 0.25: 1250 } },
+    { name: "የፍየል ቁርጥ / ሸክላ ጥብስ 1/2 ኪሎ (Goat Qurt / Shekla Tibs 1/2 kg)", image: "/images/Yefseg/Lunch and dinner/shekla.jpg", description: "Goat Qurt (Raw) / Shekla Tibs 1/2 kg", meatType: "Goat", weights: { 0.5: 2500 } },
+    { name: "የፍየል ቁርጥ / ሸክላ ጥብስ 1 ኪሎ (Goat Qurt / Shekla Tibs 1 kg)", image: "/images/Yefseg/Lunch and dinner/shekla.jpg", description: "Goat Qurt (Raw) / Shekla Tibs 1 kg", meatType: "Goat", weights: { 1: 5000 } },
+    { name: "የፍየል አላንዶ 1/4 ኪሎ (Goat Meat Alando 1/4 kg)", image: "/images/Yefseg/Lunch and dinner/olando.jpg", description: "Goat Meat Alando 1/4 kg", meatType: "Goat", weights: { 0.25: 1500 } },
+    { name: "የፍየል አላንዶ 1/2 ኪሎ (Goat Meat Alando 1/2 kg)", image: "/images/Yefseg/Lunch and dinner/olando.jpg", description: "Goat Meat Alando 1/2 kg", meatType: "Goat", weights: { 0.5: 3000 } },
+    { name: "የፍየል አላንዶ 1 ኪሎ (Goat Meat Alando 1 kg)", image: "/images/Yefseg/Lunch and dinner/olando.jpg", description: "Goat Meat Alando 1 kg", meatType: "Goat", weights: { 1: 6000 } },
+    // Beef by kilo
+    { name: "የበሬ ቁርጥ / ሸክላ ጥብስ 1/4 ኪሎ (Beef Qurt / Shekla Tibs 1/4 kg)", image: "/images/Yefseg/Lunch and dinner/shekla.jpg", description: "Beef Qurt (Raw) / Shekla Tibs 1/4 kg", meatType: "Beef", weights: { 0.25: 1000 } },
+    { name: "የበሬ ቁርጥ / ሸክላ ጥብስ 1/2 ኪሎ (Beef Qurt / Shekla Tibs 1/2 kg)", image: "/images/Yefseg/Lunch and dinner/shekla.jpg", description: "Beef Qurt (Raw) / Shekla Tibs 1/2 kg", meatType: "Beef", weights: { 0.5: 2000 } },
+    { name: "የበሬ ቁርጥ / ሸክላ ጥብስ 1 ኪሎ (Beef Qurt / Shekla Tibs 1 kg)", image: "/images/Yefseg/Lunch and dinner/shekla.jpg", description: "Beef Qurt (Raw) / Shekla Tibs 1 kg", meatType: "Beef", weights: { 1: 4000 } },
+    { name: "የበሬ አላንዶ 1/4 ኪሎ (Beef Alando 1/4 kg)", image: "/images/Yefseg/Lunch and dinner/olando.jpg", description: "Beef Alando 1/4 kg", meatType: "Beef", weights: { 0.25: 1200 } },
+    { name: "የበሬ አላንዶ 1/2 ኪሎ (Beef Alando 1/2 kg)", image: "/images/Yefseg/Lunch and dinner/olando.jpg", description: "Beef Alando 1/2 kg", meatType: "Beef", weights: { 0.5: 2250 } },
+    { name: "የበሬ አላንዶ 1 ኪሎ (Beef Alando 1 kg)", image: "/images/Yefseg/Lunch and dinner/olando.jpg", description: "Beef Alando 1 kg", meatType: "Beef", weights: { 1: 4500 } },
+    { name: "የበሬ ጎርድ ጎርድ 1/4 ኪሎ (Beef Gored Gored 1/4 kg)", image: "/images/gored gored.jpg", description: "Beef Gored Gored 1/4 kg", meatType: "Beef", weights: { 0.25: 1150 } },
+    { name: "የበሬ ጎርድ ጎርድ 1/2 ኪሎ (Beef Gored Gored 1/2 kg)", image: "/images/gored gored.jpg", description: "Beef Gored Gored 1/2 kg", meatType: "Beef", weights: { 0.5: 2200 } },
+    { name: "የበሬ ጎርድ ጎርድ 1 ኪሎ (Beef Gored Gored 1 kg)", image: "/images/gored gored.jpg", description: "Beef Gored Gored 1 kg", meatType: "Beef", weights: { 1: 4500 } },
+    // Breakfast
+    { name: "Kuanta Firfir (ቋንጣ ፍርፍር)", image: "/images/Yefseg/kurs/ቋንጣ ፍርፍር (Kuanta Firfir).jpg", description: "Shredded injera with kuanta (dried beef) and berbere sauce", meatType: "Beef", weights: { 0.25: 125, 0.5: 250, 1: 500 } },
+    { name: "Sega Firfir (ሥጋ ፍርፍር)", image: "/images/Yefseg/kurs/ሥጋ ፍርፍር (Sega Firfir).jpg", description: "Shredded injera with minced meat and berbere sauce", meatType: "Beef", weights: { 0.25: 113, 0.5: 225, 1: 450 } },
+    { name: "Dulet (ዱለት)", image: "/images/Yefseg/kurs/ዱለት (Dulet).jpg", description: "Minced tripe, liver and beef sautéed with onions and mitmita", meatType: "Beef", weights: { 0.25: 100, 0.5: 200, 1: 400 } },
+    { name: "Special Dulet (ስፔሻል ዱለት)", image: "/images/Yefseg/kurs/ስፔሻል ዱለት (Special Dulet).jpg", description: "Premium dulet with extra spices and niter kibbeh", meatType: "Beef", weights: { 0.25: 150, 0.5: 300, 1: 600 } },
+    { name: "Enkulal Besega (እንቁላል በሥጋ)", image: "/images/Yefseg/kurs/እንቁላል በሥጋ (Enkulal be Sega ).jpg", description: "Eggs scrambled with meat and traditional spices", meatType: "Beef", weights: { 0.25: 88, 0.5: 175, 1: 350 } },
+    { name: "Yefyel Senber 1/4 kg (የፍየል ሰንበር 1/4 ኪሎ)", image: "/images/Yefseg/kurs/የፍየል ሰንበር (Yefeyel Senber).jpg", description: "Quarter kilo of raw goat meat seasoned with mitmita", meatType: "Goat", weights: { 0.25: 500 } },
+    { name: "Yefyel Senber 1/2 kg (የፍየል ሰንበር 1/2 ኪሎ)", image: "/images/Yefseg/kurs/የፍየል ሰንበር (Yefeyel Senber).jpg", description: "Half kilo of raw goat meat seasoned with mitmita", meatType: "Goat", weights: { 0.5: 1000 } },
+    { name: "Yefyel Senber 1 kg (የፍየል ሰንበር 1 ኪሎ)", image: "/images/Yefseg/kurs/የፍየል ሰንበር (Yefeyel Senber).jpg", description: "One kilo of raw goat meat seasoned with mitmita", meatType: "Goat", weights: { 1: 2000 } },
+    { name: "Yebere Senber 1/4 kg (የበሬ ሰንበር 1/4 ኪሎ)", image: "/images/Yefseg/kurs/የበሬ ሰንበር (Yebere Senber).jpg", description: "Quarter kilo of raw beef seasoned with mitmita", meatType: "Beef", weights: { 0.25: 400 } },
+    { name: "Yebere Senber 1/2 kg (የበሬ ሰንበር 1/2 ኪሎ)", image: "/images/Yefseg/kurs/የበሬ ሰንበር (Yebere Senber).jpg", description: "Half kilo of raw beef seasoned with mitmita", meatType: "Beef", weights: { 0.5: 800 } },
+    { name: "Yebere Senber 1 kg (የበሬ ሰንበር 1 ኪሎ)", image: "/images/Yefseg/kurs/የበሬ ሰንበር (Yebere Senber).jpg", description: "One kilo of raw beef seasoned with mitmita", meatType: "Beef", weights: { 1: 1600 } },
   ];
 
   const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
@@ -649,7 +698,7 @@ function ButcherOrderForm() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.05 }}
-                    onClick={() => setMeatType(type.id)}
+                    onClick={() => { setMeatType(type.id); setSelectedDishObj(null); setMenuItemName("Tibs"); setWeight("1"); }}
                     className={`group relative overflow-hidden rounded-xl border-2 transition-all duration-200 ${
                       meatType === type.id
                         ? "border-ethiopian-gold ring-2 ring-ethiopian-gold/30 shadow-lg"
@@ -676,13 +725,13 @@ function ButcherOrderForm() {
           <div>
             <label className="block text-sm font-semibold text-red-600 dark:text-red-500 mb-3">Dish</label>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-              {dishOptions.map((dish, i) => (
+              {dishOptions.filter((d) => d.meatType === meatType).map((dish, i) => (
                 <motion.button
                   key={dish.name}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05 }}
-                  onClick={() => setMenuItemName(dish.name)}
+                  onClick={() => { setMenuItemName(dish.name); setSelectedDishObj(dish); const firstW = Object.keys(dish.weights)[0]; setWeight(firstW); setCustomWeight(false); }}
                   className={`group relative overflow-hidden rounded-xl border-2 transition-all duration-200 ${
                     menuItemName === dish.name
                       ? "border-ethiopian-gold ring-2 ring-ethiopian-gold/30 shadow-lg"
@@ -697,7 +746,7 @@ function ButcherOrderForm() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute bottom-0 left-0 right-0 p-2.5 text-left">
-                      <p className="text-white font-bold text-sm drop-shadow-sm">{dish.name}</p>
+                      <p className="text-white font-bold text-xs drop-shadow-sm leading-tight">{dish.name}</p>
                       <p className="text-white/70 text-[10px] leading-tight line-clamp-1">{dish.description}</p>
                     </div>
                   </div>
@@ -712,25 +761,31 @@ function ButcherOrderForm() {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-red-600 dark:text-red-500 mb-3">Weight (kg)</label>
-            <div className="flex flex-wrap gap-2">
-              {weightPresets.map((w) => (
-                <button key={w} onClick={() => { setWeight(w.toString()); setCustomWeight(false); }}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    weight === w.toString() && !customWeight
-                      ? "bg-ethiopian-burgundy text-white shadow-md"
-                      : "bg-ethiopian-cream text-red-600 dark:text-red-500 hover:bg-ethiopian-gold/20 border border-transparent"
-                  }`}
-                >{w} kg</button>
-              ))}
-              <button onClick={() => setCustomWeight(true)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                  customWeight
-                    ? "bg-ethiopian-gold text-white shadow-md"
-                    : "bg-ethiopian-cream text-red-600 dark:text-red-500 hover:bg-ethiopian-gold/20 border border-transparent"
-                }`}
-              >Custom</button>
-            </div>
+            <label className="block text-sm font-semibold text-red-600 dark:text-red-500 mb-3">
+              Weight (kg) {selectedDishObj && <span className="text-xs font-normal text-red-400 dark:text-red-400">— {selectedDishObj.name}</span>}
+            </label>
+            {selectedDishObj ? (
+              <div className="space-y-2">
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(selectedDishObj.weights).map(([w, price]) => (
+                    <button key={w} onClick={() => { setWeight(w); setCustomWeight(false); }}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border ${
+                        weight === w && !customWeight
+                          ? "bg-ethiopian-burgundy text-white border-ethiopian-burgundy shadow-md"
+                          : "bg-ethiopian-cream text-red-600 dark:text-red-500 hover:bg-ethiopian-gold/20 border-transparent"
+                      }`}
+                    >
+                      {w} kg — <span className="font-bold">{(price ?? 0).toLocaleString()} ETB</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="text-xs text-red-500 dark:text-red-400 font-semibold">
+                  Total: {(() => { const priceForWeight = selectedDishObj.weights[parseFloat(weight)] ?? Object.values(selectedDishObj.weights)[0] ?? 0; return (priceForWeight * quantity).toLocaleString(); })()} ETB
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-red-400 dark:text-red-400 italic">Select a dish first to see available weights</p>
+            )}
             {customWeight && (
               <input type="number" step="0.1" min="0.1" placeholder="Enter weight in kg"
                 value={weight} onChange={(e) => setWeight(e.target.value)}

@@ -43,3 +43,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: "Failed to create reservation" }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const { tableId, action } = await req.json();
+    const reservations = await readDemoReservations();
+    const idx = reservations.findIndex((r: any) => r.tableId === tableId && (r.status === "PENDING" || r.status === "CONFIRMED"));
+    if (idx === -1) {
+      return NextResponse.json({ success: false, error: "No active reservation found" }, { status: 404 });
+    }
+    reservations[idx].status = action === "cancel" ? "CANCELLED" : "COMPLETED";
+    reservations[idx].updatedAt = new Date().toISOString();
+    await writeDemoReservations(reservations);
+    return NextResponse.json({ success: true, data: reservations[idx] });
+  } catch {
+    return NextResponse.json({ success: false, error: "Failed to update reservation" }, { status: 500 });
+  }
+}

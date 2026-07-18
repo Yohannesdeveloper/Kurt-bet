@@ -527,21 +527,67 @@ function ButcherShopStatus() {
   const [orders, setOrders] = useState<ButcherShopOrder[]>([]);
   const [activeTab, setActiveTab] = useState<"pending" | "status">("pending");
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchOrders = useCallback(() => {
     fetch("/api/butcher-orders")
       .then((r) => r.json())
       .then((d) => { if (d.success) setOrders(d.data); })
       .catch(() => {})
       .finally(() => setLoading(false));
-    const interval = setInterval(() => {
-      fetch("/api/butcher-orders")
-        .then((r) => r.json())
-        .then((d) => { if (d.success) setOrders(d.data); })
-        .catch(() => {});
-    }, 5000);
-    return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    fetchOrders();
+    const interval = setInterval(fetchOrders, 5000);
+    return () => clearInterval(interval);
+  }, [fetchOrders]);
+
+  const approveOrder = async (order: ButcherShopOrder) => {
+    setActionLoading(order.id);
+    try {
+      const res = await fetch("/api/butcher-orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: order.id, status: "APPROVED" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(isButcherKurtOrder(order.menuItemName)
+          ? `Order #${order.orderNumber} approved — waiter notified for pickup`
+          : `Order #${order.orderNumber} approved and sent to kitchen`);
+        fetchOrders();
+      } else {
+        toast.error(data.error || "Action failed");
+      }
+    } catch {
+      toast.error("Action failed");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const rejectOrder = async (order: ButcherShopOrder) => {
+    setActionLoading(order.id);
+    try {
+      const res = await fetch("/api/butcher-orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: order.id, status: "REJECTED" }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success(`Order #${order.orderNumber} rejected`);
+        fetchOrders();
+      } else {
+        toast.error(data.error || "Action failed");
+      }
+    } catch {
+      toast.error("Action failed");
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const pendingOrders = orders.filter((o) => o.status === "PENDING");
   const statusOrders = orders.filter((o) => o.status !== "PENDING");
@@ -607,7 +653,7 @@ function ButcherShopStatus() {
                     : butcherStatusLabel[order.status]}
                 </span>
               </div>
-              <div className="flex items-center gap-4 text-xs text-ethiopian-coffee/60">
+              <div className="flex items-center gap-4 text-xs text-ethiopian-coffee/60 mb-3">
                 <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
                   {new Date(order.createdAt).toLocaleString()}
@@ -615,6 +661,36 @@ function ButcherShopStatus() {
                 <span className="text-ethiopian-coffee/30">·</span>
                 <span>{order.customerName}</span>
               </div>
+              {activeTab === "pending" && order.status === "PENDING" && (
+                <div className="flex items-center gap-2 pt-3 border-t border-ethiopian-gold/10">
+                  <button
+                    onClick={() => approveOrder(order)}
+                    disabled={actionLoading === order.id}
+                    className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                  >
+                    {actionLoading === order.id ? "..." : (
+                      <><Check className="w-4 h-4" /> {isButcherKurtOrder(order.menuItemName) ? "Approve & Notify Waiter" : "Approve & Send to Kitchen"}</>
+                    )}
+                  </button>
+                  <button
+                    onClick={() => rejectOrder(order)}
+                    disabled={actionLoading === order.id}
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-all disabled:opacity-50"
+                  >
+                    <XCircle className="w-4 h-4" /> Reject
+                  </button>
+                </div>
+              )}
+              {order.status === "APPROVED" && order.approvedAt && (
+                <div className="text-xs text-emerald-600 font-medium pt-2 border-t border-ethiopian-gold/10">
+                  Approved: {new Date(order.approvedAt).toLocaleString()}
+                </div>
+              )}
+              {order.status === "REJECTED" && order.rejectedAt && (
+                <div className="text-xs text-red-600 font-medium pt-2 border-t border-ethiopian-gold/10">
+                  Rejected: {new Date(order.rejectedAt).toLocaleString()}
+                </div>
+              )}
             </div>
           ))}
         </div>

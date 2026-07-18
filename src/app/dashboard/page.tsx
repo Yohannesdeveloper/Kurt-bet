@@ -759,32 +759,32 @@ function ButcherShopStatus() {
                 </div>
                 <div className="flex-1 p-5">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
+                    <span className="text-xl font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
                     {order.tableNumber && (
-                      <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                      <span className="text-base font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
                     )}
-                    <span className={`ml-auto px-2.5 py-0.5 rounded-full text-xs font-semibold border ${butcherStatusColors[order.status]}`}>
+                    <span className={`ml-auto px-3 py-1 rounded-full text-sm font-semibold border ${butcherStatusColors[order.status]}`}>
                       {order.status === "APPROVED"
                         ? (isButcherKurtOrder(order.menuItemName) ? "Approved — Sent to Waiter" : "Approved — Sent to Kitchen")
                         : butcherStatusLabel[order.status]}
                     </span>
                   </div>
 
-                  <p className="text-sm font-semibold text-ethiopian-coffee mb-1">{order.menuItemName}</p>
+                  <p className="text-lg font-semibold text-ethiopian-coffee mb-1">{order.menuItemName}</p>
 
-                  <div className="flex flex-wrap gap-3 text-xs text-ethiopian-coffee/60 mb-2">
+                  <div className="flex flex-wrap gap-4 text-sm text-ethiopian-coffee/60 mb-2">
                     <span><span className="font-semibold text-ethiopian-burgundy">Meat:</span> {order.meatType}</span>
                     <span><span className="font-semibold text-ethiopian-burgundy">Weight:</span> {order.weight} kg</span>
                     <span><span className="font-semibold text-ethiopian-burgundy">Qty:</span> x{order.quantity}</span>
                   </div>
 
                   {order.notes && (
-                    <p className="text-xs text-ethiopian-coffee/50 italic mb-2">&quot;{order.notes}&quot;</p>
+                    <p className="text-sm text-ethiopian-coffee/50 italic mb-2">&quot;{order.notes}&quot;</p>
                   )}
 
-                  <div className="flex items-center gap-4 text-xs text-ethiopian-coffee/60 mb-3">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-4 text-sm text-ethiopian-coffee/60 mb-3">
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="w-4 h-4" />
                       {new Date(order.createdAt).toLocaleString()}
                     </span>
                     <span className="text-ethiopian-coffee/30">·</span>
@@ -796,28 +796,28 @@ function ButcherShopStatus() {
                       <button
                         onClick={() => approveOrder(order)}
                         disabled={actionLoading === order.id}
-                        className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-6 py-3 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-base font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                       >
                         {actionLoading === order.id ? "..." : (
-                          <><Check className="w-4 h-4" /> {isButcherKurtOrder(order.menuItemName) ? "Approve & Notify Waiter" : "Approve & Send to Kitchen"}</>
+                          <><Check className="w-5 h-5" /> {isButcherKurtOrder(order.menuItemName) ? "Approve & Notify Waiter" : "Approve & Send to Kitchen"}</>
                         )}
                       </button>
                       <button
                         onClick={() => rejectOrder(order)}
                         disabled={actionLoading === order.id}
-                        className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-all disabled:opacity-50"
+                        className="flex items-center gap-1.5 px-5 py-3 rounded-xl bg-red-600 text-white text-base font-medium hover:bg-red-700 transition-all disabled:opacity-50"
                       >
-                        <XCircle className="w-4 h-4" /> Reject
+                        <XCircle className="w-5 h-5" /> Reject
                       </button>
                     </div>
                   )}
                   {order.status === "APPROVED" && order.approvedAt && (
-                    <div className="text-xs text-emerald-600 font-medium pt-2 border-t border-ethiopian-gold/10">
+                    <div className="text-sm text-emerald-600 font-medium pt-2 border-t border-ethiopian-gold/10">
                       Approved: {new Date(order.approvedAt).toLocaleString()}
                     </div>
                   )}
                   {order.status === "REJECTED" && order.rejectedAt && (
-                    <div className="text-xs text-red-600 font-medium pt-2 border-t border-ethiopian-gold/10">
+                    <div className="text-sm text-red-600 font-medium pt-2 border-t border-ethiopian-gold/10">
                       Rejected: {new Date(order.rejectedAt).toLocaleString()}
                     </div>
                   )}

@@ -2,16 +2,11 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { Beef, Check, XCircle, Clock, Package, Minus, Plus, ChevronDown, ChevronUp, Save, Pencil } from "lucide-react";
+import { motion } from "framer-motion";
+import { Beef, Check, XCircle, Clock, Package } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
-
-const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
-const weightPresets = [0.5, 1, 2, 3, 5];
-const dishOptions = ["Tibs", "Kurt", "Dulet", "Gored Gored"];
 
 const KURT_KEYWORDS = ["kurt", "qurt", "ቁርጥ"];
 function isKurtOrder(name: string) {
@@ -56,21 +51,9 @@ export default function ButcherDashboardPage() {
   const [activeTab, setActiveTab] = useState<"pending" | "status">("pending");
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [fMeatType, setFMeatType] = useState("Beef");
-  const [fDish, setFDish] = useState("Tibs");
-  const [fWeight, setFWeight] = useState("1");
-  const [fCustomWeight, setFCustomWeight] = useState(false);
-  const [fQuantity, setFQuantity] = useState(1);
-  const [fTable, setFTable] = useState("");
-  const [fNotes, setFNotes] = useState("");
-  const [fSubmitting, setFSubmitting] = useState(false);
-  const searchParams = useSearchParams();
-  const [showForm, setShowForm] = useState(searchParams.get("shop") === "1");
 
   const [cashflowRevenue, setCashflowRevenue] = useState(0);
   const [cashflowCount, setCashflowCount] = useState(0);
-  const [editingOrder, setEditingOrder] = useState<string | null>(null);
-  const [editFields, setEditFields] = useState<{ meatType: string; menuItemName: string; weight: string; quantity: number; notes: string }>({ meatType: "", menuItemName: "", weight: "", quantity: 1, notes: "" });
 
   useEffect(() => {
     async function fetchCashflow() {
@@ -151,81 +134,6 @@ export default function ButcherDashboardPage() {
     }
   };
 
-  const startEditing = (order: ButcherOrder) => {
-    setEditingOrder(order.id);
-    setEditFields({
-      meatType: order.meatType || "Beef",
-      menuItemName: order.menuItemName || "",
-      weight: String(order.weight || 1),
-      quantity: order.quantity || 1,
-      notes: order.notes || "",
-    });
-  };
-
-  const saveFields = async (order: ButcherOrder) => {
-    setActionLoading(order.id);
-    try {
-      const res = await fetch("/api/butcher-orders", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: order.id,
-          meatType: editFields.meatType,
-          menuItemName: editFields.menuItemName,
-          weight: parseFloat(editFields.weight) || 1,
-          quantity: editFields.quantity,
-          notes: editFields.notes,
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        toast.success("Order updated");
-        setEditingOrder(null);
-        fetchOrders();
-      } else {
-        toast.error(data.error || "Update failed");
-      }
-    } catch {
-      toast.error("Update failed");
-    } finally {
-      setActionLoading(null);
-    }
-  };
-
-  const placeOrder = async () => {
-    const w = parseFloat(fWeight);
-    if (!w || w <= 0) { toast.error("Select a weight"); return; }
-    setFSubmitting(true);
-    try {
-      const res = await fetch("/api/butcher-orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          meatType: fMeatType,
-          menuItemName: fDish,
-          weight: w,
-          quantity: fQuantity,
-          tableNumber: fTable || null,
-          notes: fNotes || "",
-        }),
-      });
-      const data = await res.json();
-      if (data.success) {
-        toast.success(`Butcher order #${data.data.orderNumber} placed!`);
-        setFMeatType("Beef");
-        setFDish("Tibs");
-        setFWeight("1");
-        setFQuantity(1);
-        setFTable("");
-        setFNotes("");
-        fetchOrders();
-      } else {
-        toast.error(data.error || "Failed to place order");
-      }
-    } catch { toast.error("Failed to place order"); }
-    finally { setFSubmitting(false); }
-  };
-
   if (role !== "BUTCHER") {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -278,102 +186,6 @@ export default function ButcherDashboardPage() {
             <p className="text-2xl font-bold tracking-tight text-red-700">{formatCurrency(cashflowRevenue)}</p>
           </div>
         </motion.div>
-      </div>
-
-      <div className="bg-white rounded-2xl shadow-md border border-ethiopian-gold/10 overflow-hidden">
-        <button onClick={() => setShowForm(!showForm)} className="w-full flex items-center justify-between px-6 py-4 hover:bg-ethiopian-cream/30 transition-colors">
-          <h2 className="text-lg font-bold font-serif text-ethiopian-coffee">New Butcher Order</h2>
-          {showForm ? <ChevronUp className="w-5 h-5 text-ethiopian-coffee/60" /> : <ChevronDown className="w-5 h-5 text-ethiopian-coffee/60" />}
-        </button>
-        <AnimatePresence>
-          {showForm && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="px-6 pb-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-                <div>
-                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Meat Type</label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {meatTypes.map((type) => (
-                      <button key={type} onClick={() => setFMeatType(type)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                          fMeatType === type ? "bg-ethiopian-burgundy text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
-                        }`}
-                      >{type}</button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Dish</label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {dishOptions.map((dish) => (
-                      <button key={dish} onClick={() => setFDish(dish)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                          fDish === dish ? "bg-ethiopian-gold text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
-                        }`}
-                      >{dish}</button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Weight (kg)</label>
-                  <div className="flex flex-wrap gap-1.5">
-                    {weightPresets.map((w) => (
-                      <button key={w} onClick={() => { setFWeight(w.toString()); setFCustomWeight(false); }}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                          fWeight === w.toString() && !fCustomWeight ? "bg-ethiopian-burgundy text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
-                        }`}
-                      >{w} kg</button>
-                    ))}
-                    <button onClick={() => setFCustomWeight(true)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                        fCustomWeight ? "bg-ethiopian-gold text-white shadow-md" : "bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20"
-                      }`}
-                    >Custom</button>
-                  </div>
-                  {fCustomWeight && (
-                    <input type="number" step="0.1" min="0.1" value={fWeight} onChange={(e) => setFWeight(e.target.value)}
-                      className="mt-1.5 w-full px-2 py-1.5 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none text-xs"
-                    />
-                  )}
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-2">Quantity</label>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => setFQuantity(Math.max(1, fQuantity - 1))} className="w-8 h-8 rounded-lg bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 flex items-center justify-center">
-                      <Minus className="w-3.5 h-3.5" />
-                    </button>
-                    <span className="text-lg font-bold text-ethiopian-gold min-w-[1.5rem] text-center">{fQuantity}</span>
-                    <button onClick={() => setFQuantity(Math.min(20, fQuantity + 1))} className="w-8 h-8 rounded-lg bg-ethiopian-cream text-ethiopian-coffee hover:bg-ethiopian-gold/20 flex items-center justify-center">
-                      <Plus className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
-                <div>
-                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-1.5">Table (optional)</label>
-                  <input type="text" value={fTable} onChange={(e) => setFTable(e.target.value)}
-                    placeholder="e.g. 5"
-                    className="w-full px-3 py-1.5 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-ethiopian-coffee mb-1.5">Notes (optional)</label>
-                  <input type="text" value={fNotes} onChange={(e) => setFNotes(e.target.value)}
-                    placeholder="Special instructions"
-                    className="w-full px-3 py-1.5 rounded-lg bg-ethiopian-cream text-ethiopian-coffee border border-transparent focus:border-ethiopian-gold focus:outline-none text-xs"
-                  />
-                </div>
-                <div className="flex items-end">
-                  <button onClick={placeOrder} disabled={fSubmitting}
-                    className="w-full px-5 py-2 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
-                  >
-                    {fSubmitting ? "Placing..." : "Place Order"}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       <div className="flex gap-2 border-b border-gray-200">
@@ -430,67 +242,7 @@ export default function ButcherDashboardPage() {
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20">
-                  {editingOrder === order.id ? (
-                    <>
-                      <div>
-                        <p className="text-xs text-ethiopian-coffee/40 mb-1">Meat Type</p>
-                        <select value={editFields.meatType} onChange={(e) => setEditFields({ ...editFields, meatType: e.target.value })}
-                          className="w-full px-2 py-1.5 rounded-lg bg-white text-ethiopian-burgundy border border-ethiopian-gold/30 text-sm font-bold focus:outline-none focus:border-ethiopian-gold">
-                          <option>Beef</option><option>Lamb</option><option>Goat</option><option>Chicken</option>
-                        </select>
-                      </div>
-                      <div>
-                        <p className="text-xs text-ethiopian-coffee/40 mb-1">Dish</p>
-                        <input type="text" value={editFields.menuItemName} onChange={(e) => setEditFields({ ...editFields, menuItemName: e.target.value })}
-                          className="w-full px-2 py-1.5 rounded-lg bg-white text-ethiopian-coffee border border-ethiopian-gold/30 text-sm font-semibold focus:outline-none focus:border-ethiopian-gold" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-ethiopian-coffee/40 mb-1">Weight (kg)</p>
-                        <input type="number" step="0.25" min="0.25" value={editFields.weight} onChange={(e) => setEditFields({ ...editFields, weight: e.target.value })}
-                          className="w-full px-2 py-1.5 rounded-lg bg-white text-ethiopian-gold border border-ethiopian-gold/30 text-sm font-bold focus:outline-none focus:border-ethiopian-gold" />
-                      </div>
-                      <div>
-                        <p className="text-xs text-ethiopian-coffee/40 mb-1">Quantity</p>
-                        <div className="flex items-center gap-1.5">
-                          <button onClick={() => setEditFields({ ...editFields, quantity: Math.max(1, editFields.quantity - 1) })}
-                            className="w-7 h-7 rounded-lg bg-ethiopian-cream hover:bg-ethiopian-gold/20 flex items-center justify-center"><Minus className="w-3 h-3" /></button>
-                          <span className="text-sm font-semibold text-ethiopian-coffee min-w-[1.5rem] text-center">{editFields.quantity}</span>
-                          <button onClick={() => setEditFields({ ...editFields, quantity: editFields.quantity + 1 })}
-                            className="w-7 h-7 rounded-lg bg-ethiopian-cream hover:bg-ethiopian-gold/20 flex items-center justify-center"><Plus className="w-3 h-3" /></button>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div>
-                        <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
-                        <p className="text-sm font-bold text-ethiopian-burgundy">{order.meatType}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-ethiopian-coffee/40">Dish</p>
-                        <p className="text-sm font-semibold text-ethiopian-coffee">{order.menuItemName}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-ethiopian-coffee/40">Weight</p>
-                        <p className="text-sm font-bold text-ethiopian-gold">{order.weight} kg</p>
-                      </div>
-                      <div>
-                        <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
-                        <p className="text-sm font-semibold text-ethiopian-coffee">x{order.quantity}</p>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {editingOrder === order.id ? (
-                  <div>
-                    <p className="text-xs text-ethiopian-coffee/40 mb-1">Notes</p>
-                    <input type="text" value={editFields.notes} onChange={(e) => setEditFields({ ...editFields, notes: e.target.value })}
-                      placeholder="Special instructions"
-                      className="w-full px-2 py-1.5 rounded-lg bg-white text-ethiopian-coffee border border-ethiopian-gold/30 text-sm italic focus:outline-none focus:border-ethiopian-gold" />
-                  </div>
-                ) : order.notes && (
+                {order.notes && (
                   <div className="text-sm text-ethiopian-coffee/70 italic border-l-2 border-ethiopian-gold/30 pl-3">
                     "{order.notes}"
                   </div>
@@ -518,48 +270,22 @@ export default function ButcherDashboardPage() {
 
                 {activeTab === "pending" && order.status === "PENDING" && (
                   <div className="flex items-center gap-2 pt-2 border-t border-ethiopian-gold/10">
-                    {editingOrder === order.id ? (
-                      <>
-                        <button
-                          onClick={() => saveFields(order)}
-                          disabled={actionLoading === order.id}
-                          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-all disabled:opacity-50"
-                        >
-                          {actionLoading === order.id ? "..." : <><Save className="w-4 h-4" /> Save</>}
-                        </button>
-                        <button
-                          onClick={() => setEditingOrder(null)}
-                          className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition-all"
-                        >
-                          Cancel
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => startEditing(order)}
-                          className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-ethiopian-cream text-ethiopian-coffee text-sm font-medium hover:bg-ethiopian-gold/20 transition-all border border-ethiopian-gold/20"
-                        >
-                          <Pencil className="w-4 h-4" /> Edit
-                        </button>
-                        <button
-                          onClick={() => approveOrder(order)}
-                          disabled={actionLoading === order.id}
-                          className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
-                        >
-                          {actionLoading === order.id ? "..." : (
-                            <><Check className="w-4 h-4" /> {isKurtOrder(order.menuItemName) ? "Approve & Notify Waiter" : "Approve & Send to Kitchen"}</>
-                          )}
-                        </button>
-                        <button
-                          onClick={() => rejectOrder(order)}
-                          disabled={actionLoading === order.id}
-                          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-all disabled:opacity-50"
-                        >
-                          <XCircle className="w-4 h-4" /> Reject
-                        </button>
-                      </>
-                    )}
+                    <button
+                      onClick={() => approveOrder(order)}
+                      disabled={actionLoading === order.id}
+                      className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                    >
+                      {actionLoading === order.id ? "..." : (
+                        <><Check className="w-4 h-4" /> {isKurtOrder(order.menuItemName) ? "Approve & Notify Waiter" : "Approve & Send to Kitchen"}</>
+                      )}
+                    </button>
+                    <button
+                      onClick={() => rejectOrder(order)}
+                      disabled={actionLoading === order.id}
+                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-all disabled:opacity-50"
+                    >
+                      <XCircle className="w-4 h-4" /> Reject
+                    </button>
                   </div>
                 )}
               </div>

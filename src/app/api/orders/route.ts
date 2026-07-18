@@ -10,6 +10,29 @@ const BARTENDER_ORDERS_FILE = ".demo-bartender-orders.json";
 const BUTCHER_ITEM_KEYWORDS = ["tibs", "kurt", "qurt", "dulet", "tere sega", "tere siga", "gored gored", "senber", "alando", "kikil", "shekla", "kitfo"];
 const DRINK_KEYWORDS = ["coffee", "macchiato", "tej", "tella", "tea", "spris", "juice", "ambo", "soft drink", "besso", "atmet", "halwa", "cheesecake", "atayef", "beer", "wine", "shot", "liquor", "spirit", "tekshino", "teknshino", "areke", "arake", "red bull", "amarula", "tequila", "sambuca", "draft", "jack", "foreign"];
 
+function parseButcherItem(itemName: string) {
+  const lower = itemName.toLowerCase();
+  let meatType = "Beef";
+  if (lower.includes("የፍየል") || lower.includes("goat")) meatType = "Goat";
+  else if (lower.includes("የበሬ") || lower.includes("lamb")) meatType = "Lamb";
+  else if (lower.includes("ዶሮ") || lower.includes("chicken")) meatType = "Chicken";
+
+  let dishName = itemName;
+  const englishMatch = itemName.match(/\(([^)]+)\)/);
+  if (englishMatch) {
+    dishName = englishMatch[1].replace(/\d+\/?\d*\s*kg/gi, "").trim();
+  }
+
+  let weight = 1;
+  const weightMatch = lower.match(/(\d+(?:\/\d+)?)\s*(?:kg|ኪሎ)/);
+  if (weightMatch) {
+    const parts = weightMatch[1].split("/");
+    weight = parts.length > 1 ? parseInt(parts[0]) / parseInt(parts[1]) : parseFloat(parts[0]);
+  }
+
+  return { meatType, dishName, weight };
+}
+
 function isDrinkItem(item: any): boolean {
   const catName = (item.menuItem?.category?.name || item.menuItem?.categoryId || "").toLowerCase();
   if (catName.includes("drink")) return true;
@@ -295,23 +318,27 @@ export async function POST(req: NextRequest) {
       const butcherOrders = await readDemoJSON<any>(BUTCHER_ORDERS_FILE);
       const nextButcherNumber = butcherOrders.length > 0 ? Math.max(...butcherOrders.map((o: any) => o.orderNumber)) + 1 : 1001;
       const tableNumber = body?.tableNumber || undefined;
-      const newButcherOrders = butcherItems.map((item: any, i: number) => ({
-        id: `butcher-${demoOrder.id}-${i}`,
-        orderNumber: nextButcherNumber + i,
-        orderId: demoOrder.id,
-        tableNumber,
-        customerName: (session?.user as { name?: string })?.name || "Unknown",
-        customerId: (session?.user as { id?: string })?.id || "anonymous",
-        items: [{
-          menuItemId: item.menuItemId,
-          menuItemName: item.name,
+      const newButcherOrders = butcherItems.map((item: any, i: number) => {
+        const parsed = parseButcherItem(item.name);
+        return {
+          id: `butcher-${demoOrder.id}-${i}`,
+          orderNumber: nextButcherNumber + i,
+          orderId: demoOrder.id,
+          tableNumber,
+          customerName: (session?.user as { name?: string })?.name || "Unknown",
+          customerId: (session?.user as { id?: string })?.id || "anonymous",
+          meatType: parsed.meatType,
+          menuItemName: parsed.dishName,
+          weight: parsed.weight,
           quantity: item.quantity || 1,
-          dish: item.name,
-        }],
-        preparationNotes: item.cookingNotes || item.instructions || "",
-        status: "PENDING",
-        createdAt: new Date().toISOString(),
-      }));
+          notes: item.cookingNotes || item.instructions || "",
+          status: "PENDING",
+          kitchenStatus: "WAITING",
+          createdAt: new Date().toISOString(),
+          approvedAt: null,
+          rejectedAt: null,
+        };
+      });
       await writeDemoJSON(BUTCHER_ORDERS_FILE, [...butcherOrders, ...newButcherOrders]);
     }
     }

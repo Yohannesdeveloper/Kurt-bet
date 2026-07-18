@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Beef, Check, XCircle, Clock, Package, Minus, Plus, ChevronDown, ChevronUp } from "lucide-react";
+import { Beef, Check, XCircle, Clock, Package, Minus, Plus, ChevronDown, ChevronUp, Save, Pencil } from "lucide-react";
 import toast from "react-hot-toast";
 import { useTranslation } from "@/lib/i18n";
 import { formatCurrency } from "@/lib/utils";
@@ -69,6 +69,8 @@ export default function ButcherDashboardPage() {
 
   const [cashflowRevenue, setCashflowRevenue] = useState(0);
   const [cashflowCount, setCashflowCount] = useState(0);
+  const [editingOrder, setEditingOrder] = useState<string | null>(null);
+  const [editFields, setEditFields] = useState<{ meatType: string; menuItemName: string; weight: string; quantity: number; notes: string }>({ meatType: "", menuItemName: "", weight: "", quantity: 1, notes: "" });
 
   useEffect(() => {
     async function fetchCashflow() {
@@ -144,6 +146,47 @@ export default function ButcherDashboardPage() {
       }
     } catch {
       toast.error("Action failed");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const startEditing = (order: ButcherOrder) => {
+    setEditingOrder(order.id);
+    setEditFields({
+      meatType: order.meatType || "Beef",
+      menuItemName: order.menuItemName || "",
+      weight: String(order.weight || 1),
+      quantity: order.quantity || 1,
+      notes: order.notes || "",
+    });
+  };
+
+  const saveFields = async (order: ButcherOrder) => {
+    setActionLoading(order.id);
+    try {
+      const res = await fetch("/api/butcher-orders", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: order.id,
+          meatType: editFields.meatType,
+          menuItemName: editFields.menuItemName,
+          weight: parseFloat(editFields.weight) || 1,
+          quantity: editFields.quantity,
+          notes: editFields.notes,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast.success("Order updated");
+        setEditingOrder(null);
+        fetchOrders();
+      } else {
+        toast.error(data.error || "Update failed");
+      }
+    } catch {
+      toast.error("Update failed");
     } finally {
       setActionLoading(null);
     }
@@ -388,25 +431,66 @@ export default function ButcherDashboardPage() {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20">
-                  <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
-                    <p className="text-sm font-bold text-ethiopian-burgundy">{order.meatType}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Dish</p>
-                    <p className="text-sm font-semibold text-ethiopian-coffee">{order.menuItemName}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Weight</p>
-                    <p className="text-sm font-bold text-ethiopian-gold">{order.weight} kg</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
-                    <p className="text-sm font-semibold text-ethiopian-coffee">x{order.quantity}</p>
-                  </div>
+                  {editingOrder === order.id ? (
+                    <>
+                      <div>
+                        <p className="text-xs text-ethiopian-coffee/40 mb-1">Meat Type</p>
+                        <select value={editFields.meatType} onChange={(e) => setEditFields({ ...editFields, meatType: e.target.value })}
+                          className="w-full px-2 py-1.5 rounded-lg bg-white text-ethiopian-burgundy border border-ethiopian-gold/30 text-sm font-bold focus:outline-none focus:border-ethiopian-gold">
+                          <option>Beef</option><option>Lamb</option><option>Goat</option><option>Chicken</option>
+                        </select>
+                      </div>
+                      <div>
+                        <p className="text-xs text-ethiopian-coffee/40 mb-1">Dish</p>
+                        <input type="text" value={editFields.menuItemName} onChange={(e) => setEditFields({ ...editFields, menuItemName: e.target.value })}
+                          className="w-full px-2 py-1.5 rounded-lg bg-white text-ethiopian-coffee border border-ethiopian-gold/30 text-sm font-semibold focus:outline-none focus:border-ethiopian-gold" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-ethiopian-coffee/40 mb-1">Weight (kg)</p>
+                        <input type="number" step="0.25" min="0.25" value={editFields.weight} onChange={(e) => setEditFields({ ...editFields, weight: e.target.value })}
+                          className="w-full px-2 py-1.5 rounded-lg bg-white text-ethiopian-gold border border-ethiopian-gold/30 text-sm font-bold focus:outline-none focus:border-ethiopian-gold" />
+                      </div>
+                      <div>
+                        <p className="text-xs text-ethiopian-coffee/40 mb-1">Quantity</p>
+                        <div className="flex items-center gap-1.5">
+                          <button onClick={() => setEditFields({ ...editFields, quantity: Math.max(1, editFields.quantity - 1) })}
+                            className="w-7 h-7 rounded-lg bg-ethiopian-cream hover:bg-ethiopian-gold/20 flex items-center justify-center"><Minus className="w-3 h-3" /></button>
+                          <span className="text-sm font-semibold text-ethiopian-coffee min-w-[1.5rem] text-center">{editFields.quantity}</span>
+                          <button onClick={() => setEditFields({ ...editFields, quantity: editFields.quantity + 1 })}
+                            className="w-7 h-7 rounded-lg bg-ethiopian-cream hover:bg-ethiopian-gold/20 flex items-center justify-center"><Plus className="w-3 h-3" /></button>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
+                        <p className="text-sm font-bold text-ethiopian-burgundy">{order.meatType}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-ethiopian-coffee/40">Dish</p>
+                        <p className="text-sm font-semibold text-ethiopian-coffee">{order.menuItemName}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-ethiopian-coffee/40">Weight</p>
+                        <p className="text-sm font-bold text-ethiopian-gold">{order.weight} kg</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
+                        <p className="text-sm font-semibold text-ethiopian-coffee">x{order.quantity}</p>
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                {order.notes && (
+                {editingOrder === order.id ? (
+                  <div>
+                    <p className="text-xs text-ethiopian-coffee/40 mb-1">Notes</p>
+                    <input type="text" value={editFields.notes} onChange={(e) => setEditFields({ ...editFields, notes: e.target.value })}
+                      placeholder="Special instructions"
+                      className="w-full px-2 py-1.5 rounded-lg bg-white text-ethiopian-coffee border border-ethiopian-gold/30 text-sm italic focus:outline-none focus:border-ethiopian-gold" />
+                  </div>
+                ) : order.notes && (
                   <div className="text-sm text-ethiopian-coffee/70 italic border-l-2 border-ethiopian-gold/30 pl-3">
                     "{order.notes}"
                   </div>
@@ -434,22 +518,48 @@ export default function ButcherDashboardPage() {
 
                 {activeTab === "pending" && order.status === "PENDING" && (
                   <div className="flex items-center gap-2 pt-2 border-t border-ethiopian-gold/10">
-                    <button
-                      onClick={() => approveOrder(order)}
-                      disabled={actionLoading === order.id}
-                      className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
-                    >
-                      {actionLoading === order.id ? "..." : (
-                        <><Check className="w-4 h-4" /> {isKurtOrder(order.menuItemName) ? "Approve & Notify Waiter" : "Approve & Send to Kitchen"}</>
-                      )}
-                    </button>
-                    <button
-                      onClick={() => rejectOrder(order)}
-                      disabled={actionLoading === order.id}
-                      className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-all disabled:opacity-50"
-                    >
-                      <XCircle className="w-4 h-4" /> Reject
-                    </button>
+                    {editingOrder === order.id ? (
+                      <>
+                        <button
+                          onClick={() => saveFields(order)}
+                          disabled={actionLoading === order.id}
+                          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition-all disabled:opacity-50"
+                        >
+                          {actionLoading === order.id ? "..." : <><Save className="w-4 h-4" /> Save</>}
+                        </button>
+                        <button
+                          onClick={() => setEditingOrder(null)}
+                          className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-300 transition-all"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => startEditing(order)}
+                          className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-ethiopian-cream text-ethiopian-coffee text-sm font-medium hover:bg-ethiopian-gold/20 transition-all border border-ethiopian-gold/20"
+                        >
+                          <Pencil className="w-4 h-4" /> Edit
+                        </button>
+                        <button
+                          onClick={() => approveOrder(order)}
+                          disabled={actionLoading === order.id}
+                          className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+                        >
+                          {actionLoading === order.id ? "..." : (
+                            <><Check className="w-4 h-4" /> {isKurtOrder(order.menuItemName) ? "Approve & Notify Waiter" : "Approve & Send to Kitchen"}</>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => rejectOrder(order)}
+                          disabled={actionLoading === order.id}
+                          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-all disabled:opacity-50"
+                        >
+                          <XCircle className="w-4 h-4" /> Reject
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
               </div>

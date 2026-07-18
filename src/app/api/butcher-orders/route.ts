@@ -128,7 +128,7 @@ export async function PATCH(req: NextRequest) {
 
   const role = (session.user as { role?: string }).role;
   const body = await req.json();
-  const { id, status, kitchenStatus } = body;
+  const { id, status, kitchenStatus, meatType, menuItemName, weight, quantity, notes } = body;
 
   if (!id) {
     return NextResponse.json({ success: false, error: "id is required" }, { status: 400 });
@@ -146,6 +146,15 @@ export async function PATCH(req: NextRequest) {
 
   const order = orders[index];
   const now = new Date().toISOString();
+
+  // Allow editing fields on pending orders
+  if (order.status === "PENDING" && (meatType !== undefined || menuItemName !== undefined || weight !== undefined || quantity !== undefined || notes !== undefined)) {
+    if (meatType !== undefined) order.meatType = meatType;
+    if (menuItemName !== undefined) order.menuItemName = menuItemName;
+    if (weight !== undefined) order.weight = parseFloat(weight) || order.weight;
+    if (quantity !== undefined) order.quantity = parseInt(quantity) || order.quantity;
+    if (notes !== undefined) order.notes = notes;
+  }
 
   if (kitchenStatus && (role === "KITCHEN" || role === "ADMIN")) {
     if (order.status !== "APPROVED") {

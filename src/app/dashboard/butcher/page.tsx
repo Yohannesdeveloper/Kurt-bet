@@ -97,7 +97,7 @@ export default function ButcherDashboardPage() {
         body: JSON.stringify({ id: order.id, status: "APPROVED" }),
       });
       const data = await res.json();
-        if (data.success) {
+      if (data.success) {
         toast.success(isKurtOrder(order.menuItemName)
           ? `Order #${order.orderNumber} approved — waiter notified for pickup`
           : `Order #${order.orderNumber} approved and sent to kitchen`);
@@ -244,7 +244,7 @@ export default function ButcherDashboardPage() {
 
                 {order.notes && (
                   <div className="text-sm text-ethiopian-coffee/70 italic border-l-2 border-ethiopian-gold/30 pl-3">
-                    "{order.notes}"
+                    &quot;{order.notes}&quot;
                   </div>
                 )}
 
@@ -253,7 +253,7 @@ export default function ButcherDashboardPage() {
                     <Clock className="w-3.5 h-3.5" />
                     {new Date(order.createdAt).toLocaleString()}
                   </span>
-                  <span className="text-ethiopian-coffee/30">·</span>
+                  <span className="text-ethiopian-coffee/30">&middot;</span>
                   <span>{order.customerName}</span>
                 </div>
 

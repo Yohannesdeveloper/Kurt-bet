@@ -542,9 +542,9 @@ function ButcherShopStatus() {
     fetch("/api/menu")
       .then((r) => r.json())
       .then((d) => {
-        if (d.success && d.data) {
+        if (d.success && d.data?.items) {
           const map: Record<string, string> = {};
-          for (const item of d.data) {
+          for (const item of d.data.items) {
             if (item.name && item.image) map[item.name] = item.image;
           }
           setMenuImages(map);

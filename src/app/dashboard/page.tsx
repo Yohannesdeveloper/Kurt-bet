@@ -517,6 +517,12 @@ const butcherStatusLabel: Record<string, string> = {
   REJECTED: "Rejected",
 };
 
+const KURT_KEYWORDS = ["kurt", "qurt", "ቁርጥ"];
+function isButcherKurtOrder(name: string) {
+  const lower = (name || "").toLowerCase();
+  return KURT_KEYWORDS.some((kw) => lower.includes(kw));
+}
+
 function ButcherShopStatus() {
   const [orders, setOrders] = useState<ButcherShopOrder[]>([]);
   const [activeTab, setActiveTab] = useState<"pending" | "status">("pending");
@@ -596,7 +602,9 @@ function ButcherShopStatus() {
                   <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
                 )}
                 <span className={`ml-auto px-2.5 py-0.5 rounded-full text-xs font-semibold border ${butcherStatusColors[order.status]}`}>
-                  {butcherStatusLabel[order.status]}
+                  {order.status === "APPROVED"
+                    ? (isButcherKurtOrder(order.menuItemName) ? "Approved — Sent to Waiter" : "Approved — Sent to Kitchen")
+                    : butcherStatusLabel[order.status]}
                 </span>
               </div>
               <div className="flex items-center gap-4 text-xs text-ethiopian-coffee/60">

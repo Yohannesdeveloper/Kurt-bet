@@ -523,76 +523,12 @@ function isButcherKurtOrder(name: string) {
   return KURT_KEYWORDS.some((kw) => lower.includes(kw));
 }
 
-const butcherDishImages: Record<string, string> = {
-  "kurt": "/images/kurt.jpg",
-  "qurt": "/images/kurt.jpg",
-  "ቁርጥ": "/images/kurt.jpg",
-  "kitfo": "/images/kifo.jpg",
-  "ክትፎ": "/images/kifo.jpg",
-  "gored gored": "/images/gored gored.jpg",
-  "ጎረድ ጎረድ": "/images/gored gored.jpg",
-  "tere sega": "/images/zilzil tibs.jpg",
-  "ጠረ ስጋ": "/images/zilzil tibs.jpg",
-  "dulet": "/images/Yefseg/kurs/ዱለት (Dulet).jpg",
-  "ዱለት": "/images/Yefseg/kurs/ዱለት (Dulet).jpg",
-  "sambusa": "/images/kurt.jpg",
-  "ሳምቡሳ": "/images/kurt.jpg",
-  "tibs": "/images/tibs.jpg",
-  "ጥብስ": "/images/tibs.jpg",
-  "awaze tibs": "/images/Awaze Tibs.jpg",
-  "አዋዜ ጥብስ": "/images/Awaze Tibs.jpg",
-  "zilzil tibs": "/images/zilzil tibs.jpg",
-  "ዝልዝል ጥብስ": "/images/zilzil tibs.jpg",
-  "shekla tibs": "/images/Yefseg/Lunch and dinner/shekla.jpg",
-  "ሸክላ ጥብስ": "/images/Yefseg/Lunch and dinner/shekla.jpg",
-  "beyaynetu": "/images/Yetsom/በያይነቱ (Beyaynetu ).webp",
-  "በያይነቱ": "/images/Yetsom/በያይነቱ (Beyaynetu ).webp",
-  "doro wat": "/images/kurt.jpg",
-  "ዶሮ ወጥ": "/images/kurt.jpg",
-  "kai wat": "/images/kurt.jpg",
-  "ቀይ ወጥ": "/images/kurt.jpg",
-  "minchet abish": "/images/kurt.jpg",
-  "ምንጬ አብሽ": "/images/kurt.jpg",
-  "alicha wat": "/images/kurt.jpg",
-  "አሊጫ ወጥ": "/images/kurt.jpg",
-  "sega wat": "/images/kurt.jpg",
-  "ሥጋ ወጥ": "/images/kurt.jpg",
-  "gomen besega": "/images/Yetsom/ጎመን ጥብስ (Gomen Tibs).jpg",
-  "ጎመን በሥጋ": "/images/Yetsom/ጎመን ጥብስ (Gomen Tibs).jpg",
-  "enkulal firfir": "/images/kurt.jpg",
-  "እንቁላል ፍርፍር": "/images/kurt.jpg",
-  "kuanta firfir": "/images/Yefseg/kurs/ቋንጣ ፍርፍር (Kuanta Firfir).jpg",
-  "ቋንጣ ፍርፍር": "/images/Yefseg/kurs/ቋንጣ ፍርፍር (Kuanta Firfir).jpg",
-  "sega firfir": "/images/Yefseg/kurs/ሥጋ ፍርፍር (Sega Firfir).jpg",
-  "ሥጋ ፍርፍር": "/images/Yefseg/kurs/ሥጋ ፍርፍር (Sega Firfir).jpg",
-  "special dulet": "/images/Yefseg/kurs/ስፔሻል ዱለት (Special Dulet).jpg",
-  "ስፔሻል ዱለት": "/images/Yefseg/kurs/ስፔሻል ዱለት (Special Dulet).jpg",
-  "enkulal besega": "/images/Yefseg/kurs/እንቁላል በሥጋ (Enkulal be Sega ).jpg",
-  "እንቁላል በሥጋ": "/images/Yefseg/kurs/እንቁላል በሥጋ (Enkulal be Sega ).jpg",
-  "senber": "/images/Yefseg/kurs/የበሬ ሰንበር (Yebere Senber).jpg",
-  "አላንዶ": "/images/Yefseg/Lunch and dinner/olando.jpg",
-  "alando": "/images/Yefseg/Lunch and dinner/olando.jpg",
-  "kikil": "/images/Yefseg/Lunch and dinner/kekel.jpg",
-  "lamb tibs": "/images/tibs.jpg",
-  "yeheb gorrod": "/images/gored gored.jpg",
-  "beg wat": "/images/kurt.jpg",
-  "በግ ወጥ": "/images/kurt.jpg",
-  "dorho fitfit": "/images/kurt.jpg",
-};
-
-function getButcherDishImage(name: string) {
-  const lower = (name || "").toLowerCase();
-  for (const [key, img] of Object.entries(butcherDishImages)) {
-    if (lower.includes(key.toLowerCase())) return img;
-  }
-  return "/images/kurt.jpg";
-}
-
 function ButcherShopStatus() {
   const [orders, setOrders] = useState<ButcherShopOrder[]>([]);
   const [activeTab, setActiveTab] = useState<"pending" | "status">("pending");
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [menuImages, setMenuImages] = useState<Record<string, string>>({});
 
   const fetchOrders = useCallback(() => {
     fetch("/api/butcher-orders")
@@ -603,6 +539,18 @@ function ButcherShopStatus() {
   }, []);
 
   useEffect(() => {
+    fetch("/api/menu")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success && d.data) {
+          const map: Record<string, string> = {};
+          for (const item of d.data) {
+            if (item.name && item.image) map[item.name] = item.image;
+          }
+          setMenuImages(map);
+        }
+      })
+      .catch(() => {});
     fetchOrders();
     const interval = setInterval(fetchOrders, 5000);
     return () => clearInterval(interval);
@@ -710,7 +658,7 @@ function ButcherShopStatus() {
               <div className="flex flex-col sm:flex-row">
                 <div className="sm:w-32 sm:h-32 w-full h-40 flex-shrink-0 overflow-hidden bg-ethiopian-cream">
                   <img
-                    src={getButcherDishImage(order.menuItemName)}
+                    src={menuImages[order.menuItemName] || "/images/kurt.jpg"}
                     alt={order.menuItemName}
                     className="w-full h-full object-cover"
                   />

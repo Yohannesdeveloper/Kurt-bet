@@ -523,12 +523,118 @@ function isButcherKurtOrder(name: string) {
   return KURT_KEYWORDS.some((kw) => lower.includes(kw));
 }
 
+const BUTCHER_DISH_IMAGES: Record<string, string> = {
+  "item-1": "/images/kurt.jpg",
+  "item-2": "/images/kifo.jpg",
+  "item-3": "/images/gored gored.jpg",
+  "item-4": "/images/zilzil tibs.jpg",
+  "item-5": "/images/tibs.jpg",
+  "item-6": "/images/Awaze Tibs.jpg",
+  "item-7": "/images/zilzil tibs.jpg",
+  "item-8": "/images/Yefseg/Lunch and dinner/shekla.jpg",
+  "item-9": "/images/Yefseg/kurs/ዱለት (Dulet).jpg",
+  "item-10": "/images/tibs.jpg",
+  "item-23": "/images/kurt.jpg",
+  "item-29": "/images/Yetsom/Firfir.jpg",
+  "item-48": "/images/gored gored.jpg",
+  "item-52": "/images/Yetsom/በያይነቱ (Beyaynetu ).webp",
+  "item-61": "/images/Yetsom/ፓስታ በአትክልት (Pasta batkilt).jpg",
+  "item-62": "/images/Yetsom/ፓስታ በሰጎ (Pasta be Sego).jpg",
+  "item-63": "/images/Yetsom/ጎመን ጥብስ (Gomen Tibs).jpg",
+  "item-64": "/images/Yetsom/ጎመን ክትፎ (Gomen Kitfo).jpg",
+  "item-65": "/images/Yetsom/ተልባ (Telba).jpg",
+  "item-66": "/images/Yetsom/ሽሮ ተጋቢኖ (Shiro Tegabino).jpg",
+  "item-67": "/images/Yetsom/ሱፍ (Suf ).jpg",
+  "item-68": "/images/Yetsom/timatim lebleb.jpg",
+  "item-69": "/images/Yetsom/timatim katelo.jpg",
+  "item-70": "/images/Yetsom/Special firfir.jpg",
+  "item-71": "/images/Yetsom/siro feses.jpg",
+  "item-72": "/images/Yetsom/በያይነቱ (Beyaynetu ).webp",
+  "item-73": "/images/Yetsom/Fish/አሳ ለብለብ (Fish Lebleb).jpg",
+  "item-74": "/images/Yetsom/Fish/አሳ ዱለት (Fish Dulet).jpg",
+  "item-75": "/images/Yetsom/Fish/አሳ ጉላሽ (Fish Goulash).jpg",
+  "item-76": "/images/Yetsom/Fish/አሳ ኮሮሶ (Asa Koroso ).jpg",
+  "item-77": "/images/Yetsom/Fish/አሳ ሸክላ ግማሽ (Asa Shekla half).jpg",
+  "item-78": "/images/Yetsom/Fish/አሳ ሸክላ ግማሽ (Asa Shekla half).jpg",
+  "item-79": "/images/Yetsom/ስፔሻል ሽሮ (Special Shiro).jpg",
+  "item-80": "/images/Yetsom/Agelgel.jpg",
+  "item-81": "/images/Yetsom/Agelgel.jpg",
+  "item-82": "/images/Yefseg/kurs/ቋንጣ ፍርፍር (Kuanta Firfir).jpg",
+  "item-83": "/images/Yefseg/kurs/ሥጋ ፍርፍር (Sega Firfir).jpg",
+  "item-84": "/images/Yefseg/kurs/ዱለት (Dulet).jpg",
+  "item-85": "/images/Yefseg/kurs/ስፔሻል ዱለት (Special Dulet).jpg",
+  "item-86": "/images/Yefseg/kurs/እንቁላል በሥጋ (Enkulal be Sega ).jpg",
+  "item-87": "/images/Yefseg/kurs/የፍየል ሰንበር (Yefeyel Senber).jpg",
+  "item-88": "/images/Yefseg/kurs/የፍየል ሰንበር (Yefeyel Senber).jpg",
+  "item-89": "/images/Yefseg/kurs/የፍየል ሰንበር (Yefeyel Senber).jpg",
+  "item-90": "/images/Yefseg/kurs/የበሬ ሰንበር (Yebere Senber).jpg",
+  "item-91": "/images/Yefseg/kurs/የበሬ ሰንበር (Yebere Senber).jpg",
+  "item-92": "/images/Yefseg/kurs/የበሬ ሰንበር (Yebere Senber).jpg",
+  "item-110": "/images/Drinks/beer.jpg",
+  "item-111": "/images/Drinks/special beer.jpg",
+  "item-112": "/images/Drinks/Ambo Mineral Water (20 per box).jpg",
+  "item-113": "/images/Drinks/tekeshno.jpg",
+  "item-114": "/images/Drinks/acacia white wine.jpg",
+  "item-115": "/images/Drinks/acacia wine.jpg",
+  "item-116": "/images/Drinks/Rift valley.jpg",
+  "item-117": "/images/Drinks/Arake bemelekiya.jpg",
+  "item-118": "/images/Drinks/single beer.jpg",
+  "item-119": "/images/Drinks/Rift valley.jpg",
+  "item-120": "/images/Drinks/Rift valley.jpg",
+  "item-121": "/images/Drinks/amarula.jpg",
+  "item-122": "/images/Drinks/Red bull.jpg",
+  "item-123": "/images/Drinks/Tekila shot.jpg",
+  "item-124": "/images/Drinks/Rift valley.jpg",
+  "item-125": "/images/Drinks/soft drinks.jpg",
+  "item-126": "/images/Yefseg/Lunch and dinner/kekel.jpg",
+  "item-127": "/images/kurt.jpg",
+  "item-128": "/images/kurt.jpg",
+  "item-129": "/images/kurt.jpg",
+  "item-130": "/images/Yefseg/Lunch and dinner/olando.jpg",
+  "item-131": "/images/Yefseg/Lunch and dinner/olando.jpg",
+  "item-132": "/images/Yefseg/Lunch and dinner/olando.jpg",
+  "item-133": "/images/kurt.jpg",
+  "item-134": "/images/kurt.jpg",
+  "item-135": "/images/kurt.jpg",
+  "item-136": "/images/Yefseg/Lunch and dinner/olando.jpg",
+  "item-137": "/images/Yefseg/Lunch and dinner/olando.jpg",
+  "item-138": "/images/Yefseg/Lunch and dinner/olando.jpg",
+  "item-139": "/images/gored gored.jpg",
+  "item-140": "/images/gored gored.jpg",
+  "item-141": "/images/gored gored.jpg",
+  "item-142": "/images/Yefseg/Lunch and dinner/shekla.jpg",
+  "item-143": "/images/Yefseg/Lunch and dinner/shekla.jpg",
+  "item-144": "/images/Yefseg/Lunch and dinner/shekla.jpg",
+  "item-145": "/images/Yefseg/Lunch and dinner/shekla.jpg",
+  "item-146": "/images/Yefseg/Lunch and dinner/shekla.jpg",
+  "item-147": "/images/Yefseg/Lunch and dinner/shekla.jpg",
+};
+
+function getButcherDishImage(order: { menuItemName?: string; menuItemId?: string; items?: { menuItemId?: string }[] }) {
+  const id = order.menuItemId || order.items?.[0]?.menuItemId;
+  if (id && BUTCHER_DISH_IMAGES[id]) return BUTCHER_DISH_IMAGES[id];
+  const name = (order.menuItemName || "").toLowerCase();
+  if (name.includes("kurt") || name.includes("qurt") || name.includes("ቁርጥ")) return "/images/kurt.jpg";
+  if (name.includes("kitfo") || name.includes("ክትፎ")) return "/images/kifo.jpg";
+  if (name.includes("gored") || name.includes("ጎረድ")) return "/images/gored gored.jpg";
+  if (name.includes("tere sega") || name.includes("ጠረ")) return "/images/zilzil tibs.jpg";
+  if (name.includes("dulet") || name.includes("ዱለት")) return "/images/Yefseg/kurs/ዱለት (Dulet).jpg";
+  if (name.includes("tibs") || name.includes("ጥብስ")) return "/images/tibs.jpg";
+  if (name.includes("awaze") || name.includes("አዋዜ")) return "/images/Awaze Tibs.jpg";
+  if (name.includes("zilzil") || name.includes("ዝልዝል")) return "/images/zilzil tibs.jpg";
+  if (name.includes("shekla") || name.includes("ሸክላ")) return "/images/Yefseg/Lunch and dinner/shekla.jpg";
+  if (name.includes("beyaynetu") || name.includes("በያይነቱ")) return "/images/Yetsom/በያይነቱ (Beyaynetu ).webp";
+  if (name.includes("alando") || name.includes("አላንዶ")) return "/images/Yefseg/Lunch and dinner/olando.jpg";
+  if (name.includes("senber") || name.includes("ሰንበር")) return "/images/Yefseg/kurs/የበሬ ሰንበር (Yebere Senber).jpg";
+  if (name.includes("lamb")) return "/images/tibs.jpg";
+  return "/images/kurt.jpg";
+}
+
 function ButcherShopStatus() {
   const [orders, setOrders] = useState<ButcherShopOrder[]>([]);
   const [activeTab, setActiveTab] = useState<"pending" | "status">("pending");
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [menuImages, setMenuImages] = useState<Record<string, string>>({});
 
   const fetchOrders = useCallback(() => {
     fetch("/api/butcher-orders")
@@ -539,18 +645,6 @@ function ButcherShopStatus() {
   }, []);
 
   useEffect(() => {
-    fetch("/api/menu")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.success && d.data?.items) {
-          const map: Record<string, string> = {};
-          for (const item of d.data.items) {
-            if (item.name && item.image) map[item.name] = item.image;
-          }
-          setMenuImages(map);
-        }
-      })
-      .catch(() => {});
     fetchOrders();
     const interval = setInterval(fetchOrders, 5000);
     return () => clearInterval(interval);
@@ -658,7 +752,7 @@ function ButcherShopStatus() {
               <div className="flex flex-col sm:flex-row">
                 <div className="sm:w-32 sm:h-32 w-full h-40 flex-shrink-0 overflow-hidden bg-ethiopian-cream">
                   <img
-                    src={menuImages[order.menuItemName] || "/images/kurt.jpg"}
+                    src={getButcherDishImage(order)}
                     alt={order.menuItemName}
                     className="w-full h-full object-cover"
                   />

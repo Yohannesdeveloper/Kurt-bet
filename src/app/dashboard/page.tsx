@@ -191,6 +191,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
     { icon: Percent, label: t("nav.reports"), href: "/reports", key: "reports" },
     { icon: Coffee, label: t("nav.bartender"), href: "/dashboard/bartender", key: "bartender" },
     { icon: Coffee, label: "VIP Bartender", href: "/dashboard/bartender", key: "vip-bartender" },
+    { icon: Beef, label: "Butcher Shop", href: "/dashboard/butcher-shop", key: "butcher-shop" },
   ];
 
   const allowedForBartender = new Set(["menu", "orders", "bartender"]);
@@ -252,6 +253,8 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
                     onNavigate("bartender");
                   } else if (item.key === "vip-bartender") {
                     onNavigate("vip-bartender");
+                  } else if (item.key === "butcher-shop") {
+                    onNavigate("butcher-shop");
                   } else if (item.href.startsWith("/dashboard")) {
                     window.location.href = item.href;
                   } else {
@@ -260,7 +263,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
                   onClose();
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group border border-transparent ${
-                  currentView === (item.key === "bartender" ? "bartender" : item.key === "vip-bartender" ? "vip-bartender" : item.href === "/dashboard" ? "home" : undefined)
+                  currentView === (item.key === "bartender" ? "bartender" : item.key === "vip-bartender" ? "vip-bartender" : item.key === "butcher-shop" ? "butcher-shop" : item.href === "/dashboard" ? "home" : undefined)
                     ? "bg-ethiopian-gold/15 text-ethiopian-gold border-ethiopian-gold/30 shadow-sm shadow-ethiopian-gold/10"
                     : "text-muted-foreground dark:text-ethiopian-cream/50 hover:bg-ethiopian-gold/10 hover:text-ethiopian-gold hover:border-ethiopian-gold/20"
                 }`}
@@ -485,6 +488,133 @@ function PopularRestaurants() {
     </section>
   );
 }
+
+type ButcherShopOrder = {
+  id: string;
+  orderNumber: number;
+  customerName: string;
+  meatType: string;
+  menuItemName: string;
+  weight: number;
+  quantity: number;
+  tableNumber: string | null;
+  notes: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  createdAt: string;
+  approvedAt: string | null;
+  rejectedAt: string | null;
+};
+
+const butcherStatusColors: Record<string, string> = {
+  PENDING: "bg-amber-100 text-amber-800 border-amber-300",
+  APPROVED: "bg-emerald-100 text-emerald-800 border-emerald-300",
+  REJECTED: "bg-red-100 text-red-800 border-red-300",
+};
+
+const butcherStatusLabel: Record<string, string> = {
+  PENDING: "Pending Approval",
+  APPROVED: "Approved",
+  REJECTED: "Rejected",
+};
+
+function ButcherShopStatus() {
+  const [orders, setOrders] = useState<ButcherShopOrder[]>([]);
+  const [activeTab, setActiveTab] = useState<"pending" | "status">("pending");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/butcher-orders")
+      .then((r) => r.json())
+      .then((d) => { if (d.success) setOrders(d.data); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+    const interval = setInterval(() => {
+      fetch("/api/butcher-orders")
+        .then((r) => r.json())
+        .then((d) => { if (d.success) setOrders(d.data); })
+        .catch(() => {});
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const pendingOrders = orders.filter((o) => o.status === "PENDING");
+  const statusOrders = orders.filter((o) => o.status !== "PENDING");
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="p-2.5 rounded-xl bg-gradient-to-br from-ethiopian-burgundy to-ethiopian-gold text-white shadow-lg">
+          <Beef className="w-6 h-6" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold font-serif text-ethiopian-coffee">Butcher Shop</h1>
+          <p className="text-sm text-ethiopian-coffee/60">Butcher order statuses</p>
+        </div>
+      </div>
+
+      <div className="flex gap-2 border-b border-gray-200">
+        <button
+          onClick={() => setActiveTab("pending")}
+          className={`pb-3 px-4 text-sm font-medium border-b-2 transition-all ${
+            activeTab === "pending"
+              ? "border-ethiopian-burgundy text-ethiopian-burgundy"
+              : "border-transparent text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Pending Orders
+          <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream">{pendingOrders.length}</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("status")}
+          className={`pb-3 px-4 text-sm font-medium border-b-2 transition-all ${
+            activeTab === "status"
+              ? "border-ethiopian-burgundy text-ethiopian-burgundy"
+              : "border-transparent text-gray-500 hover:text-gray-700"
+          }`}
+        >
+          Butcher Status
+          <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream">{statusOrders.length}</span>
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-12 text-ethiopian-coffee/60">Loading...</div>
+      ) : (activeTab === "pending" ? pendingOrders : statusOrders).length === 0 ? (
+        <div className="text-center py-12">
+          <Package className="w-12 h-12 text-ethiopian-gold mx-auto mb-3 opacity-40" />
+          <p className="text-ethiopian-coffee/60">
+            {activeTab === "pending" ? "No orders waiting for approval" : "No processed orders yet"}
+          </p>
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {(activeTab === "pending" ? pendingOrders : statusOrders).map((order) => (
+            <div key={order.id} className="bg-white rounded-2xl shadow-md border border-ethiopian-gold/10 p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
+                {order.tableNumber && (
+                  <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                )}
+                <span className={`ml-auto px-2.5 py-0.5 rounded-full text-xs font-semibold border ${butcherStatusColors[order.status]}`}>
+                  {butcherStatusLabel[order.status]}
+                </span>
+              </div>
+              <div className="flex items-center gap-4 text-xs text-ethiopian-coffee/60">
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3.5 h-3.5" />
+                  {new Date(order.createdAt).toLocaleString()}
+                </span>
+                <span className="text-ethiopian-coffee/30">·</span>
+                <span>{order.customerName}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MobileNav() {
   const { t } = useTranslation();
   const mobileNavItems = [
@@ -699,6 +829,8 @@ export default function DashboardPage() {
               <BartenderWorkflow />
             ) : currentView === "vip-bartender" ? (
               <BartenderWorkflow assignedToOverride="VIP_BARTENDER" />
+            ) : currentView === "butcher-shop" ? (
+              <ButcherShopStatus />
             ) : null}
           </div>
         </div>

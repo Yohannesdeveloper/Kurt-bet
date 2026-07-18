@@ -190,6 +190,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
     { icon: Users, label: t("nav.employees"), href: "/employees", key: "employees" },
     { icon: Percent, label: t("nav.reports"), href: "/reports", key: "reports" },
     { icon: Coffee, label: t("nav.bartender"), href: "/dashboard/bartender", key: "bartender" },
+    { icon: Coffee, label: "VIP Bartender", href: "/dashboard/bartender", key: "vip-bartender" },
   ];
 
   const allowedForBartender = new Set(["menu", "orders", "bartender"]);
@@ -249,6 +250,8 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
                     onNavigate("home");
                   } else if (item.key === "bartender") {
                     onNavigate("bartender");
+                  } else if (item.key === "vip-bartender") {
+                    onNavigate("vip-bartender");
                   } else if (item.href.startsWith("/dashboard")) {
                     window.location.href = item.href;
                   } else {
@@ -257,7 +260,7 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
                   onClose();
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group border border-transparent ${
-                  currentView === (item.key === "bartender" ? "bartender" : item.href === "/dashboard" ? "home" : undefined)
+                  currentView === (item.key === "bartender" ? "bartender" : item.key === "vip-bartender" ? "vip-bartender" : item.href === "/dashboard" ? "home" : undefined)
                     ? "bg-ethiopian-gold/15 text-ethiopian-gold border-ethiopian-gold/30 shadow-sm shadow-ethiopian-gold/10"
                     : "text-muted-foreground dark:text-ethiopian-cream/50 hover:bg-ethiopian-gold/10 hover:text-ethiopian-gold hover:border-ethiopian-gold/20"
                 }`}
@@ -694,6 +697,8 @@ export default function DashboardPage() {
               </>
             ) : currentView === "bartender" ? (
               <BartenderWorkflow />
+            ) : currentView === "vip-bartender" ? (
+              <BartenderWorkflow assignedToOverride="VIP_BARTENDER" />
             ) : null}
           </div>
         </div>

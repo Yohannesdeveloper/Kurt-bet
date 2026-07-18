@@ -680,6 +680,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
   const [orderType, setOrderType] = useState("DINE_IN");
   const [guestCount, setGuestCount] = useState("1");
   const [notes, setNotes] = useState("");
+  const [bartenderType, setBartenderType] = useState("BARTENDER");
 
   useEffect(() => {
     if (!open) {
@@ -689,6 +690,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
       setOrderType("DINE_IN");
       setGuestCount("1");
       setNotes("");
+      setBartenderType("BARTENDER");
       return;
     }
     fetch("/api/tables").then(r => r.json()).then(d => {
@@ -734,6 +736,9 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
 
   const subtotal = cart.reduce((s, c) => s + c.totalPrice, 0);
 
+  const DRINK_KEYWORDS = ["coffee", "macchiato", "tej", "tella", "tea", "spris", "juice", "ambo", "soft drink", "besso", "atmet", "halwa", "cheesecake", "atayef", "beer", "wine", "shot", "liquor", "spirit", "tekshino", "teknshino", "areke", "arake", "red bull", "amarula", "tequila", "sambuca", "draft", "jack", "foreign"];
+  const hasDrinks = cart.some(c => DRINK_KEYWORDS.some(kw => c.name.toLowerCase().includes(kw)));
+
   const handleSubmit = async () => {
     if (cart.length === 0) { toast.error(t("orders.addItemError")); return; }
     setSubmitting(true);
@@ -748,6 +753,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
           notes: notes || undefined,
           subtotal,
           total: subtotal,
+          bartenderType: hasDrinks ? bartenderType : undefined,
           items: cart.map(c => ({
             menuItemId: c.menuItemId,
             name: c.name,
@@ -959,6 +965,21 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
                 </div>
               )}
             </div>
+
+            {hasDrinks && (
+              <div className="grid gap-2">
+                <Label>Assign To Bartender</Label>
+                <Select value={bartenderType} onValueChange={setBartenderType}>
+                  <SelectTrigger className="!bg-white dark:!bg-gray-950 hover:!bg-gray-50 dark:hover:!bg-gray-900">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="!bg-white dark:!bg-gray-950">
+                    <SelectItem value="BARTENDER">Bartender</SelectItem>
+                    <SelectItem value="VIP_BARTENDER">VIP Bartender</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="border-t pt-3">
               <p className="text-sm font-medium mb-2">{t("orders.items", { count: cart.reduce((s, c) => s + c.quantity, 0) })}</p>

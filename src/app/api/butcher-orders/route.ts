@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
+import { emitOrderReady, emitKurtPickupReady } from "@/lib/notification-emitter";
+
+const KURT_KEYWORDS = ["kurt", "qurt", "ቁርጥ"];
+
+function isKurtItem(menuItemName: string): boolean {
+  const lower = (menuItemName || "").toLowerCase();
+  return KURT_KEYWORDS.some((kw) => lower.includes(kw));
+}
 
 const DEMO_FILE = ".demo-butcher-orders.json";
 
@@ -153,6 +161,25 @@ export async function PATCH(req: NextRequest) {
     }
     order.status = "APPROVED";
     order.approvedAt = now;
+
+    if (isKurtItem(order.menuItemName)) {
+      order.kitchenStatus = "RECEIVED";
+      try {
+        const restaurantId = (session.user as { restaurantId?: string })?.restaurantId;
+        if (restaurantId) {
+          emitOrderReady(restaurantId, {
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+          });
+          emitKurtPickupReady(restaurantId, {
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            menuItemName: order.menuItemName,
+            tableNumber: order.tableNumber,
+          });
+        }
+      } catch {}
+    }
   } else if (order.status === "PENDING" && status === "REJECTED") {
     if (role !== "BUTCHER" && role !== "ADMIN") {
       return NextResponse.json({ success: false, error: "Only butchers can reject" }, { status: 403 });

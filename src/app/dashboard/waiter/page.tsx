@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
-import { Beef, Clock, Package, Users, ClipboardList, CreditCard, Plus, Table, DollarSign } from "lucide-react";
+import { Beef, Clock, Package, Users, ClipboardList, CreditCard, Plus, Table, DollarSign, Hand, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "@/lib/i18n";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -81,6 +81,15 @@ export default function WaiterDashboard() {
 
   const pendingButcherCount = butcherOrders.filter((o) => o.status === "PENDING").length;
 
+  const KURT_KEYWORDS = ["kurt", "qurt", "ቁርጥ"];
+  function isKurtOrder(name: string) {
+    const lower = (name || "").toLowerCase();
+    return KURT_KEYWORDS.some((kw) => lower.includes(kw));
+  }
+
+  const kurtPickupOrders = butcherOrders.filter(o => o.status === "APPROVED" && isKurtOrder(o.menuItemName));
+  const nonKurtOrders = butcherOrders.filter(o => !isKurtOrder(o.menuItemName));
+
   const stats = [
     { label: "Pending Butcher Orders", value: pendingButcherCount.toString(), icon: Beef, color: "from-ethiopian-gold to-ethiopian-coffee", bgColor: "bg-ethiopian-gold/10", iconColor: "text-ethiopian-gold" },
     { label: "Waiter Cash Flow", value: formatCurrency(cashflowRevenue), icon: DollarSign, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
@@ -136,6 +145,80 @@ export default function WaiterDashboard() {
           </motion.div>
         ))}
       </div>
+
+      {kurtPickupOrders.length > 0 && (
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="p-2 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg"
+            >
+              <Hand className="w-5 h-5" />
+            </motion.div>
+            <div>
+              <h2 className="text-2xl font-bold font-serif text-ethiopian-burgundy">Qurt Ready for Pickup</h2>
+              <p className="text-sm text-ethiopian-coffee/60">
+                Pick up from butcher — {kurtPickupOrders.length} order{kurtPickupOrders.length > 1 ? "s" : ""} waiting
+              </p>
+            </div>
+          </div>
+          <div className="grid gap-4">
+            {kurtPickupOrders.map((order) => (
+              <motion.div
+                key={order.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl shadow-lg border-2 border-amber-300 hover:shadow-xl transition-all duration-300 p-5"
+              >
+                <div className="flex items-center gap-3 flex-wrap mb-3">
+                  <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
+                  {order.tableNumber && (
+                    <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                  )}
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-amber-200 text-amber-900 border-amber-400">
+                    Ready for Pickup
+                  </span>
+                  <Hand className="w-4 h-4 text-amber-600 ml-auto" />
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-amber-200 rounded-lg bg-white/60">
+                  <div>
+                    <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
+                    <p className="text-sm font-bold text-ethiopian-burgundy">{order.meatType}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-ethiopian-coffee/40">Dish</p>
+                    <p className="text-sm font-semibold text-ethiopian-coffee">{order.menuItemName}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-ethiopian-coffee/40">Weight</p>
+                    <p className="text-sm font-bold text-ethiopian-gold">{order.weight} kg</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
+                    <p className="text-sm font-semibold text-ethiopian-coffee">x{order.quantity}</p>
+                  </div>
+                  {order.notes && (
+                    <div className="col-span-2 sm:col-span-4">
+                      <p className="text-xs text-ethiopian-coffee/40">Notes</p>
+                      <p className="text-sm italic text-ethiopian-coffee/70">{order.notes}</p>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs text-ethiopian-coffee/60">
+                    <Clock className="w-3.5 h-3.5" />
+                    {order.approvedAt ? new Date(order.approvedAt).toLocaleString() : new Date(order.createdAt).toLocaleString()}
+                  </div>
+                  <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all">
+                    <CheckCircle className="w-4 h-4" /> Picked Up
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="space-y-6">
         <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee">Butcher Orders</h2>

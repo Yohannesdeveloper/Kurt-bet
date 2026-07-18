@@ -157,10 +157,15 @@ export default function KitchenDashboard() {
     }
   };
 
-  const waitingOrders = butcherOrders.filter(o => o.kitchenStatus === "WAITING" && !localReceivedOrders.some(r => r.id === o.id));
+  const isKurtOrder = (name: string) => {
+    const lower = (name || "").toLowerCase();
+    return lower.includes("kurt") || lower.includes("qurt") || lower.includes("ቁርጥ");
+  };
+
+  const waitingOrders = butcherOrders.filter(o => o.kitchenStatus === "WAITING" && !isKurtOrder(o.menuItemName) && !localReceivedOrders.some(r => r.id === o.id));
   const receivedOrders = [
-    ...localReceivedOrders,
-    ...butcherOrders.filter(o => o.kitchenStatus === "RECEIVED" && !localReceivedOrders.some(r => r.id === o.id)),
+    ...localReceivedOrders.filter(o => !isKurtOrder(o.menuItemName)),
+    ...butcherOrders.filter(o => o.kitchenStatus === "RECEIVED" && !isKurtOrder(o.menuItemName) && !localReceivedOrders.some(r => r.id === o.id)),
   ];
   const total = Object.values(counts).reduce((a, b) => a + b, 0) + butcherOrders.length;
   const newTotal = counts.NEW + receivedOrders.length;

@@ -7,7 +7,7 @@ import { readDemoJSON, writeDemoJSON } from "@/lib/demo-storage";
 const DEMO_FILE = ".demo-orders.json";
 const BUTCHER_ORDERS_FILE = ".demo-butcher-orders.json";
 const BARTENDER_ORDERS_FILE = ".demo-bartender-orders.json";
-const BUTCHER_ITEM_KEYWORDS = ["tibs", "kurt", "dulet", "tere sega", "tere siga", "gored gored"];
+const BUTCHER_ITEM_KEYWORDS = ["tibs", "kurt", "qurt", "dulet", "tere sega", "tere siga", "gored gored", "senber", "alando", "kikil", "shekla", "kitfo"];
 const DRINK_KEYWORDS = ["coffee", "macchiato", "tej", "tella", "tea", "spris", "juice", "ambo", "soft drink", "besso", "atmet", "halwa", "cheesecake", "atayef", "beer", "wine", "shot", "liquor", "spirit", "tekshino", "teknshino", "areke", "arake", "red bull", "amarula", "tequila", "sambuca", "draft", "jack", "foreign"];
 
 function isDrinkItem(item: any): boolean {
@@ -210,6 +210,7 @@ export async function POST(req: NextRequest) {
           tableNumber,
           notes: "",
           status: "PENDING",
+          assignedTo: body?.bartenderType === "VIP_BARTENDER" ? "VIP_BARTENDER" : "BARTENDER",
           createdAt: new Date().toISOString(),
           completedAt: null,
         };
@@ -338,6 +339,7 @@ export async function POST(req: NextRequest) {
         tableNumber: tableNumber || null,
         notes: "",
         status: "PENDING",
+        assignedTo: body?.bartenderType === "VIP_BARTENDER" ? "VIP_BARTENDER" : "BARTENDER",
         createdAt: new Date().toISOString(),
         completedAt: null,
       };

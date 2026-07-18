@@ -13,6 +13,12 @@ const meatTypes = ["Beef", "Lamb", "Goat", "Chicken"];
 const weightPresets = [0.5, 1, 2, 3, 5];
 const dishOptions = ["Tibs", "Kurt", "Dulet", "Gored Gored"];
 
+const KURT_KEYWORDS = ["kurt", "qurt", "ቁርጥ"];
+function isKurtOrder(name: string) {
+  const lower = (name || "").toLowerCase();
+  return KURT_KEYWORDS.some((kw) => lower.includes(kw));
+}
+
 type ButcherOrder = {
   id: string;
   orderNumber: number;
@@ -106,8 +112,10 @@ export default function ButcherDashboardPage() {
         body: JSON.stringify({ id: order.id, status: "APPROVED" }),
       });
       const data = await res.json();
-      if (data.success) {
-        toast.success(`Order #${order.orderNumber} approved and sent to kitchen`);
+        if (data.success) {
+        toast.success(isKurtOrder(order.menuItemName)
+          ? `Order #${order.orderNumber} approved — waiter notified for pickup`
+          : `Order #${order.orderNumber} approved and sent to kitchen`);
         fetchOrders();
       } else {
         toast.error(data.error || "Action failed");
@@ -432,7 +440,7 @@ export default function ButcherDashboardPage() {
                       className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                     >
                       {actionLoading === order.id ? "..." : (
-                        <><Check className="w-4 h-4" /> Approve & Send to Kitchen</>
+                        <><Check className="w-4 h-4" /> {isKurtOrder(order.menuItemName) ? "Approve & Notify Waiter" : "Approve & Send to Kitchen"}</>
                       )}
                     </button>
                     <button

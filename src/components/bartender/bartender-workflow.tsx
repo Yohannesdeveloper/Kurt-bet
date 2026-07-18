@@ -26,6 +26,7 @@ type BartenderOrder = {
   tableNumber: string | null;
   notes: string;
   status: "PENDING" | "PREPARING" | "READY" | "SERVED";
+  assignedTo: "BARTENDER" | "VIP_BARTENDER";
   createdAt: string;
   completedAt: string | null;
 };
@@ -48,7 +49,7 @@ function formatTime(iso: string) {
   return `${hrs}h ${mins % 60}m`;
 }
 
-export function BartenderWorkflow() {
+export function BartenderWorkflow({ assignedToOverride }: { assignedToOverride?: "BARTENDER" | "VIP_BARTENDER" } = {}) {
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role;
   const isAdmin = userRole === "ADMIN";
@@ -56,13 +57,15 @@ export function BartenderWorkflow() {
   const [orders, setOrders] = useState<BartenderOrder[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const effectiveAssignedTo = assignedToOverride || (userRole === "VIP_BARTENDER" ? "VIP_BARTENDER" : "BARTENDER");
+
   const fetchOrders = useCallback(() => {
-    fetch("/api/bartender-orders?status=PENDING,PREPARING,READY,SERVED")
+    fetch(`/api/bartender-orders?status=PENDING,PREPARING,READY,SERVED&assignedTo=${effectiveAssignedTo}`)
       .then(r => r.json())
       .then(d => { if (d.success) setOrders(d.data); })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [effectiveAssignedTo]);
 
   useEffect(() => {
     fetchOrders();

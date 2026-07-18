@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Search, Plus, UtensilsCrossed, Loader2, Clock, Edit, Trash2, ShoppingCart, Minus, X, Check, Send, ArrowRight } from "lucide-react";
+import { ArrowLeft, Search, Plus, UtensilsCrossed, Loader2, Clock, Edit, Trash2, ShoppingCart, Minus, X, Check, Send, ArrowRight, Coffee, Gem } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
@@ -38,6 +38,7 @@ interface CartItem {
   quantity: number;
   totalPrice: number;
   image?: string;
+  bartenderType?: "BARTENDER" | "VIP_BARTENDER";
 }
 
 export default function MenuPage() {
@@ -72,6 +73,8 @@ export default function MenuPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCart, setShowCart] = useState(false);
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
+  const [drinkDialogOpen, setDrinkDialogOpen] = useState(false);
+  const [pendingDrinkItem, setPendingDrinkItem] = useState<MenuItem | null>(null);
 
   useEffect(() => { dispatch(fetchMenu()); }, [dispatch]);
 
@@ -95,12 +98,32 @@ export default function MenuPage() {
     }
   };
 
+  const DRINK_KEYWORDS = ["coffee", "macchiato", "tej", "tella", "tea", "spris", "juice", "ambo", "soft drink", "besso", "atmet", "halwa", "cheesecake", "atayef", "beer", "wine", "shot", "liquor", "spirit", "tekshino", "teknshino", "areke", "arake", "red bull", "amarula", "tequila", "sambuca", "draft", "jack", "foreign"];
+  const isDrinkItem = (item: MenuItem) => DRINK_KEYWORDS.some(kw => item.name.toLowerCase().includes(kw)) || item.categoryId === "drinks";
+
   const addToCart = (item: MenuItem) => {
+    if (isDrinkItem(item)) {
+      setPendingDrinkItem(item);
+      setDrinkDialogOpen(true);
+      return;
+    }
     setCart(prev => {
       const existing = prev.find(c => c.id === item.id);
       if (existing) return prev.map(c => c.id === item.id ? { ...c, quantity: c.quantity + 1, totalPrice: (c.quantity + 1) * c.unitPrice } : c);
       return [...prev, { id: item.id, name: item.name, unitPrice: item.price, quantity: 1, totalPrice: item.price, image: item.image }];
     });
+  };
+
+  const confirmAddDrink = (type: "BARTENDER" | "VIP_BARTENDER") => {
+    if (!pendingDrinkItem) return;
+    const item = pendingDrinkItem;
+    setCart(prev => {
+      const existing = prev.find(c => c.id === item.id);
+      if (existing) return prev.map(c => c.id === item.id ? { ...c, quantity: c.quantity + 1, totalPrice: (c.quantity + 1) * c.unitPrice } : c);
+      return [...prev, { id: item.id, name: item.name, unitPrice: item.price, quantity: 1, totalPrice: item.price, image: item.image, bartenderType: type }];
+    });
+    setDrinkDialogOpen(false);
+    setPendingDrinkItem(null);
   };
 
   const updateQty = (itemId: string, delta: number) => {
@@ -448,7 +471,12 @@ export default function MenuPage() {
                         {item.image && <img src={item.image} alt="" className="h-10 w-10 rounded-lg object-cover flex-shrink-0" />}
                         <div className="min-w-0">
                           <p className="font-medium text-sm truncate">{item.name}</p>
-                          <p className="text-xs text-muted-foreground">{formatCurrency(item.totalPrice)}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {formatCurrency(item.totalPrice)}
+                            {item.bartenderType && (
+                              <span className="ml-1 text-ethiopian-gold">• {item.bartenderType === "VIP_BARTENDER" ? "VIP" : "Bar"}</span>
+                            )}
+                          </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
@@ -489,6 +517,33 @@ export default function MenuPage() {
           onOrderPlaced={() => { setCart([]); setShowCart(false); setOrderDialogOpen(false); }}
         />
       )}
+
+      <Dialog open={drinkDialogOpen} onOpenChange={(o) => { if (!o) { setDrinkDialogOpen(false); setPendingDrinkItem(null); } }}>
+        <DialogContent className="sm:max-w-[380px]">
+          <DialogHeader>
+            <DialogTitle className="text-base">Assign Bartender</DialogTitle>
+            <DialogDescription className="text-sm">
+              {pendingDrinkItem?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-3 py-2">
+            <button
+              onClick={() => confirmAddDrink("BARTENDER")}
+              className="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-ethiopian-gold/20 hover:border-ethiopian-gold/60 hover:bg-ethiopian-gold/5 transition-all"
+            >
+              <Coffee className="w-8 h-8 text-ethiopian-gold" />
+              <span className="text-sm font-semibold">Bartender</span>
+            </button>
+            <button
+              onClick={() => confirmAddDrink("VIP_BARTENDER")}
+              className="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-ethiopian-gold/20 hover:border-ethiopian-clay/60 hover:bg-ethiopian-clay/5 transition-all"
+            >
+              <Gem className="w-8 h-8 text-ethiopian-clay" />
+              <span className="text-sm font-semibold">VIP Bartender</span>
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
@@ -657,6 +712,10 @@ function PlaceOrderDialog({ open, onOpenChange, cart, cartTotal, onOrderPlaced }
   const [guestCount, setGuestCount] = useState("1");
   const [notes, setNotes] = useState("");
 
+  const DRINK_KEYWORDS = ["coffee", "macchiato", "tej", "tella", "tea", "spris", "juice", "ambo", "soft drink", "besso", "atmet", "halwa", "cheesecake", "atayef", "beer", "wine", "shot", "liquor", "spirit", "tekshino", "teknshino", "areke", "arake", "red bull", "amarula", "tequila", "sambuca", "draft", "jack", "foreign"];
+  const hasDrinks = cart.some(c => DRINK_KEYWORDS.some(kw => c.name.toLowerCase().includes(kw)));
+  const drinkBartenderType = cart.find(c => c.bartenderType && DRINK_KEYWORDS.some(kw => c.name.toLowerCase().includes(kw)))?.bartenderType;
+
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
@@ -669,6 +728,7 @@ function PlaceOrderDialog({ open, onOpenChange, cart, cartTotal, onOrderPlaced }
           notes: notes || undefined,
           subtotal: cartTotal,
           total: cartTotal,
+          bartenderType: hasDrinks ? drinkBartenderType : undefined,
           items: cart.map(c => ({
             menuItemId: c.id,
             name: c.name,
@@ -730,7 +790,7 @@ function PlaceOrderDialog({ open, onOpenChange, cart, cartTotal, onOrderPlaced }
             <p className="text-sm font-medium mb-2">{t("orders.items")} ({cart.reduce((s, c) => s + c.quantity, 0)})</p>
             {cart.map(item => (
               <div key={item.id} className="flex items-center justify-between text-sm py-1">
-                <span>{item.name} x{item.quantity}</span>
+                <span>{item.name} x{item.quantity}{item.bartenderType && <span className="text-ethiopian-gold text-xs ml-1">({item.bartenderType === "VIP_BARTENDER" ? "VIP" : "Bar"})</span>}</span>
                 <span>{formatCurrency(item.totalPrice)}</span>
               </div>
             ))}

@@ -22,6 +22,7 @@ type BartenderOrder = {
   tableNumber: string | null;
   notes: string;
   status: "PENDING" | "PREPARING" | "READY" | "SERVED";
+  assignedTo: "BARTENDER" | "VIP_BARTENDER";
   createdAt: string;
   completedAt: string | null;
 };
@@ -38,11 +39,15 @@ function getNextNumber(orders: BartenderOrder[]): number {
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const status = searchParams.get("status");
+  const assignedTo = searchParams.get("assignedTo");
 
   let orders = await readDemoJSON<BartenderOrder>(DEMO_FILE);
   if (status && status !== "all") {
     const statuses = status.split(",");
     orders = orders.filter((o) => statuses.includes(o.status));
+  }
+  if (assignedTo) {
+    orders = orders.filter((o) => (o.assignedTo || "BARTENDER") === assignedTo);
   }
   orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   return NextResponse.json({ success: true, data: orders });
@@ -55,7 +60,7 @@ export async function POST(req: NextRequest) {
   const userName = (session?.user as { name?: string })?.name || "Unknown";
 
   const body = await req.json();
-  const { items, notes, tableNumber, orderId } = body;
+  const { items, notes, tableNumber, orderId, assignedTo } = body;
 
   if (!items || !Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ success: false, error: "items array is required" }, { status: 400 });
@@ -76,6 +81,7 @@ export async function POST(req: NextRequest) {
     tableNumber: tableNumber || null,
     notes: notes || "",
     status: "PENDING",
+    assignedTo: assignedTo === "VIP_BARTENDER" ? "VIP_BARTENDER" : "BARTENDER",
     createdAt: new Date().toISOString(),
     completedAt: null,
   };

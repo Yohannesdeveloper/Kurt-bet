@@ -61,14 +61,12 @@ interface Order {
 }
 
 const STATUS_FLOW: Record<string, { next: string | null; label: string; color: string; bg: string; border: string; dot: string }> = {
-  NEW:       { next: "PREPARING", label: "Pending",       color: "text-ethiopian-gold", bg: "bg-ethiopian-gold/10", border: "border-ethiopian-gold/20", dot: "bg-ethiopian-gold" },
-  PREPARING: { next: "READY",     label: "Preparing",     color: "text-ethiopian-gold", bg: "bg-ethiopian-gold/10", border: "border-ethiopian-gold/20", dot: "bg-ethiopian-gold" },
-  READY:     { next: "SERVED",    label: "Ready for Pickup", color: "text-ethiopian-clay", bg: "bg-ethiopian-clay/10", border: "border-ethiopian-clay/20", dot: "bg-ethiopian-clay" },
-  SERVED:    { next: null,        label: "Served",        color: "text-ethiopian-coffee dark:text-ethiopian-cream", bg: "bg-ethiopian-coffee/10", border: "border-ethiopian-coffee/20", dot: "bg-ethiopian-coffee" },
+  NEW:       { next: "READY",     label: "New Orders",     color: "text-ethiopian-gold", bg: "bg-ethiopian-gold/10", border: "border-ethiopian-gold/20", dot: "bg-ethiopian-gold" },
+  READY:     { next: null,        label: "Ready for Pickup", color: "text-ethiopian-clay", bg: "bg-ethiopian-clay/10", border: "border-ethiopian-clay/20", dot: "bg-ethiopian-clay" },
   CANCELLED: { next: null,        label: "Cancelled",     color: "text-ethiopian-burgundy", bg: "bg-ethiopian-burgundy/10", border: "border-ethiopian-burgundy/20", dot: "bg-ethiopian-burgundy" },
 };
 
-const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
+const STATUS_ORDER = ["NEW", "READY"];
 
 function formatTime(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -87,9 +85,7 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate, isAdmin }: { 
 
   const statusTLabel: Record<string, string> = {
     NEW: t("orders.pending"),
-    PREPARING: t("orders.preparing"),
     READY: t("orders.ready"),
-    SERVED: t("orders.delivered"),
     CANCELLED: t("orders.cancelled"),
   };
 
@@ -171,7 +167,7 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate, isAdmin }: { 
                 {updating ? "..." : <><ChevronRight className="h-3 w-3" /> {statusTLabel[s.next!]}</>}
               </Button>
             )}
-            {order.status !== "CANCELLED" && order.status !== "SERVED" && (
+            {order.status !== "CANCELLED" && order.status !== "READY" && (
               <Button
                 size="sm"
                 variant="ghost"
@@ -182,10 +178,10 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate, isAdmin }: { 
                 <XCircle className="h-3 w-3 mr-1" />{t("common.cancel")}
               </Button>
             )}
-            {isAdmin && order.status === "SERVED" && (
+            {isAdmin && order.status === "READY" && (
               <button
                 onClick={async () => {
-                  if (!confirm("Delete this delivered order permanently?")) return;
+                  if (!confirm("Delete this order from KDS?")) return;
                   setDeleting(true);
                   try {
                     const res = await fetch(`/api/orders/${order.id}`, { method: "DELETE" });
@@ -237,7 +233,7 @@ export default function KDSPage() {
   useSocket();
 
   const fetchOrders = useCallback(() => {
-    fetch("/api/orders?status=NEW,PREPARING,READY,SERVED&station=kitchen")
+    fetch("/api/orders?status=NEW,READY&station=kitchen")
       .then(r => r.json())
       .then(d => {
         if (d.success) setOrders(d.data);
@@ -308,9 +304,7 @@ export default function KDSPage() {
 
   const colLabel: Record<string, string> = {
     NEW: t("kds.newOrders"),
-    PREPARING: t("kds.preparing"),
     READY: t("kds.ready"),
-    SERVED: t("orders.delivered"),
   };
 
   const grouped = STATUS_ORDER.map(status => ({
@@ -321,7 +315,12 @@ export default function KDSPage() {
     orders: orders.filter(o => o.status === status),
   }));
 
-  const waitingButcherOrders = butcherOrders.filter(b => b.kitchenStatus === "WAITING");
+  const isKurtOrder = (name: string) => {
+    const lower = (name || "").toLowerCase();
+    return lower.includes("kurt") || lower.includes("ቁርጥ");
+  };
+
+  const waitingButcherOrders = butcherOrders.filter(b => b.kitchenStatus === "WAITING" && !isKurtOrder(b.menuItemName));
   const hasOrders = orders.length > 0 || waitingButcherOrders.length > 0;
 
   return (
@@ -352,7 +351,7 @@ export default function KDSPage() {
           {isAdmin && (
             <button
               onClick={async () => {
-                if (!confirm("Clear all orders from KDS (New, Preparing, Ready, Delivered, Butcher)?")) return;
+                if (!confirm("Clear all orders from KDS (New, Ready, Butcher)?")) return;
                 try {
                   const res = await fetch("/api/orders/clear-history", { method: "DELETE" });
                   const d = await res.json();
@@ -391,7 +390,7 @@ export default function KDSPage() {
             <p className="text-sm text-ethiopian-cream/50">{t("orders.noOrders")}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 h-full">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
             {grouped.map(grp => (
               <div key={grp.status} className="flex flex-col min-h-0">
                 <div className="flex items-center gap-2 mb-3 px-1">

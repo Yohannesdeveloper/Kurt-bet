@@ -612,7 +612,9 @@ function ButcherOrderForm() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Order #${order.orderNumber} approved and sent to kitchen`);
+        toast.success(isKurtOrderHelper(order.menuItemName)
+          ? `Order #${order.orderNumber} approved — waiter notified for pickup`
+          : `Order #${order.orderNumber} approved and sent to kitchen`);
         fetchButcherOrders();
       } else toast.error(data.error || "Action failed");
     } catch { toast.error("Action failed"); }
@@ -638,6 +640,12 @@ function ButcherOrderForm() {
 
   const pendingButcherOrders = butcherOrders.filter((o) => o.status === "PENDING");
   const processedButcherOrders = butcherOrders.filter((o) => o.status !== "PENDING");
+
+  const KURT_KEYWORDS = ["kurt", "qurt", "ቁርጥ"];
+  function isKurtOrderHelper(name: string) {
+    const lower = (name || "").toLowerCase();
+    return KURT_KEYWORDS.some((kw) => lower.includes(kw));
+  }
 
   const handleSubmit = async () => {
     const w = parseFloat(weight);
@@ -921,7 +929,7 @@ function ButcherOrderForm() {
                         <button onClick={() => approveOrder(order)} disabled={actionLoading === order.id}
                           className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-xs font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                         >
-                          {actionLoading === order.id ? "..." : <><Check className="w-3.5 h-3.5" /> Approve</>}
+                          {actionLoading === order.id ? "..." : <><Check className="w-3.5 h-3.5" /> {isKurtOrderHelper(order.menuItemName) ? "Approve & Notify Waiter" : "Approve & Send to Kitchen"}</>}
                         </button>
                         <button onClick={() => rejectOrder(order)} disabled={actionLoading === order.id}
                           className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition-all disabled:opacity-50"

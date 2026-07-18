@@ -14,6 +14,7 @@ enum UserRole {
   BUTCHER
   CLIENT
   KITCHEN
+  VIP_BARTENDER
   WAITER
 }
 

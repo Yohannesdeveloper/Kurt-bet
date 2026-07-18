@@ -16,4 +16,17 @@ export function onOrderReady(restaurantId: string, callback: (data: { orderId: s
   };
 }
 
+export const NOTIFY_KURT_PICKUP_READY = "kurt:pickup:ready";
+
+export function emitKurtPickupReady(restaurantId: string, data: { orderId: string; orderNumber: number; menuItemName: string; tableNumber: string | null }) {
+  notificationEmitter.emit(`${NOTIFY_KURT_PICKUP_READY}:${restaurantId}`, data);
+}
+
+export function onKurtPickupReady(restaurantId: string, callback: (data: { orderId: string; orderNumber: number; menuItemName: string; tableNumber: string | null }) => void) {
+  notificationEmitter.on(`${NOTIFY_KURT_PICKUP_READY}:${restaurantId}`, callback);
+  return () => {
+    notificationEmitter.off(`${NOTIFY_KURT_PICKUP_READY}:${restaurantId}`, callback);
+  };
+}
+
 export default notificationEmitter;

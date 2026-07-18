@@ -56,6 +56,17 @@ export function useSSENotifications() {
               actionUrl: "/orders",
               createdAt: new Date(),
             });
+          } else if (data.type === "KURT_PICKUP_READY") {
+            useNotificationStore.getState().addNotification({
+              id: `kurt-pickup-${data.orderId}`,
+              type: "KURT_PICKUP_READY",
+              title: "Qurt Ready for Pickup",
+              message: `Qurt order #${data.orderNumber}${data.tableNumber ? ` (Table ${data.tableNumber})` : ""} — ${data.menuItemName} is ready. Pick up from butcher!`,
+              data: { orderId: data.orderId, orderNumber: data.orderNumber, menuItemName: data.menuItemName, tableNumber: data.tableNumber },
+              isRead: false,
+              actionUrl: "/dashboard/waiter",
+              createdAt: new Date(),
+            });
           }
         } catch {}
       };

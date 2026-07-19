@@ -190,8 +190,8 @@ function Sidebar({ isOpen, onClose, currentView, onNavigate }: { isOpen: boolean
     { icon: Users, label: t("nav.employees"), href: "/employees", key: "employees" },
     { icon: Percent, label: t("nav.reports"), href: "/reports", key: "reports" },
     { icon: Coffee, label: t("nav.bartender"), href: "/dashboard/bartender", key: "bartender" },
-    { icon: Coffee, label: "VIP Bartender", href: "/dashboard/bartender", key: "vip-bartender" },
-    { icon: Beef, label: "Butcher Shop", href: "/dashboard/butcher-shop", key: "butcher-shop" },
+    { icon: Coffee, label: t("nav.vipBartender"), href: "/dashboard/bartender", key: "vip-bartender" },
+    { icon: Beef, label: t("nav.butcherShop"), href: "/dashboard/butcher-shop", key: "butcher-shop" },
   ];
 
   const allowedForBartender = new Set(["menu", "orders", "bartender"]);
@@ -517,6 +517,15 @@ const butcherStatusLabel: Record<string, string> = {
   REJECTED: "Rejected",
 };
 
+function getButcherStatusLabel(status: string, t: any) {
+  switch (status) {
+    case "PENDING": return t("butcher.pendingLabel");
+    case "APPROVED": return t("butcher.approvedLabel");
+    case "REJECTED": return t("butcher.rejectedLabel");
+    default: return status;
+  }
+}
+
 const KURT_KEYWORDS = ["kurt", "qurt", "ቁርጥ"];
 function isButcherKurtOrder(name: string) {
   const lower = (name || "").toLowerCase();
@@ -631,6 +640,7 @@ function getButcherDishImage(order: { menuItemName?: string; menuItemId?: string
 }
 
 function ButcherShopStatus() {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState<ButcherShopOrder[]>([]);
   const [activeTab, setActiveTab] = useState<"pending" | "status">("pending");
   const [loading, setLoading] = useState(true);
@@ -661,14 +671,14 @@ function ButcherShopStatus() {
       const data = await res.json();
       if (data.success) {
         toast.success(isButcherKurtOrder(order.menuItemName)
-          ? `Order #${order.orderNumber} approved — waiter notified for pickup`
-          : `Order #${order.orderNumber} approved and sent to kitchen`);
+          ? t("butcher.orderApprovedWaiter", { orderNumber: order.orderNumber })
+          : t("butcher.orderApprovedKitchen", { orderNumber: order.orderNumber }));
         fetchOrders();
       } else {
-        toast.error(data.error || "Action failed");
+        toast.error(data.error || t("butcher.actionFailed"));
       }
     } catch {
-      toast.error("Action failed");
+      toast.error(t("butcher.actionFailed"));
     } finally {
       setActionLoading(null);
     }
@@ -684,13 +694,13 @@ function ButcherShopStatus() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Order #${order.orderNumber} rejected`);
+        toast.success(t("butcher.orderRejected", { orderNumber: order.orderNumber }));
         fetchOrders();
       } else {
-        toast.error(data.error || "Action failed");
+        toast.error(data.error || t("butcher.actionFailed"));
       }
     } catch {
-      toast.error("Action failed");
+      toast.error(t("butcher.actionFailed"));
     } finally {
       setActionLoading(null);
     }
@@ -706,8 +716,8 @@ function ButcherShopStatus() {
           <Beef className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold font-serif text-ethiopian-coffee dark:text-ethiopian-cream">Butcher Shop</h1>
-          <p className="text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">Butcher order statuses</p>
+          <h1 className="text-2xl font-bold font-serif text-ethiopian-coffee dark:text-ethiopian-cream">{t("nav.butcherShop")}</h1>
+          <p className="text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">{t("butcher.dashboardSubtitle")}</p>
         </div>
       </div>
 
@@ -720,7 +730,7 @@ function ButcherShopStatus() {
               : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
           }`}
         >
-          Pending Orders
+          {t("butcher.pendingOrdersTab")}
           <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream dark:bg-ethiopian-gold/20 text-ethiopian-coffee dark:text-ethiopian-cream">{pendingOrders.length}</span>
         </button>
         <button
@@ -731,18 +741,18 @@ function ButcherShopStatus() {
               : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
           }`}
         >
-          Butcher Status
+          {t("butcher.statusTab")}
           <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream dark:bg-ethiopian-gold/20 text-ethiopian-coffee dark:text-ethiopian-cream">{statusOrders.length}</span>
         </button>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">Loading...</div>
+        <div className="text-center py-12 text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">{t("common.loading")}</div>
       ) : (activeTab === "pending" ? pendingOrders : statusOrders).length === 0 ? (
         <div className="text-center py-12">
           <Package className="w-12 h-12 text-ethiopian-gold mx-auto mb-3 opacity-40" />
           <p className="text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">
-            {activeTab === "pending" ? "No orders waiting for approval" : "No processed orders yet"}
+            {activeTab === "pending" ? t("butcher.noPendingOrders") : t("butcher.noProcessedOrders")}
           </p>
         </div>
       ) : (
@@ -761,12 +771,12 @@ function ButcherShopStatus() {
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xl font-bold text-ethiopian-coffee dark:text-ethiopian-cream">#{order.orderNumber}</span>
                     {order.tableNumber && (
-                      <span className="text-base font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                      <span className="text-base font-semibold text-ethiopian-gold">{t("butcher.table", { number: order.tableNumber })}</span>
                     )}
                     <span className={`ml-auto px-3 py-1 rounded-full text-sm font-semibold border ${butcherStatusColors[order.status]}`}>
                       {order.status === "APPROVED"
-                        ? (isButcherKurtOrder(order.menuItemName) ? "Approved — Sent to Waiter" : "Approved — Sent to Kitchen")
-                        : butcherStatusLabel[order.status]}
+                        ? (isButcherKurtOrder(order.menuItemName) ? t("butcher.approvedLabel") + " — " + t("butcher.sentToWaiter") : t("butcher.approvedLabel") + " — " + t("butcher.sentToKitchen"))
+                        : getButcherStatusLabel(order.status, t)}
                     </span>
                   </div>
 
@@ -799,7 +809,7 @@ function ButcherShopStatus() {
                         className="flex items-center gap-1.5 px-6 py-3 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-base font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                       >
                         {actionLoading === order.id ? "..." : (
-                          <><Check className="w-5 h-5" /> {isButcherKurtOrder(order.menuItemName) ? "Approve & Notify Waiter" : "Approve & Send to Kitchen"}</>
+                          <><Check className="w-5 h-5" /> {isButcherKurtOrder(order.menuItemName) ? t("butcher.approveNotifyWaiter") : t("butcher.approveAndSendToKitchen")}</>
                         )}
                       </button>
                       <button
@@ -807,18 +817,18 @@ function ButcherShopStatus() {
                         disabled={actionLoading === order.id}
                         className="flex items-center gap-1.5 px-5 py-3 rounded-xl bg-red-600 text-white text-base font-medium hover:bg-red-700 transition-all disabled:opacity-50"
                       >
-                        <XCircle className="w-5 h-5" /> Reject
+                        <XCircle className="w-5 h-5" /> {t("butcher.reject")}
                       </button>
                     </div>
                   )}
                   {order.status === "APPROVED" && order.approvedAt && (
                     <div className="text-sm text-emerald-600 dark:text-emerald-400 font-medium pt-2 border-t border-ethiopian-gold/10">
-                      Approved: {new Date(order.approvedAt).toLocaleString()}
+                      {t("butcher.approvedAt", { time: new Date(order.approvedAt).toLocaleString() })}
                     </div>
                   )}
                   {order.status === "REJECTED" && order.rejectedAt && (
                     <div className="text-sm text-red-600 dark:text-red-400 font-medium pt-2 border-t border-ethiopian-gold/10">
-                      Rejected: {new Date(order.rejectedAt).toLocaleString()}
+                      {t("butcher.rejectedAt", { time: new Date(order.rejectedAt).toLocaleString() })}
                     </div>
                   )}
                 </div>

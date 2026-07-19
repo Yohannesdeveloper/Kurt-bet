@@ -218,13 +218,22 @@
     "statusTab": "የሥጋ ቤት ሁኔታ",
     "noPendingOrders": "ማጽደቅ በላይ ያሉ ትዕዛዞች የሉም",
     "noProcessedOrders": "ገና የተከናወኑ ትዕዛዞች የሉም",
+    "dashboardSubtitle": "የሥጋ ቤት ትዕዛዝ ሁኔታዎች",
     "table": "ጠረጴዛ {number}",
     "approvedAt": "ጸድቋል፡ {time}",
     "rejectedAt": "ውድቅ ተደርጓል፡ {time}",
     "actionFailed": "ተግባሩ አልተሳካም",
     "orderApprovedWaiter": "ትዕዛዝ #{orderNumber} ጸድቋል — አስተናጋጅ ለመቀበል ተሳውቷል",
     "orderApprovedKitchen": "ትዕዛዝ #{orderNumber} ጸድቋልና ወደ ኩሽና ተልኳል",
-    "orderRejected": "ትዕዛዝ #{orderNumber} ተቋውሞታል"
+    "orderRejected": "ትዕዛዝ #{orderNumber} ተቋውሞታል",
+    "sentToWaiter": "ወደ አስተናጋጅ ተልኳል",
+    "sentToKitchen": "ወደ ኩሽና ተልኳል",
+    "approvedLabel": "ጸድቋል",
+    "pendingLabel": "በመጠባበቅ ላይ ያለ ጸድቻ",
+    "rejectedLabel": "ውድቅ ተደርጓል",
+    "approveNotifyWaiter": "ጸድትና አስተናጋጅን አሳውቅ",
+    "approveAndSendToKitchen": "ጸድትና ወደ ኩሽና ላክ",
+    "reject": "ውድቅ"
   },
   "tables": {
     "title": "ጠረጴዛዎች",

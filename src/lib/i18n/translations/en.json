@@ -218,13 +218,22 @@
     "statusTab": "Butcher Status",
     "noPendingOrders": "No orders waiting for approval",
     "noProcessedOrders": "No processed orders yet",
+    "dashboardSubtitle": "Butcher order statuses",
     "table": "Table {number}",
     "approvedAt": "Approved: {time}",
     "rejectedAt": "Rejected: {time}",
     "actionFailed": "Action failed",
     "orderApprovedWaiter": "Order #{orderNumber} approved — waiter notified for pickup",
     "orderApprovedKitchen": "Order #{orderNumber} approved and sent to kitchen",
-    "orderRejected": "Order #{orderNumber} rejected"
+    "orderRejected": "Order #{orderNumber} rejected",
+    "sentToWaiter": "Sent to Waiter",
+    "sentToKitchen": "Sent to Kitchen",
+    "approvedLabel": "Approved",
+    "pendingLabel": "Pending Approval",
+    "rejectedLabel": "Rejected",
+    "approveNotifyWaiter": "Approve & Notify Waiter",
+    "approveAndSendToKitchen": "Approve & Send to Kitchen",
+    "reject": "Reject"
   },
   "tables": {
     "title": "Tables",

@@ -621,7 +621,7 @@ export default function MenuPage() {
               className="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-ethiopian-gold/20 hover:border-ethiopian-clay/60 hover:bg-ethiopian-clay/5 transition-all"
             >
               <Gem className="w-8 h-8 text-ethiopian-clay" />
-              <span className="text-sm font-semibold">VIP Bartender</span>
+              <span className="text-sm font-semibold">{t("nav.vipBartender")}</span>
             </button>
           </div>
         </DialogContent>

@@ -6,34 +6,38 @@ import { TrendingUp, Users, ChefHat, ClipboardList, DollarSign, Settings, BarCha
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
 import { EthiopianCornerSet } from "@/components/shared/ethiopian-patterns";
+import { useMemo } from "react";
 
-const adminActions = [
-  { label: "Manage Employees", icon: Users, href: "/employees", description: "Add, edit, or remove staff members" },
-  { label: "View Reports", icon: BarChart3, href: "/reports", description: "Analytics and performance metrics" },
-  { label: "Settings", icon: Settings, href: "/settings", description: "Configure system settings" },
-  { label: "Inventory", icon: ClipboardList, href: "/inventory", description: "Manage stock and supplies" },
-];
+
 
 export default function AdminDashboard() {
   const { t } = useTranslation();
-  const stats = [
+  
+  const adminActions = useMemo(() => [
+    { label: t("admin.manageEmployees"), icon: Users, href: "/employees", description: t("admin.manageEmployeesDesc") },
+    { label: t("admin.viewReports"), icon: BarChart3, href: "/reports", description: t("admin.viewReportsDesc") },
+    { label: t("admin.settings"), icon: Settings, href: "/settings", description: t("admin.settingsDesc") },
+    { label: t("admin.inventory"), icon: ClipboardList, href: "/inventory", description: t("admin.inventoryDesc") },
+  ], [t]);
+  
+  const stats = useMemo(() => [
     { label: t("dashboard.totalRevenue"), value: "$0.00", icon: DollarSign, color: "from-ethiopian-gold to-ethiopian-coffee", bgColor: "bg-ethiopian-gold/10", iconColor: "text-ethiopian-gold" },
     { label: t("dashboard.totalOrders"), value: "0", icon: ClipboardList, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
-    { label: "Active Users", value: "0", icon: Users, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
-    { label: "Kitchen Queue", value: "0", icon: ChefHat, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-500/10", iconColor: "text-purple-600" },
-  ];
+    { label: t("admin.activeUsers"), value: "0", icon: Users, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
+    { label: t("admin.kitchenQueue"), value: "0", icon: ChefHat, color: "from-purple-500 to-violet-600", bgColor: "bg-purple-500/10", iconColor: "text-purple-600" },
+  ], [t]);
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-serif text-ethiopian-coffee">
-            Admin Dashboard
+            {t("admin.title")}
           </h1>
-          <p className="text-ethiopian-coffee/60 mt-1">Full control over restaurant operations</p>
+          <p className="text-ethiopian-coffee/60 mt-1">{t("admin.subtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-ethiopian-gold" />
-          <span className="text-sm font-medium text-ethiopian-coffee">Admin Access</span>
+          <span className="text-sm font-medium text-ethiopian-coffee">{t("admin.adminAccess")}</span>
         </div>
       </div>
 
@@ -71,14 +75,14 @@ export default function AdminDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 font-serif text-ethiopian-coffee">
                 <Shield className="h-5 w-5 text-ethiopian-gold" />
-                Admin Actions
+                {t("admin.adminActions")}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {adminActions.map((action) => (
                   <Button
-                    key={action.label}
+                    key={action.href}
                     variant="outline"
                     className="h-auto flex-col items-start p-4 border-ethiopian-gold/20 hover:border-ethiopian-gold/40 transition-all duration-300"
                     asChild

@@ -159,11 +159,11 @@ export function Sidebar() {
       >
         <div className="flex h-16 items-center border-b border-sidebar-border px-6">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl overflow-hidden shadow-lg shadow-ethiopian-gold/20">
-            <img src="/images/Logo.jpg" alt="Habesha Kurt Bet Logo" className="h-full w-full object-cover" />
+            <img src="/images/Logo.jpg" alt={t("app.logoAlt")} className="h-full w-full object-cover" />
           </div>
           <div className="ml-3">
             <span className="text-sm font-bold tracking-tight">{t("app.name")}</span>
-            <p className="text-[10px] text-sidebar-foreground/60 font-medium hidden sm:block">Enterprise Management</p>
+            <p className="text-[10px] text-sidebar-foreground/60 font-medium hidden sm:block">{t("app.enterpriseManagement")}</p>
           </div>
         </div>
 
@@ -188,9 +188,9 @@ export function Sidebar() {
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold truncate text-sidebar-foreground">{session?.user?.name || "User"}</p>
+              <p className="text-xs font-semibold truncate text-sidebar-foreground">{session?.user?.name || t("sidebar.user")}</p>
               <p className="text-[10px] text-sidebar-foreground/60 capitalize hidden sm:block">
-                {userRole.toLowerCase().replace("_", " ")}
+                {t(`roles.${userRole.toLowerCase()}`)}
               </p>
             </div>
             <Button

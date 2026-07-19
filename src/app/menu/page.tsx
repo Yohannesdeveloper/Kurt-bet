@@ -397,7 +397,7 @@ export default function MenuPage() {
                 : "bg-background text-foreground border-border hover:border-primary/40 hover:text-foreground"
             }`}
           >
-            {locale === "am" ? "ሁሉም ምድቦች" : "All Categories"}
+            {t("menu.allCategories")}
           </button>
           {categories.filter(c => !c.parentId).sort((a, b) => a.sortOrder - b.sortOrder).map(cat => (
             <button

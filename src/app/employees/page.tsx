@@ -36,20 +36,20 @@ interface Employee {
   position: string;
 }
 
-const positionOptions = [
-  "Chef",
-  "Waitress",
-  "Waiter",
-  "Kitchen Staff",
-  "Manager",
-  "Cashier",
-  "Bartender",
-  "Host",
-  "Cleaner",
-];
-
 export default function EmployeesPage() {
   const { t } = useTranslation();
+  
+  const positionOptions = [
+    t("employees.chef"),
+    t("employees.waitress"),
+    t("employees.waiter"),
+    t("employees.kitchenStaff"),
+    t("employees.manager"),
+    t("employees.cashier"),
+    t("employees.bartender"),
+    t("employees.host"),
+    t("employees.cleaner"),
+  ];
   const { data: session, status } = useSession();
   const router = useRouter();
   useEffect(() => {

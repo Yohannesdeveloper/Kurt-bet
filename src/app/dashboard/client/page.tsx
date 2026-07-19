@@ -14,7 +14,7 @@ export default function ClientDashboard() {
   const stats = [
     { label: t("dashboard.activeTables"), value: "0", icon: Clock, color: "from-ethiopian-gold to-ethiopian-coffee", bgColor: "bg-ethiopian-gold/10", iconColor: "text-ethiopian-gold" },
     { label: t("dashboard.totalOrders"), value: "0", icon: ShoppingBag, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
-    { label: "Loyalty Points", value: "0", icon: UtensilsCrossed, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
+    { label: t("clientDashboard.loyaltyPoints"), value: "0", icon: UtensilsCrossed, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
   ];
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -23,13 +23,13 @@ export default function ClientDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-serif text-ethiopian-coffee">
-            Customer Portal
+            {t("clientDashboard.title")}
           </h1>
-          <p className="text-ethiopian-coffee/60 mt-1">Browse menu, place orders, and track your orders</p>
+          <p className="text-ethiopian-coffee/60 mt-1">{t("clientDashboard.subtitle")}</p>
         </div>
         <Button variant="outline" className="gap-2 border-ethiopian-gold/20 text-ethiopian-coffee">
           <User className="h-4 w-4" />
-          My Profile
+          {t("clientDashboard.myProfile")}
         </Button>
       </div>
 

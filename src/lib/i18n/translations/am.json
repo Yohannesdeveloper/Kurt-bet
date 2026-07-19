@@ -1,7 +1,9 @@
 {
   "app": {
     "name": "ሐበሻ ቁርጥ ቤት",
-    "tagline": "እውነተኛ የኢትዮጵያ ምግብ"
+    "tagline": "እውነተኛ የኢትዮጵያ ምግብ",
+    "enterpriseManagement": "የንግድ አስተዳደር",
+    "logoAlt": "የሐበሻ ቁርጥ ቤት አርማ"
   },
   "nav": {
     "dashboard": "ዳሽቦርድ",
@@ -28,6 +30,24 @@
     "favorites": "ተወዳጆች",
     "profile": "መገለጫ"
   },
+  "settingsPage": {
+    "title": "ቅንብሮች",
+    "subtitle": "የምግብ ቤትዎን አዋቅር",
+    "profile": "መገለጫ",
+    "general": "አጠቃላላ",
+    "appearance": "አስመስል",
+    "notifications": "ማሳወቂያዎች",
+    "printing": "ማተሚያ",
+    "security": "ደህንነት",
+    "myProfile": "የእኔ መገለጫ",
+    "myProfileDesc": "የመግቢያ መረጃዎ",
+    "administrator": "አስተዳዳሪ",
+    "waiter": "አስተናጋጅ",
+    "kitchenStaff": "የኩሽና ሠራተኞች",
+    "bartender": "መጠጥ ቤት",
+    "butcher": "ሥጋ ቤት",
+    "client": "ደንበኛ"
+  },
   "hero": {
     "title": "ጣፋጭ ምግብ፣",
     "titleAccent": "በፍጥነት ይደርሳል",
@@ -43,6 +63,7 @@
     "title": "ምናሌያችን",
     "search": "ምናሌ ይፈልጉ...",
     "all": "ሁሉም",
+    "allCategories": "ሁሉም ምድቦች",
     "addToCart": "ወደ ጋሪ ያስገቡ",
     "price": "ዋጋ",
     "category": "ምድብ",
@@ -524,31 +545,7 @@
     "qrFeature8": "የሚወዷቸውን ምግቦች መዝግበው ያስቀምጡ",
     "qrFeature9": "ማስተዋወቂያዎችን እና ልዩ ቅናሾችን ይመልከቱ"
   },
-  "employees": {
-    "title": "ሠራተኞች",
-    "addEmployee": "ሠራተኛ ያክሉ",
-    "name": "ስም",
-    "fatherName": "የአባት ስም",
-    "age": "ዕድሜ",
-    "position": "ቦታ",
-    "subtitle": "ቡድንዎን ያስተዳድሩ",
-    "search": "ሠራተኞችን ይፈልጉ...",
-    "total": "ጠቅላላ",
-    "active": "ንቁ",
-    "positions": "ቦታዎች",
-    "noEmployees": "ገና ምንም ሠራተኞች የሉም",
-    "addFirstEmployee": "ቡድንዎን መገንባት ለመጀመር የመጀመሪያውን ሠራተኛ ያክሉ።",
-    "action": "ድርጊት",
-    "enterFullName": "ሙሉ ስም ያስገቡ",
-    "enterFatherName": "የአባት ስም ያስገቡ",
-    "enterAge": "ዕድሜ ያስገቡ",
-    "selectPosition": "ቦታ ይምረጡ",
-    "addEmployeeDescription": "የሠራተኛውን ዝርዝሮች ከታች ያስገቡ",
-    "fillAllFields": "እባክዎ ሁሉንም መስኮች ይሙሉ",
-    "ageRange": "ዕድሜ ከ18 እስከ 100 መሆን አለበት",
-    "added": "ሠራተኛ ታክሏል",
-    "removed": "ሠራተኛ ተወግዷል"
-  },
+
   "inventory": {
     "title": "እቃዎች",
     "addItem": "ዕቃ ያክሉ",
@@ -619,7 +616,61 @@
     "onFirstOrder": "በመጀመሪያ ትዕዛዝዎ ላይ",
     "codeFood50": "ኮድ፡ FOOD50",
     "logout": "ዘግተህ ውጣ",
-    "endSession": "ክፍለ ጊዜህን አጥፋ"
+    "endSession": "ክፍለ ጊዜህን አጥፋ",
+    "user": "ተጠቃሚ"
+  },
+  "roles": {
+    "admin": "አስተዳዳሪ",
+    "client": "ደንበኛ",
+    "bartender": "መጠጥ ቤት",
+    "vip_bartender": "ቪአይፒ መጠጥ ቤት",
+    "butcher": "ሥጋ ቤት",
+    "kitchen": "ኩሽና",
+    "waiter": "አስተናጋጅ"
+  },
+  "admin": {
+    "title": "የአስተዳዳሪ ዳሽቦርድ",
+    "subtitle": "ሙሉ ቁጥጥር ላይ የምግብ ቤት አሰራር",
+    "adminAccess": "የአስተዳዳሪ መዳረሻ",
+    "activeUsers": "ንቁ ተጠቃሚዎች",
+    "kitchenQueue": "የኩሽና ማስተኛ",
+    "adminActions": "የአስተዳዳሪ ተግባራት",
+    "manageEmployees": "ሠራተኞችን ያስተዳድሩ",
+    "manageEmployeesDesc": "ሠራተኞችን ያክሉ፣ ያስተካክሉ ወይም ያስወግዱ",
+    "viewReports": "ሪፖርቶችን ይመልከቱ",
+    "viewReportsDesc": "ትንታኔ እና የአፈፃፀም ማስረጃዎች",
+    "settings": "ቅንብሮች",
+    "settingsDesc": "የስርዓት ቅንብሮችን ያዋቅሩ",
+    "inventory": "እቃዎች",
+    "inventoryDesc": "እቃዎችን እና ኃይሎችን ያስተዳድሩ"
+  },
+  "reservations": {
+    "title": "ቦታ ማስያዝ",
+    "manageTableReservations": "የጠረጴዛ ቦታ ያስተዳድሩ",
+    "searchPlaceholder": "ቦታ ማስያዝን ይፈልጉ...",
+    "newReservation": "አዲስ ቦታ ማስያዝ",
+    "noReservations": "እስካሁን ምንም ቦታ ማስያዝ የለም",
+    "noReservationsDesc": "አዲስ ቦታ ማስያዞች እንዲደረጉ እዚህ ይታያሉ።"
+  },
+  "employees": {
+    "title": "ሠራተኞች",
+    "noEmployees": "ምንም ሠራተኞች የሉም",
+    "noEmployeesDesc": "ምንም ሠራተኞች አልተገኙም። የመጀመሪያውን ሠራተኛ ለማክል ይጀምሩ።",
+    "chef": "ሹፌፍ",
+    "waitress": "አስተናጋጂት",
+    "waiter": "አስተናጋጅ",
+    "kitchenStaff": "የኩሽና ሠራተኞች",
+    "manager": "አስተዳዳሪ",
+    "cashier": "ካሻየር",
+    "bartender": "መጠጥ ቤት",
+    "host": "አስተናጋጅ",
+    "cleaner": "ንፁሓኛ"
+  },
+  "clientDashboard": {
+    "title": "የደንበኛ መዳፊ",
+    "subtitle": "ምናሌውን ያስለማቹ፣ ትዕዛዞችን ያስገቡ፣ እና ትዕዛዞችዎን ይከታተሩ",
+    "myProfile": "የእኔ መገለጫ",
+    "loyaltyPoints": "የታማኝነት ነጥቦች"
   },
   "bartender": {
     "title": "መጠጥ ቤት",

@@ -93,7 +93,7 @@ export default function ButcherDashboardPage() {
         body: JSON.stringify({ id: order.id, status: "APPROVED" }),
       });
       const data = await res.json();
-        if (data.success) {
+      if (data.success) {
         toast.success(isKurtOrder(order.menuItemName)
           ? t("butcher.orderApprovedWaiter", { orderNumber: order.orderNumber })
           : t("butcher.orderApprovedKitchen", { orderNumber: order.orderNumber }));

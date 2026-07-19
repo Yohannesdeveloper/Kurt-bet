@@ -1,7 +1,9 @@
 {
   "app": {
     "name": "Habesha Kurt Bet",
-    "tagline": "Authentic Ethiopian Cuisine"
+    "tagline": "Authentic Ethiopian Cuisine",
+    "enterpriseManagement": "Enterprise Management",
+    "logoAlt": "Habesha Kurt Bet Logo"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -28,6 +30,24 @@
     "favorites": "Favorites",
     "profile": "Profile"
   },
+  "settingsPage": {
+    "title": "Settings",
+    "subtitle": "Manage your restaurant configuration",
+    "profile": "Profile",
+    "general": "General",
+    "appearance": "Appearance",
+    "notifications": "Notifications",
+    "printing": "Printing",
+    "security": "Security",
+    "myProfile": "My Profile",
+    "myProfileDesc": "Your account information from login",
+    "administrator": "Administrator",
+    "waiter": "Waiter",
+    "kitchenStaff": "Kitchen Staff",
+    "bartender": "Bartender",
+    "butcher": "Butcher",
+    "client": "Client"
+  },
   "hero": {
     "title": "Delicious food,",
     "titleAccent": "delivered fast",
@@ -43,6 +63,7 @@
     "title": "Our Menu",
     "search": "Search menu items...",
     "all": "All",
+    "allCategories": "All Categories",
     "addToCart": "Add to Cart",
     "price": "Price",
     "category": "Category",
@@ -524,31 +545,7 @@
     "qrFeature8": "Save favorite dishes",
     "qrFeature9": "View promotions and special offers"
   },
-  "employees": {
-    "title": "Employees",
-    "addEmployee": "Add Employee",
-    "name": "Name",
-    "fatherName": "Father's Name",
-    "age": "Age",
-    "position": "Position",
-    "subtitle": "Manage your team",
-    "search": "Search employees...",
-    "total": "Total",
-    "active": "Active",
-    "positions": "Positions",
-    "noEmployees": "No employees yet",
-    "addFirstEmployee": "Add your first employee to start building your team.",
-    "action": "Action",
-    "enterFullName": "Enter full name",
-    "enterFatherName": "Enter father's name",
-    "enterAge": "Enter age",
-    "selectPosition": "Select position",
-    "addEmployeeDescription": "Fill in the employee details below",
-    "fillAllFields": "Please fill in all fields",
-    "ageRange": "Age must be between 18 and 100",
-    "added": "Employee added",
-    "removed": "Employee removed"
-  },
+
   "inventory": {
     "title": "Inventory",
     "addItem": "Add Item",
@@ -619,7 +616,61 @@
     "onFirstOrder": "on your first order",
     "codeFood50": "Code: FOOD50",
     "logout": "Logout",
-    "endSession": "End your session"
+    "endSession": "End your session",
+    "user": "User"
+  },
+  "roles": {
+    "admin": "Admin",
+    "client": "Client",
+    "bartender": "Bartender",
+    "vip_bartender": "VIP Bartender",
+    "butcher": "Butcher",
+    "kitchen": "Kitchen",
+    "waiter": "Waiter"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "subtitle": "Full control over restaurant operations",
+    "adminAccess": "Admin Access",
+    "activeUsers": "Active Users",
+    "kitchenQueue": "Kitchen Queue",
+    "adminActions": "Admin Actions",
+    "manageEmployees": "Manage Employees",
+    "manageEmployeesDesc": "Add, edit, or remove staff members",
+    "viewReports": "View Reports",
+    "viewReportsDesc": "Analytics and performance metrics",
+    "settings": "Settings",
+    "settingsDesc": "Configure system settings",
+    "inventory": "Inventory",
+    "inventoryDesc": "Manage stock and supplies"
+  },
+  "reservations": {
+    "title": "Reservations",
+    "manageTableReservations": "Manage table reservations",
+    "searchPlaceholder": "Search reservations...",
+    "newReservation": "New Reservation",
+    "noReservations": "No reservations yet",
+    "noReservationsDesc": "New reservations will appear here once they are made."
+  },
+  "employees": {
+    "title": "Employees",
+    "noEmployees": "No employees",
+    "noEmployeesDesc": "No employees found. Add your first employee to get started.",
+    "chef": "Chef",
+    "waitress": "Waitress",
+    "waiter": "Waiter",
+    "kitchenStaff": "Kitchen Staff",
+    "manager": "Manager",
+    "cashier": "Cashier",
+    "bartender": "Bartender",
+    "host": "Host",
+    "cleaner": "Cleaner"
+  },
+  "clientDashboard": {
+    "title": "Customer Portal",
+    "subtitle": "Browse menu, place orders, and track your orders",
+    "myProfile": "My Profile",
+    "loyaltyPoints": "Loyalty Points"
   },
   "bartender": {
     "title": "Bartender",

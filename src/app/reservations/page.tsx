@@ -8,8 +8,10 @@ import { ArrowLeft, Search, Plus, Inbox, Calendar } from "lucide-react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/lib/i18n";
 
 export default function ReservationsPage() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role || "CLIENT";
   const isAdmin = userRole === "ADMIN";
@@ -33,9 +35,9 @@ export default function ReservationsPage() {
             <Calendar className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">Reservations</h1>
+            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">{t("reservations.title")}</h1>
             <p className="text-sm text-muted-foreground">
-              Manage table reservations
+              {t("reservations.manageTableReservations")}
             </p>
           </div>
         </div>
@@ -43,7 +45,7 @@ export default function ReservationsPage() {
           <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search reservations..."
+              placeholder={t("reservations.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 h-10 lg:h-11 w-full sm:w-64 transition-all duration-200 focus:w-72"
@@ -51,7 +53,7 @@ export default function ReservationsPage() {
           </div>
           {isAdmin && (
             <Button variant="premium" className="h-10 lg:h-11 flex-shrink-0">
-              <Plus className="h-4 w-4 mr-2" /> New Reservation
+              <Plus className="h-4 w-4 mr-2" /> {t("reservations.newReservation")}
             </Button>
           )}
         </div>
@@ -67,13 +69,13 @@ export default function ReservationsPage() {
             <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
               <Inbox className="h-10 w-10 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold mb-2">No reservations yet</h3>
+            <h3 className="text-lg font-semibold mb-2">{t("reservations.noReservations")}</h3>
             <p className="text-sm text-muted-foreground mb-6">
-              New reservations will appear here once they are made.
+              {t("reservations.noReservationsDesc")}
             </p>
             {isAdmin && (
               <Button variant="premium" className="h-11">
-                <Plus className="h-4 w-4 mr-2" /> New Reservation
+                <Plus className="h-4 w-4 mr-2" /> {t("reservations.newReservation")}
               </Button>
             )}
           </CardContent>

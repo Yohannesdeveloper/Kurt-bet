@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,13 +31,7 @@ interface TableData {
   _count: { orders: number };
 }
 
-const filterOptions = [
-  { key: "ALL", label: "tables.all" },
-  { key: "AVAILABLE", label: "tables.available" },
-  { key: "OCCUPIED", label: "tables.occupied" },
-  { key: "RESERVED", label: "tables.reserved" },
-  { key: "CLEANING", label: "tables.cleaning" },
-];
+
 
 export default function TablesPage() {
   const { t } = useTranslation();
@@ -53,12 +47,20 @@ export default function TablesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [activeFilter, setActiveFilter] = useState("ALL");
 
-  const statusConfig: Record<string, { color: string; icon: typeof CircleCheck; label: string; border: string; bg: string }> = {
+  const statusConfig: Record<string, { color: string; icon: typeof CircleCheck; label: string; border: string; bg: string }> = useMemo(() => ({
     AVAILABLE: { color: "bg-green-100 text-green-700 border-green-200", icon: CircleCheck, label: t("tables.available"), border: "border-l-4 border-l-green-500", bg: "" },
     OCCUPIED: { color: "bg-amber-100 text-amber-700 border-amber-200", icon: UserCheck, label: t("tables.occupied"), border: "border-l-4 border-l-amber-500", bg: "" },
     RESERVED: { color: "bg-blue-100 text-blue-700 border-blue-200", icon: CalendarDays, label: t("tables.reserved"), border: "border-l-4 border-l-blue-500", bg: "" },
     CLEANING: { color: "bg-gray-100 text-gray-500 border-gray-200", icon: Clock, label: t("tables.cleaning"), border: "border-l-4 border-l-gray-400", bg: "" },
-  };
+  }), [t]);
+
+  const filterOptions = useMemo(() => [
+    { key: "ALL", label: t("tables.all") },
+    { key: "AVAILABLE", label: t("tables.available") },
+    { key: "OCCUPIED", label: t("tables.occupied") },
+    { key: "RESERVED", label: t("tables.reserved") },
+    { key: "CLEANING", label: t("tables.cleaning") },
+  ], [t]);
 
   const fetchTables = () => {
     fetch("/api/tables")
@@ -165,23 +167,23 @@ export default function TablesPage() {
             <Store className="h-5 w-5 lg:h-6 lg:w-6 text-primary" />
           </div>
           <div>
-            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">Tables</h1>
-            <p className="text-sm text-muted-foreground">{occupied}/{tables.length} occupied</p>
+            <h1 className="text-xl lg:text-2xl font-bold tracking-tight">{t("tables.title")}</h1>
+            <p className="text-sm text-muted-foreground">{occupied}/{tables.length} {t("tables.occupied")}</p>
           </div>
         </div>
         {tables.length > 0 && (
           <div className="flex items-center gap-2 lg:gap-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800">
               <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-              <span className="text-xs lg:text-sm font-medium text-emerald-700 dark:text-emerald-300">{available} free</span>
+              <span className="text-xs lg:text-sm font-medium text-emerald-700 dark:text-emerald-300">{available} {t("tables.free")}</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800">
               <span className="inline-block h-2 w-2 rounded-full bg-amber-500" />
-              <span className="text-xs lg:text-sm font-medium text-amber-700 dark:text-amber-300">{occupied} occupied</span>
+              <span className="text-xs lg:text-sm font-medium text-amber-700 dark:text-amber-300">{occupied} {t("tables.occupied")}</span>
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800">
               <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
-              <span className="text-xs lg:text-sm font-medium text-blue-700 dark:text-blue-300">{reserved} reserved</span>
+              <span className="text-xs lg:text-sm font-medium text-blue-700 dark:text-blue-300">{reserved} {t("tables.reserved")}</span>
             </div>
           </div>
         )}
@@ -222,7 +224,7 @@ export default function TablesPage() {
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-            <p className="text-sm text-muted-foreground">Loading tables...</p>
+            <p className="text-sm text-muted-foreground">{t("tables.loading")}</p>
           </div>
         </div>
       ) : tables.length === 0 ? (
@@ -236,8 +238,8 @@ export default function TablesPage() {
                 <div className="h-20 w-20 rounded-2xl bg-muted flex items-center justify-center mb-4">
                   <Store className="h-10 w-10" />
                 </div>
-                <p className="text-lg font-semibold mb-2">No tables configured</p>
-                <p className="text-sm">Add tables to get started with your floor plan</p>
+                <p className="text-lg font-semibold mb-2">{t("tables.noTables")}</p>
+                <p className="text-sm">{t("tables.noTablesDesc")}</p>
               </div>
             </CardContent>
           </Card>
@@ -286,14 +288,14 @@ export default function TablesPage() {
                             <span>
                               {table.status === "OCCUPIED"
                                 ? `${table.guestCount || 0}/${table.capacity}`
-                                : `${table.capacity} seats`}
+                                : `${table.capacity} ${t("tables.seats")}`}
                             </span>
                           </div>
 
                           {table.status === "OCCUPIED" && table.orders.length > 0 && (
                             <div className="mt-2 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800">
                               <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">
-                                Active order: {formatCurrency(table.orders[0].total)}
+                                {t("tables.activeOrder", { amount: formatCurrency(table.orders[0].total) })}
                               </p>
                             </div>
                           )}
@@ -301,7 +303,7 @@ export default function TablesPage() {
                           {table.status === "RESERVED" && canReserve && (
                             <div className="mt-3 pt-3 border-t">
                               <Button size="sm" variant="outline" className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400 dark:hover:bg-amber-950" onClick={() => handleFreeTable(table)}>
-                                <XCircle className="h-3.5 w-3.5 mr-1" /> Free Table
+                                <XCircle className="h-3.5 w-3.5 mr-1" /> {t("tables.freeTable")}
                               </Button>
                             </div>
                           )}
@@ -309,7 +311,7 @@ export default function TablesPage() {
                           {table.status === "AVAILABLE" && canReserve && (
                             <div className="mt-3 pt-3 border-t">
                               <Button size="sm" variant="outline" className="w-full border-green-300 text-green-700 hover:bg-green-50 dark:border-green-700 dark:text-green-400 dark:hover:bg-green-950" onClick={() => openReserveDialog(table)}>
-                                <CalendarCheck className="h-3.5 w-3.5 mr-1" /> Reserve
+                                <CalendarCheck className="h-3.5 w-3.5 mr-1" /> {t("tables.reserve")}
                               </Button>
                             </div>
                           )}
@@ -327,26 +329,26 @@ export default function TablesPage() {
       <Dialog open={reserveDialogOpen} onOpenChange={setReserveDialogOpen}>
         <DialogContent className="sm:max-w-[400px]">
           <DialogHeader>
-            <DialogTitle>Reserve {selectedTable?.name}</DialogTitle>
+            <DialogTitle>{t("tables.reserveTitle", { tableName: selectedTable?.name || "" })}</DialogTitle>
             <DialogDescription>
-              Enter guest details to reserve this table
+              {t("tables.reserveDesc")}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleReserve}>
             <div className="space-y-4 py-4">
               <div className="grid gap-2">
-                <Label htmlFor="guestName" className="text-sm font-medium">Guest Name *</Label>
+                <Label htmlFor="guestName" className="text-sm font-medium">{t("tables.guestName")}</Label>
                 <Input
                   id="guestName"
                   value={guestName}
                   onChange={e => setGuestName(e.target.value)}
-                  placeholder="e.g. Abebe Kebede"
+                  placeholder={t("tables.guestNamePlaceholder")}
                   required
                   className="h-11"
                 />
               </div>
               <div className="grid gap-2">
-                <Label htmlFor="guestCount" className="text-sm font-medium">Number of Guests</Label>
+                <Label htmlFor="guestCount" className="text-sm font-medium">{t("tables.numberOfGuests")}</Label>
                 <Input
                   id="guestCount"
                   type="number"
@@ -360,10 +362,10 @@ export default function TablesPage() {
             </div>
             <DialogFooter className="gap-2">
               <Button type="button" variant="outline" onClick={() => setReserveDialogOpen(false)} className="h-11">
-                Cancel
+                {t("tables.cancel")}
               </Button>
               <Button type="submit" disabled={submitting} className="h-11">
-                {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Reserving...</> : "Confirm Reservation"}
+                {submitting ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> {t("tables.reserving")}</> : t("tables.confirmReservation")}
               </Button>
             </DialogFooter>
           </form>

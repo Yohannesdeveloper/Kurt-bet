@@ -9,19 +9,21 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, Save, Palette, Bell, Shield, Printer, Settings, User, Mail, Briefcase, Hash } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
-const roleLabels: Record<string, string> = {
-  ADMIN: "Administrator",
-  WAITER: "Waiter",
-  KITCHEN: "Kitchen Staff",
-  BARTENDER: "Bartender",
-  BUTCHER: "Butcher",
-  CLIENT: "Client",
-};
+import { useTranslation } from "@/lib/i18n";
 
 export default function SettingsPage() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const user = session?.user as any;
+
+  const roleLabels: Record<string, string> = {
+    ADMIN: t("settingsPage.administrator"),
+    WAITER: t("settingsPage.waiter"),
+    KITCHEN: t("settingsPage.kitchenStaff"),
+    BARTENDER: t("settingsPage.bartender"),
+    BUTCHER: t("settingsPage.butcher"),
+    CLIENT: t("settingsPage.client"),
+  };
 
   const firstName = user?.firstName || "";
   const lastName = user?.lastName || "";
@@ -46,8 +48,8 @@ export default function SettingsPage() {
           <Settings className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight font-serif text-ethiopian-coffee dark:text-ethiopian-cream">Settings</h1>
-          <p className="text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">Manage your restaurant configuration</p>
+          <h1 className="text-2xl font-bold tracking-tight font-serif text-ethiopian-coffee dark:text-ethiopian-cream">{t("settingsPage.title")}</h1>
+          <p className="text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">{t("settingsPage.subtitle")}</p>
         </div>
       </motion.div>
 
@@ -60,19 +62,19 @@ export default function SettingsPage() {
           <CardContent className="p-6">
             <Tabs defaultValue="profile">
               <TabsList className="bg-muted/50 p-1">
-                <TabsTrigger value="profile" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Profile</TabsTrigger>
-                <TabsTrigger value="general" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">General</TabsTrigger>
-                <TabsTrigger value="appearance" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Appearance</TabsTrigger>
-                <TabsTrigger value="notifications" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Notifications</TabsTrigger>
-                <TabsTrigger value="printing" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Printing</TabsTrigger>
-                <TabsTrigger value="security" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">Security</TabsTrigger>
+                <TabsTrigger value="profile" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("settingsPage.profile")}</TabsTrigger>
+                <TabsTrigger value="general" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("settingsPage.general")}</TabsTrigger>
+                <TabsTrigger value="appearance" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("settingsPage.appearance")}</TabsTrigger>
+                <TabsTrigger value="notifications" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("settingsPage.notifications")}</TabsTrigger>
+                <TabsTrigger value="printing" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("settingsPage.printing")}</TabsTrigger>
+                <TabsTrigger value="security" className="data-[state=active]:bg-background data-[state=active]:shadow-sm">{t("settingsPage.security")}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="profile" className="mt-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-lg font-serif text-ethiopian-coffee dark:text-ethiopian-cream">My Profile</CardTitle>
-                    <CardDescription>Your account information from login</CardDescription>
+                    <CardTitle className="text-lg font-serif text-ethiopian-coffee dark:text-ethiopian-cream">{t("settingsPage.myProfile")}</CardTitle>
+                    <CardDescription>{t("settingsPage.myProfileDesc")}</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div className="flex items-center gap-5">

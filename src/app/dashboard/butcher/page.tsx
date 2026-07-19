@@ -130,6 +130,9 @@ export default function ButcherDashboardPage() {
     }
   };
 
+  const pendingOrders = orders.filter((o) => o.status === "PENDING");
+  const statusOrders = orders.filter((o) => o.status !== "PENDING");
+
   if (role !== "BUTCHER") {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -141,9 +144,6 @@ export default function ButcherDashboardPage() {
       </div>
     );
   }
-
-  const pendingOrders = orders.filter((o) => o.status === "PENDING");
-  const statusOrders = orders.filter((o) => o.status !== "PENDING");
 
   return (
     <div className="space-y-6">
@@ -162,7 +162,7 @@ export default function ButcherDashboardPage() {
               {pendingOrders.length > 0 ? (
                 <span className="text-ethiopian-burgundy font-semibold">{t("butcher.ordersWaiting", { count: pendingOrders.length })}</span>
               ) : (
-                {t("butcher.allProcessed")}
+                t("butcher.allProcessed")
               )}
             </p>
           </div>

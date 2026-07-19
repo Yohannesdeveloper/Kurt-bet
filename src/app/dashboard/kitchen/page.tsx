@@ -53,11 +53,11 @@ type ButcherOrder = {
 const STATUS_ORDER = ["NEW", "PREPARING", "READY", "SERVED"];
 
 const statsConfig = {
-  NEW:       { label: "Pending Orders",   value: "0", icon: Clock,       color: "from-amber-500 to-orange-600",    bgColor: "bg-amber-500/10",  iconColor: "text-amber-600" },
-  PREPARING: { label: "In Progress",      value: "0", icon: Flame,       color: "from-orange-500 to-red-600",     bgColor: "bg-orange-500/10",  iconColor: "text-orange-600" },
-  READY:     { label: "Ready to Serve",   value: "0", icon: CheckCircle, color: "from-ethiopian-gold to-ethiopian-coffee",  bgColor: "bg-ethiopian-gold/10", iconColor: "text-ethiopian-gold" },
-  SERVED:    { label: "Served Today",     value: "0", icon: Timer,       color: "from-blue-500 to-cyan-600",     bgColor: "bg-blue-500/10",   iconColor: "text-blue-600" },
-  BUTCHER:   { label: "Butcher Orders",  value: "0", icon: Beef,        color: "from-ethiopian-burgundy to-ethiopian-gold",  bgColor: "bg-red-500/10",   iconColor: "text-ethiopian-burgundy" },
+  NEW:       { value: "0", icon: Clock,       color: "from-amber-500 to-orange-600",    bgColor: "bg-amber-500/10",  iconColor: "text-amber-600" },
+  PREPARING: { value: "0", icon: Flame,       color: "from-orange-500 to-red-600",     bgColor: "bg-orange-500/10",  iconColor: "text-orange-600" },
+  READY:     { value: "0", icon: CheckCircle, color: "from-ethiopian-gold to-ethiopian-coffee",  bgColor: "bg-ethiopian-gold/10", iconColor: "text-ethiopian-gold" },
+  SERVED:    { value: "0", icon: Timer,       color: "from-blue-500 to-cyan-600",     bgColor: "bg-blue-500/10",   iconColor: "text-blue-600" },
+  BUTCHER:   { value: "0", icon: Beef,        color: "from-ethiopian-burgundy to-ethiopian-gold",  bgColor: "bg-red-500/10",   iconColor: "text-ethiopian-burgundy" },
 };
 
 export default function KitchenDashboard() {
@@ -66,12 +66,11 @@ export default function KitchenDashboard() {
   const isAdmin = userRole === "ADMIN";
   console.log("KITCHEN DASHBOARD MOUNTED - v3");
   const { t } = useTranslation();
-  const statusLabels: Record<string, string> = {
-    NEW: t("orders.pending"),
-    PREPARING: t("orders.preparing"),
-    READY: t("orders.ready"),
-    SERVED: t("orders.delivered"),
-    BUTCHER: t("dashboard.butcherOrders"),
+  const kitchenLabels: Record<string, string> = {
+    NEW: t("kitchen.pendingOrders"),
+    PREPARING: t("kitchen.inProgress"),
+    READY: t("kitchen.readyToServe"),
+    SERVED: t("kitchen.servedToday"),
   };
   const [counts, setCounts] = useState<Record<string, number>>({ NEW: 0, PREPARING: 0, READY: 0, SERVED: 0 });
   const [butcherOrders, setButcherOrders] = useState<ButcherOrder[]>([]);
@@ -79,20 +78,20 @@ export default function KitchenDashboard() {
   const [localReceivedOrders, setLocalReceivedOrders] = useState<ButcherOrder[]>([]);
 
   const deleteButcherOrder = async (id: string) => {
-    if (!confirm("Delete this butcher order?")) return;
+    if (!confirm(t("kitchen.confirmDelete"))) return;
     setActionLoading(id);
     try {
       const res = await fetch(`/api/butcher-orders?id=${encodeURIComponent(id)}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
-        toast.success("Butcher order deleted");
+        toast.success(t("kitchen.deleted"));
         setButcherOrders(prev => prev.filter(o => o.id !== id));
         setLocalReceivedOrders(prev => prev.filter(o => o.id !== id));
       } else {
-        toast.error(data.error || "Failed to delete");
+        toast.error(data.error || t("kitchen.deleteFailed"));
       }
     } catch {
-      toast.error("Failed to delete");
+      toast.error(t("kitchen.deleteFailed"));
     } finally {
       setActionLoading(null);
     }
@@ -146,12 +145,12 @@ export default function KitchenDashboard() {
       const data = await res.json();
       console.log("PATCH response:", data);
       if (data.success) {
-        toast.success(`Butcher order marked as received`);
+        toast.success(t("kitchen.markedReceived"));
       } else {
-        toast.error(data.error || "Action failed");
+        toast.error(data.error || t("kitchen.actionFailed"));
       }
     } catch {
-      toast.error("Action failed");
+      toast.error(t("kitchen.actionFailed"));
     } finally {
       setActionLoading(null);
     }
@@ -182,15 +181,15 @@ export default function KitchenDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight font-serif text-ethiopian-coffee dark:text-ethiopian-cream">
-            {t("nav.kitchen")} Dashboard
+            {t("nav.kitchen")} {t("kitchen.dashboardTitle")}
           </h1>
-          <p className="text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 mt-1">Manage incoming orders and kitchen queue</p>
+          <p className="text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 mt-1">{t("kitchen.subtitle")}</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-300">v3</span>
           <div className="h-2 w-2 rounded-full bg-ethiopian-gold animate-pulse" />
           <ChefHat className="h-5 w-5 text-ethiopian-gold" />
-          <span className="text-sm font-medium text-ethiopian-coffee dark:text-ethiopian-cream">{total} active</span>
+          <span className="text-sm font-medium text-ethiopian-coffee dark:text-ethiopian-cream">{t("kitchen.active", { count: total })}</span>
         </div>
       </div>
 
@@ -211,7 +210,7 @@ export default function KitchenDashboard() {
                       <s.icon className={`h-5 w-5 lg:h-6 lg:w-6 ${s.iconColor}`} />
                     </div>
                   </div>
-                  <p className="text-xs lg:text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 font-medium mb-1">{statusLabels[status]}</p>
+                  <p className="text-xs lg:text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 font-medium mb-1">{kitchenLabels[status]}</p>
                   <p className="text-2xl lg:text-3xl font-bold tracking-tight text-ethiopian-coffee dark:text-ethiopian-cream">{counts[status]}</p>
                 </CardContent>
               </Card>
@@ -240,13 +239,13 @@ export default function KitchenDashboard() {
       {/* Butcher Orders - Awaiting Receipt */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee dark:text-ethiopian-cream">Butcher Orders</h2>
-          <span className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">In New Orders: {localReceivedOrders.length}</span>
+          <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee dark:text-ethiopian-cream">{t("kitchen.butcherOrders")}</h2>
+          <span className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">{t("kitchen.inNewOrders", { count: localReceivedOrders.length })}</span>
         </div>
         {waitingOrders.length === 0 ? (
           <div className="text-center py-6 text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 bg-white dark:bg-gray-950 rounded-2xl shadow-md border border-ethiopian-gold/10">
             <CheckCircle className="w-8 h-8 mx-auto mb-2 text-emerald-500" />
-            <p className="text-sm">All butcher orders received</p>
+            <p className="text-sm">{t("kitchen.allReceived")}</p>
           </div>
         ) : (
           <div className="grid gap-4">
@@ -262,10 +261,10 @@ export default function KitchenDashboard() {
                     <DishThumb name={order.menuItemName} />
                     <span className="text-lg font-bold text-ethiopian-coffee dark:text-ethiopian-cream">#{order.orderNumber}</span>
                     {order.tableNumber && (
-                      <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                      <span className="text-sm font-semibold text-ethiopian-gold">{t("kitchen.table", { number: order.tableNumber })}</span>
                     )}
                     <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700">
-                      Waiting
+                      {t("kitchen.waiting")}
                     </span>
                     <span className="text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 flex items-center gap-1">
                       <Clock className="w-3.5 h-3.5" />
@@ -275,24 +274,24 @@ export default function KitchenDashboard() {
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20 dark:bg-gray-800/50">
                     <div>
-                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">Meat Type</p>
+                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">{t("kitchen.meatType")}</p>
                       <p className="text-sm font-bold text-ethiopian-burgundy dark:text-red-400">{order.meatType}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">Dish</p>
+                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">{t("kitchen.dish")}</p>
                       <p className="text-sm font-semibold text-ethiopian-coffee dark:text-ethiopian-cream">{order.menuItemName}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">Weight</p>
+                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">{t("kitchen.weight")}</p>
                       <p className="text-sm font-bold text-ethiopian-gold">{order.weight} kg</p>
                     </div>
                     <div>
-                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">Quantity</p>
+                      <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">{t("kitchen.quantity")}</p>
                       <p className="text-sm font-semibold text-ethiopian-coffee dark:text-ethiopian-cream">x{order.quantity}</p>
                     </div>
                     {order.notes && (
                       <div className="col-span-2 sm:col-span-4">
-                        <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">Notes</p>
+                        <p className="text-xs text-ethiopian-coffee/40 dark:text-ethiopian-cream/40">{t("kitchen.notes")}</p>
                         <p className="text-sm italic text-ethiopian-coffee/70 dark:text-ethiopian-cream/70">{order.notes}</p>
                       </div>
                     )}
@@ -305,17 +304,17 @@ export default function KitchenDashboard() {
                       className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-all disabled:opacity-50"
                     >
                       <Check className="w-4 h-4" />
-                      {actionLoading === order.id ? "Marking..." : "Mark as Received"}
+                      {actionLoading === order.id ? t("kitchen.marking") : t("kitchen.markReceived")}
                     </button>
                     {isAdmin && (
                       <button
                         onClick={() => deleteButcherOrder(order.id)}
                         disabled={actionLoading === order.id}
                         className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-100 dark:bg-red-950/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/40 transition-all disabled:opacity-50 text-sm font-medium"
-                        title="Delete order"
+                        title={t("kitchen.delete")}
                       >
                         {actionLoading === order.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                        Delete
+                        {t("kitchen.delete")}
                       </button>
                     )}
                   </div>
@@ -335,7 +334,7 @@ export default function KitchenDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 font-serif text-ethiopian-coffee dark:text-ethiopian-cream">
               <AlertCircle className="h-5 w-5 text-ethiopian-gold" />
-              Order Queue
+              {t("kitchen.orderQueue")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -357,30 +356,30 @@ export default function KitchenDashboard() {
             {total === 0 && receivedOrders.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">
                 <ChefHat className="h-16 w-16 mb-4 opacity-30 text-ethiopian-coffee dark:text-ethiopian-cream" />
-                <p className="font-medium mb-1 text-ethiopian-coffee dark:text-ethiopian-cream">No orders in queue</p>
-                <p className="text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">New orders will appear here</p>
+                <p className="font-medium mb-1 text-ethiopian-coffee dark:text-ethiopian-cream">{t("kitchen.noOrdersInQueue")}</p>
+                <p className="text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">{t("kitchen.newOrdersWillAppear")}</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {receivedOrders.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-xs font-semibold text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 uppercase tracking-wider">New Orders</p>
+                    <p className="text-xs font-semibold text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 uppercase tracking-wider">{t("kitchen.newOrdersLabel")}</p>
                     {receivedOrders.map((order) => (
                       <div key={order.id} className="flex items-center gap-3 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/30">
                         <DishThumb name={order.menuItemName} size="sm" />
                         <Beef className="w-4 h-4 text-ethiopian-burgundy flex-shrink-0" />
                         <span className="text-sm font-semibold text-ethiopian-coffee dark:text-ethiopian-cream">#{order.orderNumber} {order.menuItemName}</span>
                         <span className="text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">{order.meatType} · {order.weight}kg · x{order.quantity}</span>
-                        {order.tableNumber && <span className="text-xs font-medium text-ethiopian-gold ml-auto">Table {order.tableNumber}</span>}
+                        {order.tableNumber && <span className="text-xs font-medium text-ethiopian-gold ml-auto">{t("kitchen.table", { number: order.tableNumber })}</span>}
                         {isAdmin && (
                           <button
                             onClick={() => deleteButcherOrder(order.id)}
                             disabled={actionLoading === order.id}
                             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/30 text-red-500 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 hover:text-red-600 transition-colors disabled:opacity-50 text-xs font-medium"
-                            title="Delete"
+                            title={t("kitchen.delete")}
                           >
                             {actionLoading === order.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                            Delete
+                            {t("kitchen.delete")}
                           </button>
                         )}
                       </div>
@@ -392,8 +391,8 @@ export default function KitchenDashboard() {
                     Array.from({ length: Math.min(counts[status], 3) }).map((_, i) => (
                       <div key={`${status}-${i}`} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 dark:bg-gray-800/50">
                         <div className={`h-2 w-2 rounded-full ${statsConfig[status as keyof typeof statsConfig].bgColor}`} />
-                        <span className="text-sm font-medium text-ethiopian-coffee dark:text-ethiopian-cream">{statusLabels[status]}</span>
-                        <span className="text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 ml-auto">In queue</span>
+                        <span className="text-sm font-medium text-ethiopian-coffee dark:text-ethiopian-cream">{kitchenLabels[status]}</span>
+                        <span className="text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 ml-auto">{t("kitchen.inQueue")}</span>
                       </div>
                     ))
                   )}
@@ -403,7 +402,7 @@ export default function KitchenDashboard() {
             <Button className="w-full mt-4" variant="premium" asChild>
               <Link href="/kds">
                 <CookingPot className="h-4 w-4 mr-2" />
-                Open Kitchen Display System
+                {t("kitchen.openKDS")}
               </Link>
             </Button>
           </CardContent>

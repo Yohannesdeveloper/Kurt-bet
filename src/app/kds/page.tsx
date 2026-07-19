@@ -68,13 +68,13 @@ const STATUS_FLOW: Record<string, { next: string | null; label: string; color: s
 
 const STATUS_ORDER = ["NEW", "READY"];
 
-function formatTime(iso: string) {
+function formatTime(iso: string, t: (key: string, params?: Record<string, string | number>) => string) {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "just now";
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return t("kds.justNow");
+  if (mins < 60) return t("kds.minutesAgo", { n: mins });
   const hrs = Math.floor(mins / 60);
-  return `${hrs}h ${mins % 60}m`;
+  return t("kds.hoursAgo", { h: hrs, m: mins % 60 });
 }
 
 const OrderCard = memo(function OrderCard({ order, onStatusUpdate, isAdmin }: { order: Order; onStatusUpdate: (id: string, status: string) => void; isAdmin?: boolean }) {
@@ -100,7 +100,7 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate, isAdmin }: { 
       });
       const d = await res.json();
       if (d.success) {
-        toast.success(`Order #${order.orderNumber} → ${STATUS_FLOW[newStatus]?.label || newStatus}`);
+        toast.success(t("kds.movedToNewOrders"));
         const socket = getSocket();
         if (socket.connected) {
           sendKitchenUpdate(socket, {
@@ -110,10 +110,10 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate, isAdmin }: { 
           });
         }
       } else {
-        toast.error(d.error || "Status update failed");
+        toast.error(d.error || t("kds.statusUpdateFailed"));
       }
     } catch {
-      toast.error("Status update failed (network)");
+      toast.error(t("kds.statusUpdateFailedNetwork"));
     } finally {
       setUpdating(false);
     }
@@ -131,9 +131,9 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate, isAdmin }: { 
                 <Badge variant={order.status === "NEW" ? "premium" : "outline"} className={`text-xs ${s.color}`}>{statusTLabel[order.status]}</Badge>
               </div>
               <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/70">
-                <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(order.createdAt)}</span>
-                {order.table && <span className="flex items-center gap-1"><UtensilsCrossed className="h-3 w-3" />Table {order.table.number}</span>}
-                {order.guestCount && <span>{order.guestCount} guests</span>}
+                <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(order.createdAt, t)}</span>
+                {order.table && <span className="flex items-center gap-1"><UtensilsCrossed className="h-3 w-3" />{t("kds.table", { number: order.table.number })}</span>}
+                {order.guestCount && <span>{t("kds.guests", { count: order.guestCount })}</span>}
               </div>
             </div>
             {order.notes && (
@@ -181,21 +181,21 @@ const OrderCard = memo(function OrderCard({ order, onStatusUpdate, isAdmin }: { 
             {isAdmin && order.status === "READY" && (
               <button
                 onClick={async () => {
-                  if (!confirm("Delete this order from KDS?")) return;
+                  if (!confirm(t("kds.confirmDeleteOrder"))) return;
                   setDeleting(true);
                   try {
                     const res = await fetch(`/api/orders/${order.id}`, { method: "DELETE" });
                     const d = await res.json();
-                    if (d.success) { toast.success("Order deleted"); onStatusUpdate(order.id, "DELETED"); }
-                    else { toast.error(d.error || "Failed"); }
-                  } catch { toast.error("Failed"); }
+                    if (d.success) { toast.success(t("kds.orderDeleted")); onStatusUpdate(order.id, "DELETED"); }
+                    else { toast.error(d.error || t("kds.failed")); }
+                  } catch { toast.error(t("kds.failed")); }
                   setDeleting(false);
                 }}
                 disabled={deleting}
                 className="ml-auto flex items-center gap-1 px-2 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors text-xs font-medium disabled:opacity-50"
-                title="Delete order"
+                title={t("kds.deleteOrder")}
               >
-                <Trash2 className="w-3.5 h-3.5" /> {deleting ? "..." : "Delete"}
+                <Trash2 className="w-3.5 h-3.5" /> {deleting ? "..." : t("kds.delete")}
               </button>
             )}
           </div>
@@ -290,15 +290,15 @@ export default function KDSPage() {
       });
       const orderData = await res.json();
       if (orderData.success) {
-        toast.success(`#${bo.orderNumber} moved to New Orders`);
+        toast.success(t("kds.movedToNewOrders"));
         setOrders(prev => [orderData.data, ...prev]);
         await fetch(`/api/butcher-orders?id=${encodeURIComponent(bo.id)}`, { method: "DELETE" });
         fetchButcherOrders();
       } else {
-        toast.error(orderData.error || "Failed");
+        toast.error(orderData.error || t("kds.failed"));
       }
     } catch {
-      toast.error("Failed to receive order");
+      toast.error(t("kds.failed"));
     }
   };
 
@@ -342,27 +342,27 @@ export default function KDSPage() {
           </div>
           <div>
             <h1 className="text-lg font-bold tracking-tight text-ethiopian-gold font-serif">{t("kds.title")}</h1>
-            <p className="text-xs text-ethiopian-cream/50">{orders.length + waitingButcherOrders.length} orders active</p>
+            <p className="text-xs text-ethiopian-cream/50">{t("kds.ordersActive", { count: orders.length + waitingButcherOrders.length })}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <motion.div animate={{ scale: [1, 1.2, 1] }} transition={{ duration: 2, repeat: Infinity }} className="h-2 w-2 rounded-full bg-ethiopian-gold" />
-          <span className="text-xs text-ethiopian-cream/50">Live</span>
+          <span className="text-xs text-ethiopian-cream/50">{t("kds.live")}</span>
           {isAdmin && (
             <button
               onClick={async () => {
-                if (!confirm("Clear all orders from KDS (New, Ready, Butcher)?")) return;
+                if (!confirm(t("kds.confirmClear"))) return;
                 try {
                   const res = await fetch("/api/orders/clear-history", { method: "DELETE" });
                   const d = await res.json();
-                  if (d.success) { toast.success("All orders cleared"); refresh(); }
-                  else { toast.error(d.error || "Failed"); }
-                } catch { toast.error("Failed"); }
+                  if (d.success) { toast.success(t("kds.cleared")); refresh(); }
+                  else { toast.error(d.error || t("kds.failed")); }
+                } catch { toast.error(t("kds.failed")); }
               }}
               className="ml-3 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-ethiopian-clay/10 text-ethiopian-clay hover:bg-ethiopian-clay/20 transition-colors text-xs font-medium border border-ethiopian-clay/20"
-              title="Clear history"
+              title={t("kds.clearHistory")}
             >
-              <Trash2 className="w-3.5 h-3.5" /> Clear history
+              <Trash2 className="w-3.5 h-3.5" /> {t("kds.clearHistory")}
             </button>
           )}
         </div>
@@ -433,8 +433,8 @@ export default function KDSPage() {
                                   <Badge variant="outline" className="text-xs text-ethiopian-clay border-ethiopian-clay/30">{t("kds.butcher")}</Badge>
                                 </div>
                                 <div className="flex items-center gap-3 text-xs text-ethiopian-coffee/60 dark:text-ethiopian-cream/70">
-                                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(bo.createdAt)}</span>
-                                  {bo.tableNumber && <span>Table {bo.tableNumber}</span>}
+                                  <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{formatTime(bo.createdAt, t)}</span>
+                                  {bo.tableNumber && <span>{t("kds.table", { number: bo.tableNumber })}</span>}
                                 </div>
                               </div>
                             </div>
@@ -458,23 +458,23 @@ export default function KDSPage() {
                               </Button>
                             )}
                             {bo.kitchenStatus === "RECEIVED" && (
-                              <Badge variant="secondary" className="text-xs">Received</Badge>
+                              <Badge variant="secondary" className="text-xs">{t("kds.received")}</Badge>
                             )}
                             {isAdmin && (
                               <button
                                 onClick={async () => {
-                                  if (!confirm("Delete this butcher order?")) return;
+                                  if (!confirm(t("kds.confirmDeleteButcher"))) return;
                                   try {
                                     const res = await fetch(`/api/butcher-orders?id=${encodeURIComponent(bo.id)}`, { method: "DELETE" });
                                     const d = await res.json();
-                                    if (d.success) { toast.success("Deleted"); fetchButcherOrders(); }
-                                    else { toast.error(d.error || "Failed"); }
-                                  } catch { toast.error("Failed"); }
+                                    if (d.success) { toast.success(t("kds.deleted")); fetchButcherOrders(); }
+                                    else { toast.error(d.error || t("kds.failed")); }
+                                  } catch { toast.error(t("kds.failed")); }
                                 }}
                                 className="ml-auto flex items-center gap-1 px-2 py-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600 transition-colors text-xs font-medium"
                                 title="Delete order"
                               >
-                                <Trash2 className="w-3.5 h-3.5" /> Delete
+                                <Trash2 className="w-3.5 h-3.5" /> {t("kds.delete")}
                               </button>
                             )}
                           </div>

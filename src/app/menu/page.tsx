@@ -21,12 +21,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Search, Plus, UtensilsCrossed, Loader2, Clock, Edit, Trash2, ShoppingCart, Minus, X, Check, Send, ArrowRight, Coffee, Gem } from "lucide-react";
+import { ArrowLeft, Search, Plus, UtensilsCrossed, Loader2, Clock, Edit, Trash2, ShoppingCart, Minus, X, Check, Send, ArrowRight, Coffee, Gem, Filter } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { motion } from "framer-motion";
 import { useTranslation } from "@/lib/i18n";
+
+function hasAmharic(text: string): boolean {
+  return /[\u1200-\u137F]/.test(text);
+}
+
+function getLocalizedName(name: string, locale: string): string {
+  const match = name.match(/^(.+?)\s*\((.+?)\)$/);
+  if (match) {
+    const [, before, inside] = match;
+    if (locale === "am") return hasAmharic(before) ? before : inside;
+    return hasAmharic(before) ? inside : before;
+  }
+  return name;
+}
+
 import { useAppSelector, useAppDispatch } from "@/lib/store/hooks";
 import { fetchMenu, addItem, updateItem as updateItemAction, removeItem, optimisticToggleAvailability } from "@/lib/store/features/menuSlice";
 import type { MenuItem, MenuCategory } from "@/lib/store/features/menuSlice";
@@ -43,7 +58,7 @@ interface CartItem {
 
 export default function MenuPage() {
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const { items, categories, loading } = useAppSelector(s => s.menu);
 
   const descMap: Record<string, string> = {
@@ -62,11 +77,15 @@ export default function MenuPage() {
   const canAddItem = ["ADMIN", "WAITER", "KITCHEN"].includes(userRole);
   const canEditDelete = userRole === "ADMIN";
   const [searchQuery, setSearchQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [availabilityFilter, setAvailabilityFilter] = useState<"all" | "available" | "unavailable">("all");
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const q = params.get("search");
     if (q) setSearchQuery(q);
+    const cat = params.get("category");
+    if (cat) setCategoryFilter(cat);
   }, []);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
@@ -133,12 +152,22 @@ export default function MenuPage() {
   const cartTotal = cart.reduce((s, c) => s + c.totalPrice, 0);
   const cartCount = cart.reduce((s, c) => s + c.quantity, 0);
 
-  const filtered = useMemo(() =>
-    items.filter(i =>
-      i.name.toLowerCase().includes(searchQuery.toLowerCase())
-    ),
-    [items, searchQuery]
-  );
+  const filtered = useMemo(() => {
+    let matchingCategoryIds: string[] = [];
+    if (categoryFilter !== "all") {
+      matchingCategoryIds = [categoryFilter];
+      categories.forEach(c => {
+        if (c.parentId === categoryFilter) matchingCategoryIds.push(c.id);
+      });
+    }
+    return items.filter(i => {
+      if (!i.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+      if (categoryFilter !== "all" && !matchingCategoryIds.includes(i.categoryId)) return false;
+      if (availabilityFilter === "available" && !i.isAvailable) return false;
+      if (availabilityFilter === "unavailable" && i.isAvailable) return false;
+      return true;
+    });
+  }, [items, searchQuery, categoryFilter, availabilityFilter, categories]);
 
   const grouped = useMemo(() => {
     const topLevel = categories.filter(c => !c.parentId).sort((a, b) => a.sortOrder - b.sortOrder);
@@ -170,7 +199,7 @@ export default function MenuPage() {
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4 pt-12">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm lg:text-base text-white drop-shadow-sm">{item.name}</p>
+                    <p className="font-semibold text-sm lg:text-base text-white drop-shadow-sm">{getLocalizedName(item.name, locale)}</p>
                     {item.description && (
                       <p className="text-xs text-white/80 line-clamp-1 mt-0.5">{itemDesc(item)}</p>
                     )}
@@ -209,7 +238,7 @@ export default function MenuPage() {
             <CardContent className="p-4 lg:p-5 pb-2">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm lg:text-base text-foreground dark:text-ethiopian-cream">{item.name}</p>
+                  <p className="font-semibold text-sm lg:text-base text-foreground dark:text-ethiopian-cream">{getLocalizedName(item.name, locale)}</p>
                   {item.description && (
                     <p className="text-xs text-muted-foreground dark:text-ethiopian-cream/60 line-clamp-1 mt-0.5">{itemDesc(item)}</p>
                   )}
@@ -273,7 +302,7 @@ export default function MenuPage() {
                       : "bg-red-50 text-red-700 border-red-200 hover:bg-red-100"
                   }`}
                 >
-                  {item.isAvailable ? "Available" : "Unavailable"}
+                  {item.isAvailable ? (locale === "am" ? "የሚገኝ" : "Available") : (locale === "am" ? "የማይገኝ" : "Unavailable")}
                 </button>
               </div>
             )}
@@ -328,7 +357,7 @@ export default function MenuPage() {
           </div>
           <div>
             <h1 className="text-xl lg:text-2xl font-bold tracking-tight">{t("menu.title")}</h1>
-            <p className="text-sm text-muted-foreground">{items.length} items · {categories.length} categories</p>
+            <p className="text-sm text-muted-foreground">{filtered.length}{filtered.length !== items.length ? ` of ${items.length}` : ""} items · {categories.length} categories</p>
           </div>
         </div>
         <div className="flex items-center gap-2 lg:gap-3 w-full sm:w-auto">
@@ -352,6 +381,59 @@ export default function MenuPage() {
           )}
         </div>
       </motion.div>
+
+      {/* Filter Bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 sm:p-4 rounded-xl bg-muted/50 border border-border">
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Filter className="h-5 w-5 text-primary" />
+          <span className="text-sm font-bold text-foreground uppercase tracking-wider">{locale === "am" ? "ማጣሪያዎች" : "Filters"}</span>
+        </div>
+        <div className="flex items-center gap-2.5 flex-wrap flex-1">
+          <button
+            onClick={() => setCategoryFilter("all")}
+            className={`px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all duration-200 ${
+              categoryFilter === "all"
+                ? "bg-primary text-primary-foreground border-primary shadow-md"
+                : "bg-background text-foreground border-border hover:border-primary/40 hover:text-foreground"
+            }`}
+          >
+            {locale === "am" ? "ሁሉም ምድቦች" : "All Categories"}
+          </button>
+          {categories.filter(c => !c.parentId).sort((a, b) => a.sortOrder - b.sortOrder).map(cat => (
+            <button
+              key={cat.id}
+              onClick={() => setCategoryFilter(categoryFilter === cat.id ? "all" : cat.id)}
+              className={`px-4 py-2 rounded-full text-sm font-semibold border-2 transition-all duration-200 ${
+                categoryFilter === cat.id
+                  ? "bg-primary text-primary-foreground border-primary shadow-md"
+                  : "bg-background text-foreground border-border hover:border-primary/40 hover:text-foreground"
+              }`}
+            >
+              {getLocalizedName(cat.name, locale)}
+            </button>
+          ))}
+        </div>
+        {canAddItem && (
+          <select
+            value={availabilityFilter}
+            onChange={(e) => setAvailabilityFilter(e.target.value as typeof availabilityFilter)}
+            className="h-10 px-3 rounded-lg text-sm font-semibold border-2 border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+          >
+            <option value="all">{locale === "am" ? "ሁሉም ሁኔታ" : "All Status"}</option>
+            <option value="available">{locale === "am" ? "የሚገኝ" : "Available"}</option>
+            <option value="unavailable">{locale === "am" ? "የማይገኝ" : "Unavailable"}</option>
+          </select>
+        )}
+        {(categoryFilter !== "all" || availabilityFilter !== "all" || searchQuery) && (
+          <button
+            onClick={() => { setCategoryFilter("all"); setAvailabilityFilter("all"); setSearchQuery(""); }}
+            className="px-4 py-2 rounded-full text-sm font-semibold text-destructive hover:bg-destructive/10 border-2 border-destructive/20 transition-all duration-200"
+          >
+            <X className="h-3.5 w-3.5 inline mr-1" />
+            {locale === "am" ? "ሁሉንም ያጽዱ" : "Clear all"}
+          </button>
+        )}
+      </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
@@ -379,7 +461,7 @@ export default function MenuPage() {
                     onClick={() => { setEditingItem(null); setDialogOpen(true); }}
                     className="h-11 hover:from-ethiopian-clay hover:to-ethiopian-burgundy"
                   >
-                    <Plus className="h-4 w-4 mr-2" /> Add Item
+              <Plus className="h-4 w-4 mr-2" /> {locale === "am" ? "ዕቃ ያክሉ" : "Add Item"}
                   </Button>
                 )}
               </div>
@@ -397,7 +479,7 @@ export default function MenuPage() {
             >
               <div className="flex items-center gap-3 mb-6">
                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">{cat.name}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground tracking-wide">{getLocalizedName(cat.name, locale)}</h2>
                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
               </div>
 
@@ -415,7 +497,7 @@ export default function MenuPage() {
                 <div key={sub.id} className="mb-8">
                   <div className="flex items-center gap-3 mb-4 ml-4">
                     <div className="w-2 h-2 rounded-full bg-border" />
-                    <h3 className="text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider">{sub.name}</h3>
+                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">{getLocalizedName(sub.name, locale)}</h3>
                     <div className="h-px flex-1 bg-gradient-to-r from-border/50 to-transparent" />
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">

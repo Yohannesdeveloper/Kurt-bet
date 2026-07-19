@@ -11,6 +11,8 @@ import { useTheme } from "next-themes";
 import { QRCodeSVG } from "qrcode.react";
 import { SectionHeader, EthiopianCard, GoldButton, PatternDivider, LoadingSpinner } from "@/components/shared/section-header";
 import { EthiopianCornerSet, JebenaIcon, MesobIcon, SpiceIcon, InjeraIcon } from "@/components/shared/ethiopian-patterns";
+import { NotificationPopups } from "@/components/shared/NotificationPopups";
+import { useSSENotifications } from "@/hooks/useSSENotifications";
 import {
   Coffee, Leaf, Heart, Wine, Users,
   ChevronDown, Star, MapPin, Clock, Phone, ArrowRight,
@@ -1117,6 +1119,7 @@ function Footer() {
 
 export default function HomePage() {
   const { status } = useSession();
+  useSSENotifications();
   if (status === "loading") return (
     <div className="min-h-screen flex items-center justify-center bg-ethiopian-charcoal">
       <div className="relative">
@@ -1135,6 +1138,7 @@ export default function HomePage() {
   );
   return (
     <div className="bg-ethiopian-cream dark:bg-black">
+      <NotificationPopups />
       <FloatingNav />
       <HeroSection />
       <FeatureHighlights />

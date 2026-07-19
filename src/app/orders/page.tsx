@@ -200,7 +200,7 @@ export default function OrdersPage() {
           </Link>
           <div>
             <h1 className="text-lg sm:text-xl font-bold text-ethiopian-gold font-serif">{t("nav.orders")}</h1>
-            <p className="text-xs text-ethiopian-cream/80">{orders.length + filteredButcher.length} orders</p>
+            <p className="text-xs text-ethiopian-cream/80">{t("orders.orderCount", { count: orders.length + filteredButcher.length })}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -221,17 +221,17 @@ export default function OrdersPage() {
             <Button
               variant="outline"
               onClick={async () => {
-                if (!confirm("Clear all orders permanently?")) return;
+                if (!confirm(t("orders.confirmClear"))) return;
                 try {
                   const res = await fetch("/api/orders/clear-history", { method: "DELETE" });
                   const d = await res.json();
-                  if (d.success) { toast.success("All orders cleared"); fetchOrders(); }
-                  else { toast.error(d.error || "Failed"); }
-                } catch { toast.error("Failed"); }
+                  if (d.success) { toast.success(t("orders.cleared")); fetchOrders(); }
+                  else { toast.error(d.error || t("orders.failed")); }
+                } catch { toast.error(t("orders.failed")); }
               }}
               className="h-10 lg:h-11 flex-shrink-0 text-red-500 border-red-200 hover:bg-red-50"
             >
-              <Trash2 className="h-4 w-4 mr-2" /> Clear history
+              <Trash2 className="h-4 w-4 mr-2" /> {t("orders.clearHistory")}
             </Button>
           )}
           {canCreateOrder && (
@@ -315,6 +315,7 @@ export default function OrdersPage() {
 
 function ButcherOrderCard({ order, index, canApprove, onApprove }: { order: ButcherOrder; index: number; canApprove: boolean; onApprove: (id: string) => void }) {
   const [approving, setApproving] = useState(false);
+  const { t } = useTranslation();
   const statusColors: Record<string, string> = {
     PENDING: "bg-amber-100 text-amber-800",
     APPROVED: "bg-emerald-100 text-emerald-800",
@@ -336,13 +337,13 @@ function ButcherOrderCard({ order, index, canApprove, onApprove }: { order: Butc
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Order #${order.orderNumber} approved & sent to kitchen`);
+        toast.success(t("orders.approveAndSendToKitchen"));
         onApprove(order.id);
       } else {
-        toast.error(data.error || "Failed");
+        toast.error(data.error || t("orders.failed"));
       }
     } catch {
-      toast.error("Failed to approve");
+      toast.error(t("orders.failed"));
     } finally {
       setApproving(false);
     }
@@ -364,13 +365,13 @@ function ButcherOrderCard({ order, index, canApprove, onApprove }: { order: Butc
                   {order.status}
                 </span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-ethiopian-burgundy/15 text-ethiopian-burgundy">
-                  Butcher
+                  {t("orders.butcherBadge")}
                 </span>
               </div>
               <p className="text-xs text-ethiopian-cream/60 flex items-center gap-1">
                 <Clock className="h-3 w-3" />
                 {new Date(order.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                {order.tableNumber && <span className="ml-2">Table {order.tableNumber}</span>}
+                {order.tableNumber && <span className="ml-2">{t("orders.tableNumber", { number: order.tableNumber })}</span>}
               </p>
             </div>
           </div>
@@ -394,13 +395,13 @@ function ButcherOrderCard({ order, index, canApprove, onApprove }: { order: Butc
                 onClick={handleApprove}
                 className="h-8 text-xs gap-1"
               >
-                {approving ? "..." : <><Check className="h-3 w-3" /> Approve & Send to Kitchen</>}
+                {approving ? "..." : <><Check className="h-3 w-3" /> {t("orders.approveAndSendToKitchen")}</>}
               </Button>
             </div>
           )}
           {order.status === "APPROVED" && (
             <div className="pt-2 border-t border-ethiopian-gold/10">
-              <span className="text-xs text-emerald-500 font-medium flex items-center gap-1"><Check className="h-3 w-3" /> Sent to kitchen</span>
+              <span className="text-xs text-emerald-500 font-medium flex items-center gap-1"><Check className="h-3 w-3" /> {t("orders.sentToKitchen")}</span>
             </div>
           )}
         </div>
@@ -423,19 +424,19 @@ function OrderCard({ order, index, isAdmin, canApprove, onApprove, onDelete }: {
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!confirm("Are you sure you want to delete this order?")) return;
+    if (!confirm(t("orders.confirmDelete"))) return;
     setDeleting(true);
     try {
       const res = await fetch(`/api/orders/${order.id}`, { method: "DELETE" });
       const data = await res.json();
       if (data.success) {
-        toast.success("Order deleted");
+        toast.success(t("orders.deleted"));
         onDelete(order.id);
       } else {
-        toast.error(data.error || "Failed to delete order");
+        toast.error(data.error || t("orders.deleteFailed"));
       }
     } catch {
-      toast.error("Failed to delete order");
+      toast.error(t("orders.deleteFailed"));
     } finally {
       setDeleting(false);
     }
@@ -519,7 +520,7 @@ function OrderCard({ order, index, isAdmin, canApprove, onApprove, onDelete }: {
                   onClick={handleDelete}
                   disabled={deleting}
                   className="p-1.5 rounded-full hover:bg-ethiopian-clay/20 hover:text-ethiopian-clay transition-colors text-ethiopian-cream/40 disabled:opacity-50"
-                  title="Delete order"
+                  title={t("orders.deleteOrder")}
                 >
                   {deleting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
                 </button>
@@ -553,13 +554,13 @@ function OrderDetailDialog({ order, open, onClose, isAdmin }: { order: Order; op
       });
       const data = await res.json();
       if (data.success) {
-        toast.success("Item removed from order");
+        toast.success(t("orders.itemRemoved"));
         onClose();
       } else {
-        toast.error(data.error || "Failed to remove item");
+        toast.error(data.error || t("orders.removeItemFailed"));
       }
     } catch {
-      toast.error("Failed to remove item");
+      toast.error(t("orders.removeItemFailed"));
     } finally {
       setDeletingId(null);
     }
@@ -907,7 +908,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
                         </div>
                       ) : (
                         <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => addToCart(item)}>
-                          <Plus className="h-3 w-3 mr-1" /> Add
+                          <Plus className="h-3 w-3 mr-1" /> {t("orders.add")}
                         </Button>
                       )}
                     </div>
@@ -923,7 +924,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
 
             {cart.length > 0 && (
               <div className="border border-ethiopian-gold/10 rounded-lg p-3 space-y-2 bg-red-50 dark:bg-red-950/20">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cart</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t("orders.cart")}</p>
                 {cart.map(item => (
                   <div key={item.menuItemId} className="flex items-center justify-between gap-2">
                     <span className="text-sm truncate flex-1">{item.name}</span>
@@ -936,7 +937,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
                         <Plus className="h-3 w-3" />
                       </Button>
                       <span className="text-xs font-medium w-14 text-right">{formatCurrency(item.totalPrice)}</span>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => updateQty(item.menuItemId, -item.quantity)} title="Remove">
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => updateQty(item.menuItemId, -item.quantity)} title={t("orders.remove")}>
                         <X className="h-3 w-3" />
                       </Button>
                     </div>
@@ -968,14 +969,14 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
 
             {hasDrinks && (
               <div className="grid gap-2">
-                <Label>Assign To Bartender</Label>
+                <Label>{t("orders.assignToBartender")}</Label>
                 <Select value={bartenderType} onValueChange={setBartenderType}>
                   <SelectTrigger className="!bg-white dark:!bg-gray-950 hover:!bg-gray-50 dark:hover:!bg-gray-900">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="!bg-white dark:!bg-gray-950">
-                    <SelectItem value="BARTENDER">Bartender</SelectItem>
-                    <SelectItem value="VIP_BARTENDER">VIP Bartender</SelectItem>
+                    <SelectItem value="BARTENDER">{t("nav.bartender")}</SelectItem>
+                    <SelectItem value="VIP_BARTENDER">{t("nav.vipBartender")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -999,7 +1000,7 @@ function NewOrderDialog({ open, onOpenChange, onOrderCreated }: { open: boolean;
                         <Plus className="h-3 w-3" />
                       </Button>
                       <span className="text-xs font-medium w-14 text-right">{formatCurrency(item.totalPrice)}</span>
-                      <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => updateQty(item.menuItemId, -item.quantity)} title="Remove">
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => updateQty(item.menuItemId, -item.quantity)} title={t("orders.remove")}>
                         <X className="h-3 w-3" />
                       </Button>
                     </div>

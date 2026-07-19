@@ -16,6 +16,7 @@ import { formatCurrency } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
+import { useTranslation } from "@/lib/i18n";
 
 interface TableData {
   id: string;
@@ -30,22 +31,16 @@ interface TableData {
   _count: { orders: number };
 }
 
-const statusConfig: Record<string, { color: string; icon: typeof CircleCheck; label: string; border: string; bg: string }> = {
-  AVAILABLE: { color: "bg-green-100 text-green-700 border-green-200", icon: CircleCheck, label: "Available", border: "border-l-4 border-l-green-500", bg: "" },
-  OCCUPIED: { color: "bg-amber-100 text-amber-700 border-amber-200", icon: UserCheck, label: "Occupied", border: "border-l-4 border-l-amber-500", bg: "" },
-  RESERVED: { color: "bg-blue-100 text-blue-700 border-blue-200", icon: CalendarDays, label: "Reserved", border: "border-l-4 border-l-blue-500", bg: "" },
-  CLEANING: { color: "bg-gray-100 text-gray-500 border-gray-200", icon: Clock, label: "Cleaning", border: "border-l-4 border-l-gray-400", bg: "" },
-};
-
 const filterOptions = [
-  { key: "ALL", label: "All" },
-  { key: "AVAILABLE", label: "Available" },
-  { key: "OCCUPIED", label: "Occupied" },
-  { key: "RESERVED", label: "Reserved" },
-  { key: "CLEANING", label: "Cleaning" },
+  { key: "ALL", label: "tables.all" },
+  { key: "AVAILABLE", label: "tables.available" },
+  { key: "OCCUPIED", label: "tables.occupied" },
+  { key: "RESERVED", label: "tables.reserved" },
+  { key: "CLEANING", label: "tables.cleaning" },
 ];
 
 export default function TablesPage() {
+  const { t } = useTranslation();
   const { data: session } = useSession();
   const userRole = (session?.user as { role?: string })?.role;
   const canReserve = userRole === "ADMIN" || userRole === "WAITER";
@@ -57,6 +52,13 @@ export default function TablesPage() {
   const [guestCount, setGuestCount] = useState("2");
   const [submitting, setSubmitting] = useState(false);
   const [activeFilter, setActiveFilter] = useState("ALL");
+
+  const statusConfig: Record<string, { color: string; icon: typeof CircleCheck; label: string; border: string; bg: string }> = {
+    AVAILABLE: { color: "bg-green-100 text-green-700 border-green-200", icon: CircleCheck, label: t("tables.available"), border: "border-l-4 border-l-green-500", bg: "" },
+    OCCUPIED: { color: "bg-amber-100 text-amber-700 border-amber-200", icon: UserCheck, label: t("tables.occupied"), border: "border-l-4 border-l-amber-500", bg: "" },
+    RESERVED: { color: "bg-blue-100 text-blue-700 border-blue-200", icon: CalendarDays, label: t("tables.reserved"), border: "border-l-4 border-l-blue-500", bg: "" },
+    CLEANING: { color: "bg-gray-100 text-gray-500 border-gray-200", icon: Clock, label: t("tables.cleaning"), border: "border-l-4 border-l-gray-400", bg: "" },
+  };
 
   const fetchTables = () => {
     fetch("/api/tables")
@@ -81,7 +83,7 @@ export default function TablesPage() {
 
   const handleReserve = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedTable || !guestName.trim()) { toast.error("Guest name required"); return; }
+    if (!selectedTable || !guestName.trim()) { toast.error(t("tables.guestNameRequired")); return; }
     setSubmitting(true);
     try {
       const res = await fetch("/api/reservations", {
@@ -97,14 +99,14 @@ export default function TablesPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Table ${selectedTable.name} reserved for ${guestName}`);
+        toast.success(t("tables.tableReserved", { tableName: selectedTable.name, guestName }));
         setReserveDialogOpen(false);
         fetchTables();
       } else {
-        toast.error(data.error || "Failed to reserve");
+        toast.error(data.error || t("tables.failedToReserve"));
       }
     } catch {
-      toast.error("Failed to reserve");
+      toast.error(t("tables.failedToReserve"));
     } finally {
       setSubmitting(false);
     }
@@ -119,13 +121,13 @@ export default function TablesPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`${table.name} is now available`);
+        toast.success(t("tables.tableAvailable", { tableName: table.name }));
         fetchTables();
       } else {
-        toast.error(data.error || "Failed to free table");
+        toast.error(data.error || t("tables.failedToFree"));
       }
     } catch {
-      toast.error("Failed to free table");
+      toast.error(t("tables.failedToFree"));
     }
   };
 

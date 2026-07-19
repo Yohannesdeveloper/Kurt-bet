@@ -72,8 +72,8 @@ export default function WaiterDashboard() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <Users className="w-16 h-16 text-ethiopian-gold mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-ethiopian-coffee">Access Denied</h2>
-          <p className="text-ethiopian-coffee/60 mt-2">Waiter or Admin access required</p>
+          <h2 className="text-2xl font-bold text-ethiopian-coffee">{t("waiter.accessDenied")}</h2>
+          <p className="text-ethiopian-coffee/60 mt-2">{t("waiter.accessDeniedDesc")}</p>
         </div>
       </div>
     );
@@ -91,10 +91,10 @@ export default function WaiterDashboard() {
   const nonKurtOrders = butcherOrders.filter(o => !isKurtOrder(o.menuItemName));
 
   const stats = [
-    { label: "Pending Butcher Orders", value: pendingButcherCount.toString(), icon: Beef, color: "from-ethiopian-gold to-ethiopian-coffee", bgColor: "bg-ethiopian-gold/10", iconColor: "text-ethiopian-gold" },
-    { label: "Waiter Cash Flow", value: formatCurrency(cashflowRevenue), icon: DollarSign, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
-    { label: "Orders Served", value: cashflowCount.toString(), icon: ClipboardList, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
-    { label: "Payments Pending", value: "0", icon: CreditCard, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
+    { label: t("waiter.pendingButcherOrders"), value: pendingButcherCount.toString(), icon: Beef, color: "from-ethiopian-gold to-ethiopian-coffee", bgColor: "bg-ethiopian-gold/10", iconColor: "text-ethiopian-gold" },
+    { label: t("waiter.cashFlow"), value: formatCurrency(cashflowRevenue), icon: DollarSign, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
+    { label: t("waiter.ordersServed"), value: cashflowCount.toString(), icon: ClipboardList, color: "from-blue-500 to-cyan-600", bgColor: "bg-blue-500/10", iconColor: "text-blue-600" },
+    { label: t("waiter.paymentsPending"), value: "0", icon: CreditCard, color: "from-amber-500 to-orange-600", bgColor: "bg-amber-500/10", iconColor: "text-amber-600" },
   ];
 
   return (
@@ -110,13 +110,13 @@ export default function WaiterDashboard() {
           </motion.div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight font-serif text-ethiopian-coffee">
-              Waiter Dashboard
+              {t("waiter.dashboardTitle")}
             </h1>
             <p className="text-ethiopian-coffee/60 mt-1">
               {pendingButcherCount > 0 ? (
-                <span className="text-ethiopian-burgundy font-semibold">{pendingButcherCount} butcher order{pendingButcherCount > 1 ? "s" : ""} pending</span>
+                <span className="text-ethiopian-burgundy font-semibold">{t("waiter.xOrdersPending", { count: pendingButcherCount })}</span>
               ) : (
-                "No pending butcher orders"
+                t("waiter.noPendingOrders")
               )}
             </p>
           </div>
@@ -157,9 +157,9 @@ export default function WaiterDashboard() {
               <Hand className="w-5 h-5" />
             </motion.div>
             <div>
-              <h2 className="text-2xl font-bold font-serif text-ethiopian-burgundy">Qurt Ready for Pickup</h2>
+              <h2 className="text-2xl font-bold font-serif text-ethiopian-burgundy">{t("waiter.qurtReady")}</h2>
               <p className="text-sm text-ethiopian-coffee/60">
-                Pick up from butcher — {kurtPickupOrders.length} order{kurtPickupOrders.length > 1 ? "s" : ""} waiting
+                {t("waiter.pickupFromButcher", { count: kurtPickupOrders.length })}
               </p>
             </div>
           </div>
@@ -174,33 +174,33 @@ export default function WaiterDashboard() {
                 <div className="flex items-center gap-3 flex-wrap mb-3">
                   <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
                   {order.tableNumber && (
-                    <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                    <span className="text-sm font-semibold text-ethiopian-gold">{t("waiter.table", { number: order.tableNumber })}</span>
                   )}
                   <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold border bg-amber-200 text-amber-900 border-amber-400">
-                    Ready for Pickup
+                    {t("waiter.readyForPickup")}
                   </span>
                   <Hand className="w-4 h-4 text-amber-600 ml-auto" />
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-amber-200 rounded-lg bg-white/60">
                   <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
+                    <p className="text-xs text-ethiopian-coffee/40">{t("waiter.meatType")}</p>
                     <p className="text-sm font-bold text-ethiopian-burgundy">{order.meatType}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Dish</p>
+                    <p className="text-xs text-ethiopian-coffee/40">{t("waiter.dish")}</p>
                     <p className="text-sm font-semibold text-ethiopian-coffee">{order.menuItemName}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Weight</p>
+                    <p className="text-xs text-ethiopian-coffee/40">{t("waiter.weight")}</p>
                     <p className="text-sm font-bold text-ethiopian-gold">{order.weight} kg</p>
                   </div>
                   <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
+                    <p className="text-xs text-ethiopian-coffee/40">{t("waiter.quantity")}</p>
                     <p className="text-sm font-semibold text-ethiopian-coffee">x{order.quantity}</p>
                   </div>
                   {order.notes && (
                     <div className="col-span-2 sm:col-span-4">
-                      <p className="text-xs text-ethiopian-coffee/40">Notes</p>
+                      <p className="text-xs text-ethiopian-coffee/40">{t("waiter.notes")}</p>
                       <p className="text-sm italic text-ethiopian-coffee/70">{order.notes}</p>
                     </div>
                   )}
@@ -211,7 +211,7 @@ export default function WaiterDashboard() {
                     {order.approvedAt ? new Date(order.approvedAt).toLocaleString() : new Date(order.createdAt).toLocaleString()}
                   </div>
                   <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all">
-                    <CheckCircle className="w-4 h-4" /> Picked Up
+                    <CheckCircle className="w-4 h-4" /> {t("waiter.pickedUp")}
                   </button>
                 </div>
               </motion.div>
@@ -221,13 +221,13 @@ export default function WaiterDashboard() {
       )}
 
       <div className="space-y-6">
-        <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee">Butcher Orders</h2>
+        <h2 className="text-2xl font-bold font-serif text-ethiopian-coffee">{t("waiter.butcherOrdersSection")}</h2>
         {loading ? (
           <div className="text-center py-12 text-ethiopian-coffee/60">{t("common.loading")}</div>
         ) : butcherOrders.length === 0 ? (
           <div className="text-center py-12">
             <Package className="w-12 h-12 text-ethiopian-gold mx-auto mb-3" />
-            <p className="text-ethiopian-coffee/60">No butcher orders</p>
+            <p className="text-ethiopian-coffee/60">{t("waiter.noButcherOrders")}</p>
           </div>
         ) : (
           <div className="grid gap-4">
@@ -241,42 +241,42 @@ export default function WaiterDashboard() {
                 <div className="flex items-center gap-3 flex-wrap mb-3">
                   <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
                   {order.tableNumber && (
-                    <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                    <span className="text-sm font-semibold text-ethiopian-gold">{t("waiter.table", { number: order.tableNumber })}</span>
                   )}
                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border ${
                     order.status === "PENDING"
                       ? "bg-amber-100 text-amber-800 border-amber-300"
                       : "bg-green-100 text-green-800 border-green-300"
                   }`}>
-                    {order.status === "PENDING" ? "Pending" : "Approved"}
+                    {order.status === "PENDING" ? t("waiter.pending") : t("waiter.approved")}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 border border-ethiopian-gold/10 rounded-lg bg-ethiopian-cream/20">
                   <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Meat Type</p>
+                    <p className="text-xs text-ethiopian-coffee/40">{t("waiter.meatType")}</p>
                     <p className="text-sm font-bold text-ethiopian-burgundy">{order.meatType}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Dish</p>
+                    <p className="text-xs text-ethiopian-coffee/40">{t("waiter.dish")}</p>
                     <p className="text-sm font-semibold text-ethiopian-coffee">{order.menuItemName}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Weight</p>
+                    <p className="text-xs text-ethiopian-coffee/40">{t("waiter.weight")}</p>
                     <p className="text-sm font-bold text-ethiopian-gold">{order.weight} kg</p>
                   </div>
                   <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Quantity</p>
+                    <p className="text-xs text-ethiopian-coffee/40">{t("waiter.quantity")}</p>
                     <p className="text-sm font-semibold text-ethiopian-coffee">x{order.quantity}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-ethiopian-coffee/40">Kitchen</p>
+                    <p className="text-xs text-ethiopian-coffee/40">{t("waiter.kitchen")}</p>
                     <p className="text-sm font-semibold text-ethiopian-coffee">
-                      {order.kitchenStatus === "RECEIVED" ? "Received" : "Waiting"}
+                      {order.kitchenStatus === "RECEIVED" ? t("waiter.received") : t("waiter.waiting")}
                     </p>
                   </div>
                   {order.notes && (
                     <div>
-                      <p className="text-xs text-ethiopian-coffee/40">Notes</p>
+                      <p className="text-xs text-ethiopian-coffee/40">{t("waiter.notes")}</p>
                       <p className="text-sm italic text-ethiopian-coffee/70">{order.notes}</p>
                     </div>
                   )}
@@ -301,7 +301,7 @@ export default function WaiterDashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Plus className="h-5 w-5" />
-                Quick Actions
+                {t("waiter.quickActions")}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -321,13 +321,13 @@ export default function WaiterDashboard() {
                 <Button className="w-full justify-start gap-2" variant="outline" asChild>
                   <Link href="/menu">
                     <ClipboardList className="h-4 w-4" />
-                    View Menu
+                    {t("waiter.viewMenu")}
                   </Link>
                 </Button>
                 <Button className="w-full justify-start gap-2" variant="outline" asChild>
                   <Link href="/payments">
                     <CreditCard className="h-4 w-4" />
-                    Process Payments
+                    {t("waiter.processPayments")}
                   </Link>
                 </Button>
               </div>

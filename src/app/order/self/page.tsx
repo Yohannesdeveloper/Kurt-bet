@@ -13,6 +13,7 @@ import {
 import { formatCurrency } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { useState, useEffect } from "react";
+import { useTranslation } from "@/lib/i18n";
 
 interface CartItem {
   id: string;
@@ -41,6 +42,7 @@ function SelfOrderContent() {
   const [showCart, setShowCart] = useState(false);
   const [ordered, setOrdered] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation();
 
   const addToCart = (item: { id: string; name: string; price: number; image?: string }) => {
     setCart((prev) => {
@@ -48,7 +50,7 @@ function SelfOrderContent() {
       if (existing) return prev.map((ci) => ci.id === item.id ? { ...ci, quantity: ci.quantity + 1 } : ci);
       return [...prev, { id: item.id, name: item.name, price: item.price, quantity: 1, image: item.image }];
     });
-    toast.success(`${item.name} added`);
+    toast.success(t("selfOrder.itemAdded", { name: item.name }));
   };
 
   const removeFromCart = (itemId: string) => {
@@ -68,11 +70,11 @@ function SelfOrderContent() {
           <div className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 mb-6">
             <Check className="h-10 w-10 text-green-600" />
           </div>
-          <h1 className="text-3xl font-bold mb-2">Order Placed!</h1>
-          <p className="text-muted-foreground mb-2">Your order has been sent to the kitchen.</p>
-          {tableNumber && <p className="text-sm text-muted-foreground">Being prepared for Table {tableNumber}</p>}
+          <h1 className="text-3xl font-bold mb-2">{t("selfOrder.orderPlaced")}</h1>
+          <p className="text-muted-foreground mb-2">{t("selfOrder.sentToKitchen")}</p>
+          {tableNumber && <p className="text-sm text-muted-foreground">{t("selfOrder.beingPrepared", { number: tableNumber })}</p>}
           <Button className="mt-6" onClick={() => setOrdered(false)}>
-            <ArrowLeft className="h-4 w-4 mr-1" /> Order More
+            <ArrowLeft className="h-4 w-4 mr-1" /> {t("selfOrder.orderMore")}
           </Button>
         </motion.div>
       </div>
@@ -85,8 +87,8 @@ function SelfOrderContent() {
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <UtensilsCrossed className="h-5 w-5 text-primary" />
-            <span className="font-bold">Digital Menu</span>
-            {tableNumber && <Badge variant="secondary">Table {tableNumber}</Badge>}
+            <span className="font-bold">{t("selfOrder.digitalMenu")}</span>
+            {tableNumber && <Badge variant="secondary">{t("selfOrder.table", { number: tableNumber })}</Badge>}
           </div>
           <Button variant="outline" size="sm" className="relative" onClick={() => setShowCart(!showCart)}>
             <ShoppingCart className="h-4 w-4" />
@@ -102,20 +104,20 @@ function SelfOrderContent() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="text-center py-16 text-muted-foreground">
           <Inbox className="h-12 w-12 mx-auto mb-3" />
-          <p className="font-medium">Menu not available</p>
-          <p className="text-sm">Please scan a valid QR code to view the menu</p>
+          <p className="font-medium">{t("selfOrder.menuNotAvailable")}</p>
+          <p className="text-sm">{t("selfOrder.scanQR")}</p>
         </div>
       </div>
 
       {showCart && (
         <motion.div initial={{ y: "100%" }} animate={{ y: 0 }} className="fixed inset-x-0 bottom-0 z-30 bg-background border-t rounded-t-3xl shadow-2xl" style={{ maxHeight: "70vh" }}>
           <div className="p-4 border-b flex items-center justify-between">
-            <h2 className="font-bold text-lg">Your Order</h2>
+            <h2 className="font-bold text-lg">{t("selfOrder.yourOrder")}</h2>
             <Button variant="ghost" size="icon" onClick={() => setShowCart(false)}><X className="h-5 w-5" /></Button>
           </div>
           <div className="overflow-y-auto p-4" style={{ maxHeight: "calc(70vh - 140px)" }}>
             {cart.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">Your cart is empty</p>
+              <p className="text-center text-muted-foreground py-8">{t("selfOrder.cartEmpty")}</p>
             ) : (
               <div className="space-y-3">
                 {cart.map((item) => (
@@ -144,11 +146,11 @@ function SelfOrderContent() {
           {cart.length > 0 && (
             <div className="p-4 border-t bg-background rounded-b-3xl">
               <div className="flex items-center justify-between mb-3">
-                <span className="font-semibold">Total</span>
+                <span className="font-semibold">{t("selfOrder.total")}</span>
                 <span className="font-bold text-xl">{formatCurrency(total)}</span>
               </div>
               <Button className="w-full h-12 text-base" onClick={() => { setOrdered(true); setCart([]); }}>
-                <Send className="h-4 w-4 mr-2" /> Place Order
+                <Send className="h-4 w-4 mr-2" /> {t("selfOrder.placeOrder")}
               </Button>
             </div>
           )}

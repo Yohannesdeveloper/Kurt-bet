@@ -38,11 +38,7 @@ const statusColors: Record<string, string> = {
   REJECTED: "bg-red-100 text-red-800 border-red-300",
 };
 
-const statusLabel: Record<string, string> = {
-  PENDING: "Pending Approval",
-  APPROVED: "Approved - Sent to Kitchen",
-  REJECTED: "Rejected",
-};
+
 
 export default function ButcherDashboardPage() {
   const { t } = useTranslation();
@@ -99,14 +95,14 @@ export default function ButcherDashboardPage() {
       const data = await res.json();
         if (data.success) {
         toast.success(isKurtOrder(order.menuItemName)
-          ? `Order #${order.orderNumber} approved — waiter notified for pickup`
-          : `Order #${order.orderNumber} approved and sent to kitchen`);
+          ? t("butcher.orderApprovedWaiter", { orderNumber: order.orderNumber })
+          : t("butcher.orderApprovedKitchen", { orderNumber: order.orderNumber }));
         fetchOrders();
       } else {
-        toast.error(data.error || "Action failed");
+        toast.error(data.error || t("butcher.actionFailed"));
       }
     } catch {
-      toast.error("Action failed");
+      toast.error(t("butcher.actionFailed"));
     } finally {
       setActionLoading(null);
     }
@@ -122,13 +118,13 @@ export default function ButcherDashboardPage() {
       });
       const data = await res.json();
       if (data.success) {
-        toast.success(`Order #${order.orderNumber} rejected`);
+        toast.success(t("butcher.orderRejected", { orderNumber: order.orderNumber }));
         fetchOrders();
       } else {
-        toast.error(data.error || "Action failed");
+        toast.error(data.error || t("butcher.actionFailed"));
       }
     } catch {
-      toast.error("Action failed");
+      toast.error(t("butcher.actionFailed"));
     } finally {
       setActionLoading(null);
     }
@@ -139,8 +135,8 @@ export default function ButcherDashboardPage() {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="text-center">
           <Beef className="w-16 h-16 text-ethiopian-gold mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-ethiopian-coffee">Access Denied</h2>
-          <p className="text-ethiopian-coffee/60 mt-2">Butcher or Admin access required</p>
+          <h2 className="text-2xl font-bold text-ethiopian-coffee">{t("butcher.accessDenied")}</h2>
+          <p className="text-ethiopian-coffee/60 mt-2">{t("butcher.accessDeniedDesc")}</p>
         </div>
       </div>
     );
@@ -161,12 +157,12 @@ export default function ButcherDashboardPage() {
             <Beef className="w-6 h-6" />
           </motion.div>
           <div>
-            <h1 className="text-2xl font-bold font-serif text-ethiopian-coffee">Butcher Dashboard</h1>
+            <h1 className="text-2xl font-bold font-serif text-ethiopian-coffee">{t("butcher.dashboardTitle")}</h1>
             <p className="text-sm text-ethiopian-coffee/60">
               {pendingOrders.length > 0 ? (
-                <span className="text-ethiopian-burgundy font-semibold">{pendingOrders.length} order{pendingOrders.length > 1 ? "s" : ""} waiting for approval</span>
+                <span className="text-ethiopian-burgundy font-semibold">{t("butcher.ordersWaiting", { count: pendingOrders.length })}</span>
               ) : (
-                "All orders processed"
+                {t("butcher.allProcessed")}
               )}
             </p>
           </div>
@@ -180,9 +176,9 @@ export default function ButcherDashboardPage() {
               <div className="h-10 w-10 rounded-xl bg-red-500/10 flex items-center justify-center">
                 <Beef className="h-5 w-5 text-red-600" />
               </div>
-              <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">{cashflowCount} items</span>
+              <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-medium">{cashflowCount} {t("butcher.itemsLabel")}</span>
             </div>
-            <p className="text-sm text-muted-foreground font-medium mb-1">Butcher Cash Flow</p>
+            <p className="text-sm text-muted-foreground font-medium mb-1">{t("butcher.cashFlow")}</p>
             <p className="text-2xl font-bold tracking-tight text-red-700">{formatCurrency(cashflowRevenue)}</p>
           </div>
         </motion.div>
@@ -197,7 +193,7 @@ export default function ButcherDashboardPage() {
               : "border-transparent text-gray-500 hover:text-gray-700"
           }`}
         >
-          Pending Orders
+          {t("butcher.pendingOrdersTab")}
           <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream">{pendingOrders.length}</span>
         </button>
         <button
@@ -208,7 +204,7 @@ export default function ButcherDashboardPage() {
               : "border-transparent text-gray-500 hover:text-gray-700"
           }`}
         >
-          Butcher Status
+          {t("butcher.statusTab")}
           <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream">{statusOrders.length}</span>
         </button>
       </div>
@@ -219,7 +215,7 @@ export default function ButcherDashboardPage() {
         <div className="text-center py-12">
           <Package className="w-12 h-12 text-ethiopian-gold mx-auto mb-3" />
           <p className="text-ethiopian-coffee/60">
-            {activeTab === "pending" ? "No orders waiting for approval" : "No processed orders yet"}
+            {activeTab === "pending" ? t("butcher.noPendingOrders") : t("butcher.noProcessedOrders")}
           </p>
         </div>
       ) : (
@@ -235,10 +231,10 @@ export default function ButcherDashboardPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-lg font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
                   {order.tableNumber && (
-                    <span className="text-sm font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
+                    <span className="text-sm font-semibold text-ethiopian-gold">{t("butcher.table", { number: order.tableNumber })}</span>
                   )}
                   <span className={`ml-auto px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusColors[order.status]}`}>
-                    {statusLabel[order.status]}
+                    {order.status === "PENDING" ? t("butcher.pendingLabel") : order.status === "APPROVED" ? t("butcher.approvedLabel") : t("butcher.rejectedLabel")}
                   </span>
                 </div>
 
@@ -259,12 +255,12 @@ export default function ButcherDashboardPage() {
 
                 {order.status === "APPROVED" && order.approvedAt && (
                   <div className="text-xs text-emerald-600 font-medium">
-                    Approved: {new Date(order.approvedAt).toLocaleString()}
+                    {t("butcher.approvedAt", { time: new Date(order.approvedAt).toLocaleString() })}
                   </div>
                 )}
                 {order.status === "REJECTED" && order.rejectedAt && (
                   <div className="text-xs text-red-600 font-medium">
-                    Rejected: {new Date(order.rejectedAt).toLocaleString()}
+                    {t("butcher.rejectedAt", { time: new Date(order.rejectedAt).toLocaleString() })}
                   </div>
                 )}
 
@@ -276,7 +272,7 @@ export default function ButcherDashboardPage() {
                       className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-gradient-to-r from-ethiopian-burgundy to-ethiopian-gold text-white text-sm font-semibold hover:shadow-lg transition-all disabled:opacity-50"
                     >
                       {actionLoading === order.id ? "..." : (
-                        <><Check className="w-4 h-4" /> {isKurtOrder(order.menuItemName) ? "Approve & Notify Waiter" : "Approve & Send to Kitchen"}</>
+                        <><Check className="w-4 h-4" /> {isKurtOrder(order.menuItemName) ? t("butcher.approveNotifyWaiter") : t("butcher.approveAndSendToKitchen")}</>
                       )}
                     </button>
                     <button
@@ -284,7 +280,7 @@ export default function ButcherDashboardPage() {
                       disabled={actionLoading === order.id}
                       className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition-all disabled:opacity-50"
                     >
-                      <XCircle className="w-4 h-4" /> Reject
+                      <XCircle className="w-4 h-4" /> {t("butcher.reject")}
                     </button>
                   </div>
                 )}

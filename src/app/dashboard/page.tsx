@@ -506,9 +506,9 @@ type ButcherShopOrder = {
 };
 
 const butcherStatusColors: Record<string, string> = {
-  PENDING: "bg-amber-100 text-amber-800 border-amber-300",
-  APPROVED: "bg-emerald-100 text-emerald-800 border-emerald-300",
-  REJECTED: "bg-red-100 text-red-800 border-red-300",
+  PENDING: "bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-700",
+  APPROVED: "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700",
+  REJECTED: "bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300 border-red-300 dark:border-red-700",
 };
 
 const butcherStatusLabel: Record<string, string> = {
@@ -706,51 +706,51 @@ function ButcherShopStatus() {
           <Beef className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold font-serif text-ethiopian-coffee">Butcher Shop</h1>
-          <p className="text-sm text-ethiopian-coffee/60">Butcher order statuses</p>
+          <h1 className="text-2xl font-bold font-serif text-ethiopian-coffee dark:text-ethiopian-cream">Butcher Shop</h1>
+          <p className="text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">Butcher order statuses</p>
         </div>
       </div>
 
-      <div className="flex gap-2 border-b border-gray-200">
+      <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
         <button
           onClick={() => setActiveTab("pending")}
           className={`pb-3 px-4 text-sm font-medium border-b-2 transition-all ${
             activeTab === "pending"
               ? "border-ethiopian-burgundy text-ethiopian-burgundy"
-              : "border-transparent text-gray-500 hover:text-gray-700"
+              : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
           }`}
         >
           Pending Orders
-          <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream">{pendingOrders.length}</span>
+          <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream dark:bg-ethiopian-gold/20 text-ethiopian-coffee dark:text-ethiopian-cream">{pendingOrders.length}</span>
         </button>
         <button
           onClick={() => setActiveTab("status")}
           className={`pb-3 px-4 text-sm font-medium border-b-2 transition-all ${
             activeTab === "status"
               ? "border-ethiopian-burgundy text-ethiopian-burgundy"
-              : "border-transparent text-gray-500 hover:text-gray-700"
+              : "border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
           }`}
         >
           Butcher Status
-          <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream">{statusOrders.length}</span>
+          <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-ethiopian-cream dark:bg-ethiopian-gold/20 text-ethiopian-coffee dark:text-ethiopian-cream">{statusOrders.length}</span>
         </button>
       </div>
 
       {loading ? (
-        <div className="text-center py-12 text-ethiopian-coffee/60">Loading...</div>
+        <div className="text-center py-12 text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">Loading...</div>
       ) : (activeTab === "pending" ? pendingOrders : statusOrders).length === 0 ? (
         <div className="text-center py-12">
           <Package className="w-12 h-12 text-ethiopian-gold mx-auto mb-3 opacity-40" />
-          <p className="text-ethiopian-coffee/60">
+          <p className="text-ethiopian-coffee/60 dark:text-ethiopian-cream/60">
             {activeTab === "pending" ? "No orders waiting for approval" : "No processed orders yet"}
           </p>
         </div>
       ) : (
         <div className="grid gap-4">
           {(activeTab === "pending" ? pendingOrders : statusOrders).map((order) => (
-            <div key={order.id} className="bg-white rounded-2xl shadow-md border border-ethiopian-gold/10 overflow-hidden">
+            <div key={order.id} className="bg-white dark:bg-gray-950 rounded-2xl shadow-md border border-ethiopian-gold/10 overflow-hidden">
               <div className="flex flex-col sm:flex-row">
-                <div className="sm:w-32 sm:h-32 w-full h-40 flex-shrink-0 overflow-hidden bg-ethiopian-cream">
+                <div className="sm:w-32 sm:h-32 w-full h-40 flex-shrink-0 overflow-hidden bg-ethiopian-cream dark:bg-gray-800/50">
                   <img
                     src={getButcherDishImage(order)}
                     alt={order.menuItemName}
@@ -759,7 +759,7 @@ function ButcherShopStatus() {
                 </div>
                 <div className="flex-1 p-5">
                   <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xl font-bold text-ethiopian-coffee">#{order.orderNumber}</span>
+                    <span className="text-xl font-bold text-ethiopian-coffee dark:text-ethiopian-cream">#{order.orderNumber}</span>
                     {order.tableNumber && (
                       <span className="text-base font-semibold text-ethiopian-gold">Table {order.tableNumber}</span>
                     )}
@@ -770,24 +770,24 @@ function ButcherShopStatus() {
                     </span>
                   </div>
 
-                  <p className="text-lg font-semibold text-ethiopian-coffee mb-1">{order.menuItemName}</p>
+                  <p className="text-lg font-semibold text-ethiopian-coffee dark:text-ethiopian-cream mb-1">{order.menuItemName}</p>
 
-                  <div className="flex flex-wrap gap-4 text-sm text-ethiopian-coffee/60 mb-2">
-                    <span><span className="font-semibold text-ethiopian-burgundy">Meat:</span> {order.meatType}</span>
-                    <span><span className="font-semibold text-ethiopian-burgundy">Weight:</span> {order.weight} kg</span>
-                    <span><span className="font-semibold text-ethiopian-burgundy">Qty:</span> x{order.quantity}</span>
+                  <div className="flex flex-wrap gap-4 text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 mb-2">
+                    <span><span className="font-semibold text-ethiopian-burgundy dark:text-red-400">Meat:</span> {order.meatType}</span>
+                    <span><span className="font-semibold text-ethiopian-burgundy dark:text-red-400">Weight:</span> {order.weight} kg</span>
+                    <span><span className="font-semibold text-ethiopian-burgundy dark:text-red-400">Qty:</span> x{order.quantity}</span>
                   </div>
 
                   {order.notes && (
-                    <p className="text-sm text-ethiopian-coffee/50 italic mb-2">&quot;{order.notes}&quot;</p>
+                    <p className="text-sm text-ethiopian-coffee/50 dark:text-ethiopian-cream/50 italic mb-2">&quot;{order.notes}&quot;</p>
                   )}
 
-                  <div className="flex items-center gap-4 text-sm text-ethiopian-coffee/60 mb-3">
+                  <div className="flex items-center gap-4 text-sm text-ethiopian-coffee/60 dark:text-ethiopian-cream/60 mb-3">
                     <span className="flex items-center gap-1.5">
                       <Clock className="w-4 h-4" />
                       {new Date(order.createdAt).toLocaleString()}
                     </span>
-                    <span className="text-ethiopian-coffee/30">·</span>
+                    <span className="text-ethiopian-coffee/30 dark:text-ethiopian-cream/30">·</span>
                     <span>{order.customerName}</span>
                   </div>
 
@@ -812,12 +812,12 @@ function ButcherShopStatus() {
                     </div>
                   )}
                   {order.status === "APPROVED" && order.approvedAt && (
-                    <div className="text-sm text-emerald-600 font-medium pt-2 border-t border-ethiopian-gold/10">
+                    <div className="text-sm text-emerald-600 dark:text-emerald-400 font-medium pt-2 border-t border-ethiopian-gold/10">
                       Approved: {new Date(order.approvedAt).toLocaleString()}
                     </div>
                   )}
                   {order.status === "REJECTED" && order.rejectedAt && (
-                    <div className="text-sm text-red-600 font-medium pt-2 border-t border-ethiopian-gold/10">
+                    <div className="text-sm text-red-600 dark:text-red-400 font-medium pt-2 border-t border-ethiopian-gold/10">
                       Rejected: {new Date(order.rejectedAt).toLocaleString()}
                     </div>
                   )}
